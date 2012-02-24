@@ -1,0 +1,10 @@
+#PBS -V
+#PBS -l mppwidth=1
+#PBS -l mppnppn=1
+#PBS -l mppdepth=4
+#PBS -l walltime=0:10:00
+#PBS -o pthreads4.stdout
+#PBS -j oe
+
+cd $PBS_O_WORKDIR
+aprun -d 4 -n 1 -N 1 ./pthreads -p 4 -n 500 -o pthreads.txt

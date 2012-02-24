@@ -1,0 +1,13 @@
+#PBS -V
+#PBS -l mppwidth=1
+#PBS -l mppnppn=1
+#PBS -l mppdepth=24
+#PBS -S /bin/bash
+#PBS -l walltime=0:10:00
+#PBS -o openmp24.stdout
+#PBS -j oe
+
+cd $PBS_O_WORKDIR
+
+export OMP_NUM_THREADS=24
+aprun -d 24 -n 1 -N 1 ./openmp -n 2000 -o openmp.txt

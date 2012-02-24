@@ -1,0 +1,13 @@
+#PBS -V
+#PBS -l mppwidth=1
+#PBS -l mppnppn=1
+#PBS -l mppdepth=4
+#PBS -S /bin/bash
+#PBS -l walltime=0:10:00
+#PBS -o openmp4.stdout
+#PBS -j oe
+
+cd $PBS_O_WORKDIR
+
+export OMP_NUM_THREADS=4
+aprun -d 4 -n 1 -N 1 ./openmp -n 500 -o openmp.txt

@@ -1,0 +1,10 @@
+#PBS -V
+#PBS -l mppwidth=4
+#PBS -l mppnppn=1
+#PBS -l mppdepth=1
+#PBS -l walltime=0:10:00
+#PBS -o mpi4.stdout
+#PBS -j oe
+
+cd $PBS_O_WORKDIR
+aprun -d 1 -n 4 -N 1 ./mpi -n 500 -o mpi.txt
