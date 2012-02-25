@@ -97,7 +97,7 @@ int main( int argc, char **argv )
     double simulation_time = read_timer( );
     for( int step = 0; step < NSTEPS; step++ )
     {
-
+/*
         // Do binning for all particles
         // Initialize linked list of pointers to &particles[i] 
         // Use dynamic array since bins will have particles << n
@@ -114,7 +114,7 @@ int main( int argc, char **argv )
 	   insertNode(&subBlocks[yIdx+(xIdx*subBlockNum)], head);
 
 	}	
-
+*/
 
 
 
