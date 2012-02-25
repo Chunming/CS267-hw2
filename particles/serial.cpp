@@ -70,7 +70,8 @@ int main( int argc, char **argv )
            bdx = 0;
 	   // Store into first non-NULL index in array
 	   while (binArray[yIdx+(xIdx*subBlockNum)][bdx]!=NULL) {
-              bdx++;   
+              bdx++; 
+	      printf("bdx is %d \n", bdx); 
 	      if (bdx > 500) {
 	         printf("ERROR: Overflow \n");
 	         return -1;
