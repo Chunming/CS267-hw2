@@ -40,6 +40,9 @@ int main( int argc, char **argv )
     for (int idx=0; idx<binNum; idx++) { 
 	    binParticleNum[idx] = 0;
 	    binArray[idx] = new particle_t* [100]; // Set it to max 100 particles first
+	    for (int kdx=0; kdx<100; kdx++) {
+	       binArray[idx][kdx] = NULL; // Set all ptrs to NULL
+	    }
     }
     
     printf("Bins are allocated \n");
@@ -52,7 +55,8 @@ int main( int argc, char **argv )
     //
 
 
-    int xIdx, yIdx;
+    int xIdx, yIdx; // x/y index in 1D array
+    int bdx 
     double subBlockLen = 0.1;
     int subBlockNum = 5; // No. of sub blocks along a row/column
     double simulation_time = read_timer( );
@@ -60,9 +64,20 @@ int main( int argc, char **argv )
     {
 
 	// Bin the particles
-	for (int ndx=0; ndx<n; ndx++) {
-           xIdx = (particles[ndx].x)/subBlockLen;
+	for (int ndx=0; ndx<n; ndx++) { // For each particle
+           xIdx = (particles[ndx].x)/subBlockLen; 
            yIdx = (particles[ndx].y)/subBlockLen;
+           bdx = 0;
+	   // Store into first non-NULL index in array
+	   while (binArray[yIdx+(xIdx*subBlockNum)][bdx]!=NULL) {
+              bdx++;   
+	      if (bdx > 100) {
+	         printf("ERROR: Overflow \n");
+	         return;
+	      }
+	   }
+           binArray[yIdx+(xIdx*subBlockNum)][bdx] = &particles[ndx];
+           binParticleNum[yIdx+(xIdx*subBlockNum)]++; // Increment bin count
 	}
 
 	    
