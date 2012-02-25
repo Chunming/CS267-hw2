@@ -56,7 +56,7 @@ int main( int argc, char **argv )
 
 
     int xIdx, yIdx; // x/y index in 1D array
-    int bdx 
+    int bdx; 
     double subBlockLen = 0.1;
     int subBlockNum = 5; // No. of sub blocks along a row/column
     double simulation_time = read_timer( );
@@ -73,7 +73,7 @@ int main( int argc, char **argv )
               bdx++;   
 	      if (bdx > 100) {
 	         printf("ERROR: Overflow \n");
-	         return;
+	         return -1;
 	      }
 	   }
            binArray[yIdx+(xIdx*subBlockNum)][bdx] = &particles[ndx];
