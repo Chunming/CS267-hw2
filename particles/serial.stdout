@@ -1,120 +1,22 @@
 Warning: no access to tty (Bad file descriptor).
 Thus no job control in this shell.
-The time step is 0 
-The time step is 10 
-The time step is 20 
-The time step is 30 
-The time step is 40 
-The time step is 50 
-The time step is 60 
-The time step is 70 
-The time step is 80 
-The time step is 90 
-The time step is 100 
-The time step is 110 
-The time step is 120 
-The time step is 130 
-The time step is 140 
-The time step is 150 
-The time step is 160 
-The time step is 170 
-The time step is 180 
-The time step is 190 
-The time step is 200 
-The time step is 210 
-The time step is 220 
-The time step is 230 
-The time step is 240 
-The time step is 250 
-The time step is 260 
-The time step is 270 
-The time step is 280 
-The time step is 290 
-The time step is 300 
-The time step is 310 
-The time step is 320 
-The time step is 330 
-The time step is 340 
-The time step is 350 
-The time step is 360 
-The time step is 370 
-The time step is 380 
-The time step is 390 
-The time step is 400 
-The time step is 410 
-The time step is 420 
-The time step is 430 
-The time step is 440 
-The time step is 450 
-The time step is 460 
-The time step is 470 
-The time step is 480 
-The time step is 490 
-The time step is 500 
-The time step is 510 
-The time step is 520 
-The time step is 530 
-The time step is 540 
-The time step is 550 
-The time step is 560 
-The time step is 570 
-The time step is 580 
-The time step is 590 
-The time step is 600 
-The time step is 610 
-The time step is 620 
-The time step is 630 
-The time step is 640 
-The time step is 650 
-The time step is 660 
-The time step is 670 
-The time step is 680 
-The time step is 690 
-The time step is 700 
-The time step is 710 
-The time step is 720 
-The time step is 730 
-The time step is 740 
-The time step is 750 
-The time step is 760 
-The time step is 770 
-The time step is 780 
-The time step is 790 
-The time step is 800 
-The time step is 810 
-The time step is 820 
-The time step is 830 
-The time step is 840 
-The time step is 850 
-The time step is 860 
-The time step is 870 
-The time step is 880 
-The time step is 890 
-The time step is 900 
-The time step is 910 
-The time step is 920 
-The time step is 930 
-The time step is 940 
-The time step is 950 
-The time step is 960 
-The time step is 970 
-The time step is 980 
-The time step is 990 
-n = 500, simulation time = 1.32421 seconds
-Application 25962491 resources: utime 0, stime 0
+The value of n is  500 
+The box size is 0.500000 
+n = -2147483648, simulation time = 1.86848 seconds
+Application 25963709 resources: utime 0, stime 0
 
  + --------------------------------------------------------------------------
  +        Job name: job-franklin-serial
- +          Job Id: 7518184.nid00003
+ +          Job Id: 7518269.nid00003
  +          System: franklin
- +     Queued Time: Sat Feb 25 11:50:58 2012
- +      Start Time: Sat Feb 25 11:51:13 2012
- + Completion Time: Sat Feb 25 11:51:16 2012
+ +     Queued Time: Sat Feb 25 13:14:10 2012
+ +      Start Time: Sat Feb 25 13:14:36 2012
+ + Completion Time: Sat Feb 25 13:14:40 2012
  +            User: cmchin
- +        MOM Host: nid04096
+ +        MOM Host: nid00259
  +           Queue: debug
- +  Req. Resources: other=QSUBPID:70086:nid00004,walltime=00:10:00
- +  Used Resources: cput=00:00:00,mem=0kb,vmem=0kb,walltime=00:00:03
+ +  Req. Resources: other=QSUBPID:55028:nid00235,walltime=00:10:00
+ +  Used Resources: cput=00:00:00,mem=0kb,vmem=0kb,walltime=00:00:04
  +     Acct String: mp309
  +   PBS_O_WORKDIR: /global/homes/c/cmchin/franklin/CS267-hw2/particles
  +     Submit Args: job-franklin-serial
