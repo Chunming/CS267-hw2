@@ -42,7 +42,7 @@ int main( int argc, char **argv )
 	    binArray[idx] = new particle_t* [100]; // Set it to max 100 particles first
     }
     
-
+    printf("Bins are allocated \n");
 
     // Initialize particles 
     init_particles( n, particles );
@@ -50,9 +50,22 @@ int main( int argc, char **argv )
     //
     //  simulate a number of time steps
     //
+
+
+    int xIdx, yIdx;
+    double subBlockLen = 0.1;
+    int subBlockNum = 5; // No. of sub blocks along a row/column
     double simulation_time = read_timer( );
     for( int step = 0; step < NSTEPS; step++ )
     {
+
+	// Bin the particles
+	for (int ndx=0; ndx<n; ndx++) {
+           xIdx = (particles[ndx].x)/subBlockLen;
+           yIdx = (particles[ndx].y)/subBlockLen;
+	}
+
+	    
         //
         //  compute forces
         //
