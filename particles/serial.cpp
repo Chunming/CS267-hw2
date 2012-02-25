@@ -49,12 +49,32 @@ int main( int argc, char **argv )
 
     // Initialize particles 
     init_particles( n, particles );
-    
+
+
+
+
+    // Initialize particle binning
+    for (int ndx=0; ndx<n; ndx++) { // For each particle
+       xIdx = (particles[ndx].x)/subBlockLen; 
+       yIdx = (particles[ndx].y)/subBlockLen;
+       bdx = 0;
+       // Store into first non-NULL index in array
+       while (binArray[yIdx+(xIdx*subBlockNum)][bdx]!=NULL) {
+          bdx++; 
+          printf("bdx is %d \n", bdx); 
+          if (bdx > 500) {
+             printf("ERROR: Overflow \n");
+             return -1;
+          }
+       }
+       binArray[yIdx+(xIdx*subBlockNum)][bdx] = &particles[ndx];
+       binParticleNum[yIdx+(xIdx*subBlockNum)]++; // Increment bin count
+    }
+
+
     //
     //  simulate a number of time steps
     //
-
-
     int xIdx, yIdx; // x/y index in 1D array
     int bdx; 
     double subBlockLen = 0.1;
@@ -63,23 +83,6 @@ int main( int argc, char **argv )
     for( int step = 0; step < NSTEPS; step++ )
     {
 
-	// Bin the particles
-	for (int ndx=0; ndx<n; ndx++) { // For each particle
-           xIdx = (particles[ndx].x)/subBlockLen; 
-           yIdx = (particles[ndx].y)/subBlockLen;
-           bdx = 0;
-	   // Store into first non-NULL index in array
-	   while (binArray[yIdx+(xIdx*subBlockNum)][bdx]!=NULL) {
-              bdx++; 
-	      printf("bdx is %d \n", bdx); 
-	      if (bdx > 500) {
-	         printf("ERROR: Overflow \n");
-	         return -1;
-	      }
-	   }
-           binArray[yIdx+(xIdx*subBlockNum)][bdx] = &particles[ndx];
-           binParticleNum[yIdx+(xIdx*subBlockNum)]++; // Increment bin count
-	}
 
 	    
         //
