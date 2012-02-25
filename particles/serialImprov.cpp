@@ -25,9 +25,9 @@ bool insert(ListNode** root, ListNode* targetNode) {
       ListNode* tmp;
       tmp = *root;      
       while (tmp->nextNode != NULL) {
-         tmp = tmp->next;
+         tmp = tmp->nextNode;
       }
-      tmp->next = targetNode;
+      tmp->nextNode = targetNode;
    }
 
    return 1; 
