@@ -12,11 +12,8 @@ TARGETS = serial pthreads openmp mpi
 
 all:	$(TARGETS)
 
-#serial: serialImprov.o common.o
-#	$(CC) -o $@ $(LIBS) serial.o common.o
-
 serial: serialImprov.o common.o
-	$(CC) -o $@ $(LIBS) serialImprov.o common.o
+	$(CC) -o $@ $(LIBS) serial.o common.o
 
 pthreads: pthreads.o common.o
 	$(CC) -o $@ $(LIBS) -lpthread pthreads.o common.o
@@ -28,12 +25,9 @@ mpi: mpi.o common.o
 openmp.o: openmp.cpp common.h
 	$(CC) -c $(OPENMP) $(CFLAGS) openmp.cpp
 
-# Commented out original serial.cpp
-#serial.o: serial.cpp common.h
-#	$(CC) -c $(CFLAGS) $IPM  serial.cpp
+serial.o: serial.cpp common.h
+	$(CC) -c $(CFLAGS) $IPM  serial.cpp
 
-serialImprov.o: serialImprov.cpp common.h
-	$(CC) -c $(CFLAGS) serialImprov.cpp
 
 pthreads.o: pthreads.cpp common.h
 	$(CC) -c $(CFLAGS) pthreads.cpp
