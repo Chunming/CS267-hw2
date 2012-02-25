@@ -1,25 +1,20 @@
 Warning: no access to tty (Bad file descriptor).
 Thus no job control in this shell.
-The value of n is  500 
-The box size is 0.500000 
-=>> PBS: job killed: walltime 628 exceeded limit 600
-Terminated
-aprun: Apid 25959601: Caught signal Terminated awaiting barrier, sending to application
-Application 25959601 exit signals: Terminated
-Application 25959601 resources: utime 0, stime 0
+aprun: file ./serial not found
+aprun: Exiting due to errors. Application aborted
 
  + --------------------------------------------------------------------------
  +        Job name: job-franklin-serial
- +          Job Id: 7517970.nid00003
+ +          Job Id: 7518141.nid00003
  +          System: franklin
- +     Queued Time: Sat Feb 25 02:08:54 2012
- +      Start Time: Sat Feb 25 02:09:09 2012
- + Completion Time: Sat Feb 25 02:19:37 2012
+ +     Queued Time: Sat Feb 25 11:07:13 2012
+ +      Start Time: Sat Feb 25 11:07:36 2012
+ + Completion Time: Sat Feb 25 11:07:38 2012
  +            User: cmchin
- +        MOM Host: nid04096
+ +        MOM Host: nid00579
  +           Queue: debug
- +  Req. Resources: other=QSUBPID:94019:nid00004,walltime=00:10:00
- +  Used Resources: cput=00:00:00,mem=5480kb,vmem=24544kb,walltime=00:10:28
+ +  Req. Resources: other=QSUBPID:65343:nid00095,walltime=00:10:00
+ +  Used Resources: cput=00:00:00,mem=0kb,vmem=0kb,walltime=00:00:02
  +     Acct String: mp309
  +   PBS_O_WORKDIR: /global/homes/c/cmchin/franklin/CS267-hw2/particles
  +     Submit Args: job-franklin-serial
