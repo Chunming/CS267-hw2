@@ -25,6 +25,30 @@ int main( int argc, char **argv )
     FILE *fsave = savename ? fopen( savename, "w" ) : NULL;
     particle_t *particles = (particle_t*) malloc( n * sizeof(particle_t) );
     set_size( n );
+
+    double boxSize = sqrt(0.0005*n); // Density is set at 0.0005
+    printf("The value of n is  %d \n", n);
+    printf("The box size is %f \n", boxSize); // Box size is 0.5
+     
+	      
+    // Determine number of sublocks, represent as a vector;
+    // Set no. of blocks as 5 x 5
+    int arrSize = 25;
+    particle_t** subBlocks = new particle_t* [arrSize]; // Array of ptrs to particle*
+    for (int idx=0; idx<arrSize; idx++) { // Ini all entries to NULL
+	    subBlocks[idx] = NULL;
+    }
+		   
+
+
+
+
+
+
+
+
+
+    // Initialize particles 
     init_particles( n, particles );
     
     //
