@@ -9,11 +9,31 @@
 // Improve version of serial implementation
 // Size of walls in x/y direction is size
 // Declare new class called Node
-class Node {
+class ListNode {
    public:
    particle_t* pAddress; // Value of curr particle's address
-   Node* nextNode;
+   ListNode* nextNode;
 };
+
+bool insert(ListNode** root, ListNode* targetNode) {
+
+   if (targetNode==NULL) return 0; // Error
+	
+   else if ((*root)==NULL) *root = targetNode; // Initialize array
+
+   else {
+      ListNode* tmp;
+      tmp = *root      
+      while (tmp->nextNode != NULL) {
+         tmp = tmp->next;
+      }
+      tmp->next = targetNode;
+   }
+
+   return 1; 
+
+
+}
 
 //
 //  benchmarking program
@@ -44,16 +64,26 @@ int main( int argc, char **argv )
 
     // Determine number of sublocks, represent as a vector;
     // Set no. of blocks as 5 x 5
-    particle_t** subBlocks = new particle_t* [25]; 
-
+    int arrSize = 25;
+    ListNode** subBlocks = new ListNode* [arrSize]; // Array of ptrs ListNode*
+    for (int idx=0; idx<arrSize; idx++) { // Ini all entries to NULL
+       subBlocks[idx] = NULL;
+    }
 
 
 
     init_particles( n, particles );
-    
+   
+
     //
     //  simulate a number of time steps
     //
+
+    Node* head;
+    int xIdx;
+    int yIdx;
+    double subBlockLen = 0.1;
+    int subBlockNum = 5; // No. of sub blocks along a row/column
     double simulation_time = read_timer( );
     for( int step = 0; step < NSTEPS; step++ )
     {
@@ -63,10 +93,21 @@ int main( int argc, char **argv )
         // Initialize linked list of pointers to &particles[i] 
         // (i.e. Address corressponding to index in particles array)
         // Use dynamic array since bins will have particles << n
-        // Node* head = new Node;
-        // head->pAddress = &particles[0];
-        // head->nextNode = NULL;
-        // delete head;
+
+	for (int ndx=0; ndx < n; n++) { // For each particle
+           head = new Node; // Remember to delete later
+           head->pAddress = &particles[ndx];
+           head->nextNode = NULL;
+           
+	   xIdx = (particles[ndx].x)/subBlockLen;
+	   yIdx = (particles[ndx].y)/subBlockLen;
+
+	   insert(&subBlocks[yIdx+(xIdx*subBlockNum)], head); // Insert to end of Linked List
+
+
+	}	
+
+
 
 
         //
@@ -75,7 +116,7 @@ int main( int argc, char **argv )
         for( int i = 0; i < n; i++ )
         {
             particles[i].ax = particles[i].ay = 0;
-            for (int j = 0; j < n; j++ )
+	    for (int j = 0; j < n; j++ )
                 apply_force( particles[i], particles[j] );
         }
         
