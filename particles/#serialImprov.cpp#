@@ -1,4 +1,4 @@
-#include <stdlib.h>
+OB#include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
 #include <math.h>
@@ -43,10 +43,14 @@ int main( int argc, char **argv )
 
 
     // Determine number of sublocks, represent as a vector;
-    // Set no. of blocks as 5 x 5
-    particle_t** subBlocks = new particle_t* [25]; 
+   
+    vector<vector<int> > subBlock[25];
+    vector <int> A;
 
+    A.push_back(0);
+    subBlock.push_back(A); 
 
+  //vector<particle_t*> subBlock; // Each subBlock is represented by a vector
 
 
     init_particles( n, particles );
