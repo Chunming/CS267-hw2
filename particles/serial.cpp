@@ -121,30 +121,30 @@ int main( int argc, char **argv )
         //
         //  Compute forces
         //
-	int count = 0; // Count no. of particles
-	ListNode* tNode; // Target node
-	ListNode* nNode; // Neighboring node
-        for (int sdx=0; sdx<arrSize; sdx++) { // For each bin
-	   tNode = subBlocks[sdx]; // Initialize to head of list
-	   while(tNode!=NULL) {
-              nNode = subBlocks[sdx]; 
-              while(nNode!=NULL) {
-	         apply_force(*(tNode->pAddress), *(nNode->pAddress) ); 
-	         nNode = nNode->nextNode;
-	      }
-              tNode = tNode->nextNode;
-	      count++;
-	   }
-	}
-	printf("The count check is %d \n", count);
+//	int count = 0; // Count no. of particles
+//	ListNode* tNode; // Target node
+//	ListNode* nNode; // Neighboring node
+//        for (int sdx=0; sdx<arrSize; sdx++) { // For each bin
+//	   tNode = subBlocks[sdx]; // Initialize to head of list
+//	   while(tNode!=NULL) {
+//              nNode = subBlocks[sdx]; 
+//              while(nNode!=NULL) {
+//	         apply_force(*(tNode->pAddress), *(nNode->pAddress) ); 
+//	         nNode = nNode->nextNode;
+//	      }
+//              tNode = tNode->nextNode;
+//	      count++;
+//	   }
+//	}
+//	printf("The count check is %d \n", count);
 
 
-        //for( int i = 0; i < n; i++ )
-        //{
-        //    particles[i].ax = particles[i].ay = 0;
-	//    for (int j = 0; j < n; j++ )
-        //        apply_force( particles[i], particles[j] );
-        //}
+        for( int i = 0; i < n; i++ )
+        {
+            particles[i].ax = particles[i].ay = 0;
+	    for (int j = 0; j < n; j++ )
+                apply_force( particles[i], particles[j] );
+        }
         
         //
         //  move particles
