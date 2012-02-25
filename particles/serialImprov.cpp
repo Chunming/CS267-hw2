@@ -15,12 +15,10 @@ class ListNode {
    ListNode* nextNode;
 };
 
-bool insert(ListNode** root, ListNode* targetNode) {
+bool insertNode(ListNode** root, ListNode* targetNode) {
 
    if (targetNode==NULL) return 0; // Error
-	
    else if ((*root)==NULL) *root = targetNode; // Initialize array
-
    else {
       ListNode* tmp;
       tmp = *root;      
@@ -31,7 +29,21 @@ bool insert(ListNode** root, ListNode* targetNode) {
    }
 
    return 1; 
+}
 
+void deleteNodes(ListNode* root) {  
+ 
+   if (root == NULL) return; // Special case
+
+   else if (root->nextNode==NULL) {
+      delete root; // Base Case
+      root = NULL;
+   }
+
+   else {
+      deleteNodes(root->nextNode); 
+      delete root;
+   }   
 
 }
 
@@ -80,20 +92,16 @@ int main( int argc, char **argv )
     //
 
     ListNode* head;
-    int xIdx;
-    int yIdx;
+    int xIdx, yIdx;
     double subBlockLen = 0.1;
     int subBlockNum = 5; // No. of sub blocks along a row/column
     double simulation_time = read_timer( );
     for( int step = 0; step < NSTEPS; step++ )
     {
 
-
-        // Do binning first for all particles
+        // Do binning for all particles
         // Initialize linked list of pointers to &particles[i] 
-        // (i.e. Address corressponding to index in particles array)
         // Use dynamic array since bins will have particles << n
-
 	for (int ndx=0; ndx < n; n++) { // For each particle
            head = new ListNode; // Remember to delete later
            head->pAddress = &particles[ndx];
@@ -101,9 +109,9 @@ int main( int argc, char **argv )
            
 	   xIdx = (particles[ndx].x)/subBlockLen;
 	   yIdx = (particles[ndx].y)/subBlockLen;
-
-	   insert(&subBlocks[yIdx+(xIdx*subBlockNum)], head); // Insert to end of Linked List
-
+           
+	   // Insert to end of linked list
+	   insertNode(&subBlocks[yIdx+(xIdx*subBlockNum)], head);
 
 	}	
 
@@ -111,7 +119,7 @@ int main( int argc, char **argv )
 
 
         //
-        //  compute forces
+        //  Compute forces
         //
         for( int i = 0; i < n; i++ )
         {
@@ -139,7 +147,16 @@ int main( int argc, char **argv )
     simulation_time = read_timer( ) - simulation_time;
     
     printf( "n = %d, simulation time = %g seconds\n", n, simulation_time );
+
     
+    // Delete all nodes 
+    for (int ndx=0; ndx<25; ndx++) {
+       deleteNodes(subBlocks[ndx]);  
+    }
+
+    // Delete subBlocks array
+    delete [] subBlocks;
+
     free( particles );
     if( fsave )
         fclose( fsave );
