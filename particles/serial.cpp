@@ -33,19 +33,15 @@ int main( int argc, char **argv )
 	      
     // Determine number of sublocks, represent as a vector;
     // Set no. of blocks as 5 x 5
-    int arrSize = 25;
-    particle_t** subBlocks = new particle_t* [arrSize]; // Array of ptrs to particle*
-    for (int idx=0; idx<arrSize; idx++) { // Ini all entries to NULL
-	    subBlocks[idx] = NULL;
+    int binNum = 25; // No. of bins
+    int* binParticleNum = new int [binNum]; // No. of particles in each bin
+    particle_t*** binArray = new particle_t** [binNum]; // Array of ptrs to particle*
+   
+    for (int idx=0; idx<binNum; idx++) { 
+	    binParticleNum[idx] = 0;
+	    binArray[idx] = new particle_t* [100]; // Set it to max 100 particles first
     }
-		   
-
-
-
-
-
-
-
+    
 
 
     // Initialize particles 
@@ -86,7 +82,14 @@ int main( int argc, char **argv )
     simulation_time = read_timer( ) - simulation_time;
     
     printf( "n = %d, simulation time = %g seconds\n", n, simulation_time );
-    
+   
+    delete [] binParticleNum;
+    for (int idx=0; idx<binNum; idx++) {
+       delete [] binArray[idx];
+    }
+    delete binArray;
+
+
     free( particles );
     if( fsave )
         fclose( fsave );
