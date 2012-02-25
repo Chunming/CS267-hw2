@@ -107,8 +107,9 @@ int main( int argc, char **argv )
            head->nextNode = NULL;
            
 	   xIdx = (particles[ndx].x)/subBlockLen;
+	   printf("xIdx is %d \n", xIdx);
 	   yIdx = (particles[ndx].y)/subBlockLen;
-           
+           printf("yIdx is %d \n", yIdx);
 	   // Insert to end of linked list
 	   insertNode(&subBlocks[yIdx+(xIdx*subBlockNum)], head);
 
