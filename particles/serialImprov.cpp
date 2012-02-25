@@ -79,7 +79,7 @@ int main( int argc, char **argv )
     //  simulate a number of time steps
     //
 
-    Node* head;
+    ListNode* head;
     int xIdx;
     int yIdx;
     double subBlockLen = 0.1;
