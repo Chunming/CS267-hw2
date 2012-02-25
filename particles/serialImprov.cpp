@@ -95,7 +95,7 @@ int main( int argc, char **argv )
         // Use dynamic array since bins will have particles << n
 
 	for (int ndx=0; ndx < n; n++) { // For each particle
-           head = new Node; // Remember to delete later
+           head = new ListNode; // Remember to delete later
            head->pAddress = &particles[ndx];
            head->nextNode = NULL;
            
