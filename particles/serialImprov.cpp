@@ -40,7 +40,7 @@ void deleteNodes(ListNode* root) {
    else {
       while (root!=NULL) {
          delete root;
-	 root = root->next;
+	 root = root->nextNode;
       }
    }
 
@@ -123,7 +123,7 @@ int main( int argc, char **argv )
 	int count = 0; // Count no. of particles
 	ListNode* tNode; // Target node
 	ListNode* nNode; // Neighboring node
-        for (int sdx; sdx<arrSize; sdx++) { // For each bin
+        for (int sdx=0; sdx<arrSize; sdx++) { // For each bin
 	   tNode = subBlocks[sdx]; // Initialize to head of list
 	   while(tNode!=NULL) {
               nNode = subBlocks[sdx]; 
@@ -132,8 +132,10 @@ int main( int argc, char **argv )
 	         nNode = nNode->nextNode;
 	      }
               tNode = tNode->nextNode;
+	      count++
 	   }
 	}
+	printf("The count check is %d \n", count);
 
 
         //for( int i = 0; i < n; i++ )
