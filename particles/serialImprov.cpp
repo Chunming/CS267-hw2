@@ -23,7 +23,7 @@ bool insert(ListNode** root, ListNode* targetNode) {
 
    else {
       ListNode* tmp;
-      tmp = *root      
+      tmp = *root;      
       while (tmp->nextNode != NULL) {
          tmp = tmp->next;
       }
