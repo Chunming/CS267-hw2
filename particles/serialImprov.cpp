@@ -15,6 +15,7 @@ class ListNode {
    ListNode* nextNode;
 };
 
+// Insert Nodes as linked list at each array index
 bool insertNode(ListNode** root, ListNode* targetNode) {
 
    if (targetNode==NULL) return 0; // Error
@@ -31,19 +32,17 @@ bool insertNode(ListNode** root, ListNode* targetNode) {
    return 1; 
 }
 
+// Delete all nodes at each array index
 void deleteNodes(ListNode* root) {  
  
    if (root == NULL) return; // Special case
 
-   else if (root->nextNode==NULL) {
-      delete root; // Base Case
-      root = NULL;
-   }
-
    else {
-      deleteNodes(root->nextNode); 
-      delete root;
-   }   
+      while (root!=NULL) {
+         delete root;
+	 root = root->next;
+      }
+   }
 
 }
 
@@ -121,12 +120,28 @@ int main( int argc, char **argv )
         //
         //  Compute forces
         //
-        for( int i = 0; i < n; i++ )
-        {
-            particles[i].ax = particles[i].ay = 0;
-	    for (int j = 0; j < n; j++ )
-                apply_force( particles[i], particles[j] );
-        }
+	int count = 0; // Count no. of particles
+	ListNode* tNode; // Target node
+	ListNode* nNode; // Neighboring node
+        for (int sdx; sdx<arrSize; sdx++) { // For each bin
+	   tNode = subBlocks[sdx]; // Initialize to head of list
+	   while(tNode!=NULL) {
+              nNode = subBlocks[sdx]; 
+              while(nNode!=NULL) {
+	         apply_force(*(tNode->pAddress), *(nNode->pAddress) ); 
+	         nNode = nNode->nextNode;
+	      }
+              tNode = tNode->nextNode;
+	   }
+	}
+
+
+        //for( int i = 0; i < n; i++ )
+        //{
+        //    particles[i].ax = particles[i].ay = 0;
+	//    for (int j = 0; j < n; j++ )
+        //        apply_force( particles[i], particles[j] );
+        //}
         
         //
         //  move particles
