@@ -132,7 +132,7 @@ int main( int argc, char **argv )
 	         nNode = nNode->nextNode;
 	      }
               tNode = tNode->nextNode;
-	      count++
+	      count++;
 	   }
 	}
 	printf("The count check is %d \n", count);
