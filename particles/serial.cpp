@@ -6,16 +6,6 @@
 
 #define cutoff 0.01 // Was defined in common.cpp
 
-
-bool check_adjacent_blocks(bool left, bool right, bool top, bool bottom, int b, double len, particle_t*** binArray) {
-
-
-
-}
-
-
-
-
 //
 //  benchmarking program
 //
@@ -141,7 +131,7 @@ int main( int argc, char **argv )
 	      // Consider 8 different adjacent subBlocks
 	      if (leftDist<cutoff) {
 		 if (leftBnd!=0) { // Left subBlock index is valid
-		    bLeft = b - len; // Find index of left subBlock in 1D array
+		    bLeft = b - subBlockLen; // Find index of left subBlock in 1D array
 		    kdx=0;
 		    for (int k=0; k<binParticleNum[bLeft]; k++) { 
 		       while ((binArray[bLeft][kdx])==NULL) { kdx++; }
@@ -152,7 +142,7 @@ int main( int argc, char **argv )
 
 	      if (rightDist<cutoff) {
 		 if (rightBnd!=boxSize) { 
-  		    bRight = b + len; 
+  		    bRight = b + subBlockLen; 
 	 	    kdx=0;
 		    for (int k=0; k<binParticleNum[bRight]; k++) { 
 		       while ((binArray[bRight][kdx])==NULL) { kdx++; }
@@ -185,7 +175,7 @@ int main( int argc, char **argv )
 
 	      if (topDist<cutoff && leftDist<cutoff) { 
 		 if (topBnd!=0 && leftBnd !=0) {
-		    bTopLeft = b-len-1;     
+		    bTopLeft = b-subBlockLen-1;     
 		    kdx=0;
 		    for (int k=0; k<binParticleNum[bTopLeft]; k++) { 
 		       while ((binArray[bTopLeft][kdx])==NULL) { kdx++; }
@@ -196,7 +186,7 @@ int main( int argc, char **argv )
 
 	      if (botDist<cutoff && leftDist<cutoff) { 
 		 if (botBnd!=boxSize && leftBnd!=0) { 
-		    bBotLeft = b-len+1;     
+		    bBotLeft = b-subBlockLen+1;     
      		    kdx=0;
 		    for (int k=0; k<binParticleNum[bBotLeft]; k++) { 
 		       while ((binArray[bBotLeft][kdx])==NULL) { kdx++; }
@@ -207,7 +197,7 @@ int main( int argc, char **argv )
 
 	      if (topDist<cutoff && rightDist<cutoff) { 
 		 if (topBnd!=0 && rightBnd!=boxSize) {
-		    bTopRight = b+len-1;     
+		    bTopRight = b+subBlockLen-1;     
      		    kdx=0;
 		    for (int k=0; k<binParticleNum[bTopRight]; k++) { 
 		       while ((binArray[bTopRight][kdx])==NULL) { kdx++; }
@@ -218,7 +208,7 @@ int main( int argc, char **argv )
 
 	      if (botDist<cutoff && rightDist<cutoff) { 
 		 if (botBnd!=boxSize && rightBnd!=boxSize) {
-   		    bBotRight = b+len+1;     
+   		    bBotRight = b+subBlockLen+1;     
      		    kdx=0;
 		    for (int k=0; k<binParticleNum[bBotRight]; k++) { 
 		       while ((binArray[bBotRight][kdx])==NULL) { kdx++; }
