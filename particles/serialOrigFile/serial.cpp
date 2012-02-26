@@ -33,6 +33,8 @@ int main( int argc, char **argv )
     double simulation_time = read_timer( );
     for( int step = 0; step < NSTEPS; step++ )
     {
+	    
+	printf("The time step is %d \n", step);
         //
         //  compute forces
         //
@@ -54,7 +56,6 @@ int main( int argc, char **argv )
         //
         if( fsave && (step%SAVEFREQ) == 0 ) {
 
-	    //printf("The time step is %d \n", step);
             save( fsave, n, particles );
 
          }

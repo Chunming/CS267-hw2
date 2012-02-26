@@ -72,9 +72,9 @@ int main( int argc, char **argv )
     int subBlockNum = 5; // No. of sub blocks along a row/column
 
     for (int ndx=0; ndx<n; ndx++) { // For each particle
-       xIdx = (particles[ndx].x)/subBlockLen; 
+       xIdx = (particles[ndx].x)/subBlockLen; // Takes values 0-4
 //       printf("xIdx is %d \n", xIdx);
-       yIdx = (particles[ndx].y)/subBlockLen;
+       yIdx = (particles[ndx].y)/subBlockLen; // Takes values 0-4
 //       printf("yIdx is %d \n", yIdx);
        bdx = 0;
        // Store into first non-NULL index in array
@@ -97,7 +97,10 @@ int main( int argc, char **argv )
     int kdx;
     for( int step = 0; step < NSTEPS; step++ )
     {
-        //
+	    
+	printf("The time step is %d \n", step);
+
+	//
         //  Compute forces
         //
 	/*
@@ -313,7 +316,6 @@ int main( int argc, char **argv )
         //
         if( fsave && (step%SAVEFREQ) == 0 ) {
 
-	    //printf("The time step is %d \n", step);
             save( fsave, n, particles );
 
          }
