@@ -93,6 +93,11 @@ int main( int argc, char **argv )
         //
         //  Compute forces
         //
+	double leftBnd;
+	double rightBnd;
+	double topBnd;
+	double bottomBnd;
+	int bLeft, bRight, bTop, bBottom;
 	for (int b=0; b<binNum; b++) { // The bth bin
 
 	   idx=0;
@@ -100,11 +105,36 @@ int main( int argc, char **argv )
      	      while ((binArray[b][idx])==NULL) { idx++; } // Index skips NULL values
       	      (*binArray[b][idx]).ax = (*binArray[b][idx]).ay = 0;
 
+	      // Check all particles in bth subBlock
 	      jdx=0;
      	      for (int j=0; j<binParticleNum[b]; j++) { // The jth particle in bth bin
      	         while ((binArray[b][jdx])==NULL) { jdx++; }
 		 apply_force(*binArray[b][idx],*binArray[b][jdx]);
 	      }
+
+	      // Consider particles at edge boundaries of subBlock
+	      // Check particles to the left/right/top/bottom of bth subBlock	 
+	      xIdx = (*binArray[b][idx]).x/subBlockLen;
+              yIdx = (*binArray[b][idx]).y/subBlockLen;
+	      leftBnd = xIdx*subBlockLen;
+	      rightBnd = (xIdx*subBlockLen) + subBlockLen;
+	      topBnd = yIdx*subBlockLen;
+	      bottomBnd = yIdx*subBlockLen + subBlockLen;
+
+              // Particle at left boundary of subBlock 
+              if ((*binArray[b][idx]).x - leftBnd < cutoff*cutoff) { 	
+	     	 bLeft = b - subBlockLen; // Find index of left subBlock in 1D array
+		 if (bLeft>=0) { // Index is valid
+	            kdx=0;
+     	            for (int k=0; k<binParticleNum[bLeft]; k++) { // The jth particle in bth bin
+     	               while ((binArray[bLeft][kdx])==NULL) { kdx++; }
+		       apply_force(*binArray[b][idx],*binArray[bLeft][kdx]);
+	            }
+		 } 
+	      }
+
+
+
             }
 	}
 
@@ -128,7 +158,6 @@ int main( int argc, char **argv )
 	//
 	// Re-bin particles
 	//
-	
 	int index;
 	for (int b=0; b<binNum; b++) { // The bth bin
 	   idx = 0; // Skips across 
@@ -166,10 +195,6 @@ int main( int argc, char **argv )
 	   count += binParticleNum[b];
 	}
 	printf("The count is %d \n", count); // Check count, should be 500
-
-
-
-
 
 
         //
