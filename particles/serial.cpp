@@ -96,6 +96,16 @@ int main( int argc, char **argv )
         //
         //  Compute forces
         //
+	/*
+	// Orginal apply_force function
+        for( int i = 0; i < n; i++ )
+        {
+            particles[i].ax = particles[i].ay = 0;
+            for (int j = 0; j < n; j++ )
+                apply_force( particles[i], particles[j] );
+        }
+	*/
+
 	double leftBnd, rightBnd, topBnd, botBnd;
 	double leftDist, rightDist, topDist, botDist;
 	int bLeft, bRight, bBottom, bTop, bTopLeft, bTopRight, bBotLeft, bBotRight;
@@ -116,9 +126,9 @@ int main( int argc, char **argv )
 
 	      // Check particles to the left/right/top/bottom subBlocks of bth subBlock	 
 	      xIdx = (*binArray[b][idx]).x/subBlockLen;
-	      //printf("xIdx is %d \n", xIdx);
+	      printf("xIdx is %d \n", xIdx);
 	      yIdx = (*binArray[b][idx]).y/subBlockLen;
-	      //printf("yIdx is %d \n", yIdx);
+	      printf("yIdx is %d \n", yIdx);
 
 	      leftBnd = xIdx*subBlockLen;
 	      //printf("leftBnd is %f \n", leftBnd);
@@ -243,15 +253,6 @@ int main( int argc, char **argv )
             }
 	}
 
-	/*
-	// Orginal apply_force function
-        for( int i = 0; i < n; i++ )
-        {
-            particles[i].ax = particles[i].ay = 0;
-            for (int j = 0; j < n; j++ )
-                apply_force( particles[i], particles[j] );
-        }
-	*/        
         
 	
 	//
