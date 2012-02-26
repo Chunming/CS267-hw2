@@ -130,14 +130,17 @@ int main( int argc, char **argv )
 	//
 	
 	int index;
+	idx = 0;
 	for (int b=0; b<binNum; b++) { // The bth bin
 	   for (int i=0; i<binParticleNum[b]; i++) { // The ith particle in bth bin
 	      
 	      // Check if particle shld be moved to another bin	  
+
+     	      while ((binArray[b][idx])==NULL) { idx++; }
 	      printf("Check 1 \n");
-     	      xIdx = (*binArray[b][i]).x/subBlockLen;
+	      xIdx = (*binArray[b][idx]).x/subBlockLen;
 	      printf("Check 2 \n");
-              yIdx = (*binArray[b][i]).y/subBlockLen;
+              yIdx = (*binArray[b][idx]).y/subBlockLen;
 	      printf("Check 3 \n");
 	      index = yIdx+(xIdx*subBlockNum); // Map 2D to 1D index
 	      if (index != b) { // Particle has moved out of of the bin
@@ -152,9 +155,9 @@ int main( int argc, char **argv )
 		    }	 
 		 }
 		 printf("Check 4 \n");
-                 binArray[index][bdx] = binArray[b][i]; // Add element into first non-NULL index   	
+                 binArray[index][bdx] = binArray[b][idx]; // Add element into first non-NULL index   	
 		 printf("Check 5 \n");
-		 binArray[b][i] = NULL;
+		 binArray[b][idx] = NULL;
 		 printf("Check 6 \n");
 		 binParticleNum[b]--;
 		 printf("Check 7 \n");
