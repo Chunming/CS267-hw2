@@ -146,10 +146,16 @@ int main( int argc, char **argv )
                        return -1;
 		    }	 
 		 }
+		 printf("Check 4 \n");
                  binArray[index][bdx] = binArray[b][i]; // Add element into first non-NULL index   	
+		 printf("Check 5 \n");
 		 binArray[b][i] = NULL;
+		 printf("Check 6 \n");
 		 binParticleNum[b]--;
+		 printf("Check 7 \n");
 		 binParticleNum[index]++;
+		 printf("Check 8 \n");
+
 	      }
 	   }
 	}
