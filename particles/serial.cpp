@@ -149,7 +149,7 @@ int main( int argc, char **argv )
 	      if (leftDist<cutoff) {
 		 if (leftBnd!=0) { // Left subBlock index is valid
 		    bLeft = b - subBlockNum; // subBlockLen=0.1, subBlockNum = 5 
-		    printf("bLeft is %d \n", bLeft);
+		    //printf("bLeft is %d \n", bLeft);
 		    kdx=0;
 		    for (int k=0; k<binParticleNum[bLeft]; k++) { 
 		       while ((binArray[bLeft][kdx])==NULL) { kdx++; }
@@ -161,7 +161,7 @@ int main( int argc, char **argv )
 	      if (rightDist<cutoff) {
 		 if (rightBnd!=boxSize) { 
   		    bRight = b + subBlockNum; 
-		    printf("bRight is %d \n", bRight);
+		    //printf("bRight is %d \n", bRight);
 		    kdx=0;
 		    for (int k=0; k<binParticleNum[bRight]; k++) { 
 		       while ((binArray[bRight][kdx])==NULL) { kdx++; }
@@ -173,7 +173,7 @@ int main( int argc, char **argv )
 	      if (topDist<cutoff) {
 		 if (topBnd!=0) { 
 		    bTop = b - 1; 
-		    printf("bTop is %d \n", bTop);
+		    //printf("bTop is %d \n", bTop);
   		    kdx=0;
 		    for (int k=0; k<binParticleNum[bTop]; k++) { 
 		       while ((binArray[bTop][kdx])==NULL) { kdx++; }
@@ -185,7 +185,7 @@ int main( int argc, char **argv )
 	      if (botDist<cutoff) {
 		 if (botBnd!=boxSize) {
        		    bBottom = b + 1;
-		    printf("bBottom is %d \n", bBottom);
+		    //printf("bBottom is %d \n", bBottom);
      		    kdx=0;
 		    for (int k=0; k<binParticleNum[bBottom]; k++) { 
 		       while ((binArray[bBottom][kdx])==NULL) { kdx++; }
@@ -299,7 +299,7 @@ int main( int argc, char **argv )
 	for (int b=0; b<binNum; b++) {
 	   count += binParticleNum[b];
 	}
-	printf("The count is %d \n", count); // Check count, should be 500
+	//printf("The count is %d \n", count); // Check count, should be 500
 
 
         //
