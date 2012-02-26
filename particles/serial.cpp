@@ -158,9 +158,6 @@ int main( int argc, char **argv )
 		 }
 	      }
 
-	      
-
-
 	      if (rightDist<cutoff) {
 		 if (rightBnd!=boxSize) { 
   		    bRight = b + subBlockNum; 
@@ -180,7 +177,9 @@ int main( int argc, char **argv )
   		    kdx=0;
 		    for (int k=0; k<binParticleNum[bTop]; k++) { 
 		       while ((binArray[bRight][kdx])==NULL) { kdx++; }
+		       printf("Check 1 \n");
 		       apply_force(*binArray[b][idx],*binArray[bTop][kdx]);
+		       printf("Check 2 \n");
 		    }
 		 }
 	      }
