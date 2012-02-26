@@ -48,9 +48,13 @@ int main( int argc, char **argv )
        return -1;
     }
 
-   printf("Size of each binArray element is %d", sizeof(binArray[0]));
+   printf("Size of each binArray element is %d \n", sizeof(binArray[0]));
 
-    for (int b=0; b<binNum; b++) { 
+
+   // sizeof(binArray[i]) is 8 bytes
+   // sizeof(binArray[i][j]) is 8 bytes
+   memset(binParticleNum, 0, 8*binNum);
+   for (int b=0; b<binNum; b++) { 
 	    binParticleNum[b] = 0;
 	    binArray[b] = new particle_t* [100]; // Set it to max 100 particles first
             if (binArray[b] == NULL) {
@@ -63,7 +67,8 @@ int main( int argc, char **argv )
 	    }
     }
 
-   printf("Size of each binArr[][] is %d", sizeof(binArray[0][0]));
+   printf("Size of each binArr[][] is %d \n", sizeof(binArray[0][0]));
+   printf("Size of each binParticleNum is %d \n", sizeof(binParticleNum[0]));
 
    //printf("Bins are allocated, error check done \n");
 
