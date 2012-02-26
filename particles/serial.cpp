@@ -102,7 +102,6 @@ int main( int argc, char **argv )
 	double topBnd;
 	double bottomBnd;
 	int bLeft, bRight, bTop, bBottom;
-	int bLeftTop, bLeftBottom; bRightTop, bRightBottom
 	for (int b=0; b<binNum; b++) { // The bth bin
 
 	   idx=0;
