@@ -157,11 +157,11 @@ int main( int argc, char **argv )
 		 }
 	      }
 
-/*
+
 
 	      if (rightDist<cutoff) {
 		 if (rightBnd!=boxSize) { 
-  		    bRight = b + subBlockLen; 
+  		    bRight = b + subBlockNum; 
 	 	    kdx=0;
 		    for (int k=0; k<binParticleNum[bRight]; k++) { 
 		       while ((binArray[bRight][kdx])==NULL) { kdx++; }
@@ -194,7 +194,7 @@ int main( int argc, char **argv )
 
 	      if (topDist<cutoff && leftDist<cutoff) { 
 		 if (topBnd!=0 && leftBnd !=0) {
-		    bTopLeft = b-subBlockLen-1;     
+		    bTopLeft = b-subBlockNum-1;     
 		    kdx=0;
 		    for (int k=0; k<binParticleNum[bTopLeft]; k++) { 
 		       while ((binArray[bTopLeft][kdx])==NULL) { kdx++; }
@@ -205,7 +205,7 @@ int main( int argc, char **argv )
 
 	      if (botDist<cutoff && leftDist<cutoff) { 
 		 if (botBnd!=boxSize && leftBnd!=0) { 
-		    bBotLeft = b-subBlockLen+1;     
+		    bBotLeft = b-subBlockNum+1;     
      		    kdx=0;
 		    for (int k=0; k<binParticleNum[bBotLeft]; k++) { 
 		       while ((binArray[bBotLeft][kdx])==NULL) { kdx++; }
@@ -216,7 +216,7 @@ int main( int argc, char **argv )
 
 	      if (topDist<cutoff && rightDist<cutoff) { 
 		 if (topBnd!=0 && rightBnd!=boxSize) {
-		    bTopRight = b+subBlockLen-1;     
+		    bTopRight = b+subBlockNum-1;     
      		    kdx=0;
 		    for (int k=0; k<binParticleNum[bTopRight]; k++) { 
 		       while ((binArray[bTopRight][kdx])==NULL) { kdx++; }
@@ -227,7 +227,7 @@ int main( int argc, char **argv )
 
 	      if (botDist<cutoff && rightDist<cutoff) { 
 		 if (botBnd!=boxSize && rightBnd!=boxSize) {
-   		    bBotRight = b+subBlockLen+1;     
+   		    bBotRight = b+subBlockNum+1;     
      		    kdx=0;
 		    for (int k=0; k<binParticleNum[bBotRight]; k++) { 
 		       while ((binArray[bBotRight][kdx])==NULL) { kdx++; }
@@ -236,7 +236,7 @@ int main( int argc, char **argv )
 		 }
 	      }
 
-	      */
+	      
 
             }
 	}
