@@ -116,39 +116,40 @@ int main( int argc, char **argv )
 
 	      // Check particles to the left/right/top/bottom subBlocks of bth subBlock	 
 	      xIdx = (*binArray[b][idx]).x/subBlockLen;
-	      printf("xIdx is %d \n", xIdx);
+	      //printf("xIdx is %d \n", xIdx);
 	      yIdx = (*binArray[b][idx]).y/subBlockLen;
-	      printf("yIdx is %d \n", yIdx);
+	      //printf("yIdx is %d \n", yIdx);
 
 	      leftBnd = xIdx*subBlockLen;
-	      printf("leftBnd is %f \n", leftBnd);
+	      //printf("leftBnd is %f \n", leftBnd);
 
 	      rightBnd = (xIdx*subBlockLen) + subBlockLen;
-	      printf("rightBnd is %f \n", rightBnd);
+	      //printf("rightBnd is %f \n", rightBnd);
 
 	      topBnd = yIdx*subBlockLen;
-	      printf("topBnd is %f \n", topBnd);
+	      //printf("topBnd is %f \n", topBnd);
 
 	      botBnd = yIdx*subBlockLen + subBlockLen;
-	      printf("botBnd is %f \n", botBnd);
+	      //printf("botBnd is %f \n", botBnd);
 
 	      leftDist = fabs((*binArray[b][idx]).x - leftBnd);
-	      printf("leftDist is %f \n", leftDist);
+	      //printf("leftDist is %f \n", leftDist);
 
 	      rightDist = fabs((*binArray[b][idx]).x - rightBnd);
-	      printf("rightDist is %f \n", rightDist);
+	      //printf("rightDist is %f \n", rightDist);
 
 	      topDist = fabs((*binArray[b][idx]).y - topBnd);
-	      printf("topDist is %f \n", topDist);
+	      //printf("topDist is %f \n", topDist);
 
 	      botDist = fabs((*binArray[b][idx]).y - botBnd);
-	      printf("botDist is %f \n", botDist);
+	      //printf("botDist is %f \n", botDist);
 
 
 	      // Consider 8 different adjacent subBlocks
 	      if (leftDist<cutoff) {
 		 if (leftBnd!=0) { // Left subBlock index is valid
 		    bLeft = b - subBlockNum; // subBlockLen=0.1, subBlockNum = 5 
+		    printf("bLeft is %d \n", bLeft);
 		    kdx=0;
 		    for (int k=0; k<binParticleNum[bLeft]; k++) { 
 		       while ((binArray[bLeft][kdx])==NULL) { kdx++; }
