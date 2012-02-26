@@ -93,14 +93,14 @@ int main( int argc, char **argv )
         //
         //  Compute forces
         //
-	idx=0;
-	jdx=0;
 	for (int b=0; b<binNum; b++) { // The bth bin
 
+	   idx=0;
 	   for (int i=0; i<binParticleNum[b]; i++) { // The ith particle in bth bin
      	      while ((binArray[b][idx])==NULL) { idx++; }
       	      (*binArray[b][idx]).ax = (*binArray[b][idx]).ay = 0;
 
+	      jdx=0;
      	      for (int j=0; j<binParticleNum[b]; j++) { // The jth particle in bth bin
      	         while ((binArray[b][jdx])==NULL) { jdx++; }
 		 apply_force(*binArray[b][idx],*binArray[b][jdx]);
@@ -131,7 +131,7 @@ int main( int argc, char **argv )
 	
 	int index;
 	for (int b=0; b<binNum; b++) { // The bth bin
-	   idx = 0;
+	   idx = 0; // Skips across 
 	   for (int i=0; i<binParticleNum[b]; i++) { // The ith particle in bth bin
 	      
 	      // Check if particle shld be moved to another bin	  
