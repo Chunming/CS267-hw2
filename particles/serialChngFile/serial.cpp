@@ -79,8 +79,10 @@ int main( int argc, char **argv )
        bdx = 0;
        // Store into first non-NULL index in array
        while (binArray[yIdx+(xIdx*subBlockNum)][bdx]!=NULL) {
-          bdx++; 
+          printf("bdx is %d \n", bdx)
+          bdx++;
        }
+       printf("Bin index is %d \n", yIdx+xIdx*subBlockNum);
        binArray[yIdx+(xIdx*subBlockNum)][bdx] = &particles[ndx];
        binParticleNum[yIdx+(xIdx*subBlockNum)]++; // Increment bin count
     }
