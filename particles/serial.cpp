@@ -98,9 +98,7 @@ int main( int argc, char **argv )
         //
 	count = 0;
 	for (int b=0; b<binNum; b++) { // The bth bin
-
 	   count += binParticleNum[b];	
-
 	   for (int i=0; i<binParticleNum[b]; i++) { // The ith particle in bth bin
 	      (*binArray[b][i]).ax = (*binArray[b][i]).ay = 0;
      	      for (int j=0; j<binParticleNum[b]; j++) { // The jth particle in bth bin
@@ -108,9 +106,10 @@ int main( int argc, char **argv )
 	      }
             }
 	}
-	printf("The count is %d \n", count);
+	//printf("The count is %d \n", count); // Check count, should be 500
 
 	/*
+	// Orginal apply_force function
         for( int i = 0; i < n; i++ )
         {
             particles[i].ax = particles[i].ay = 0;
@@ -129,6 +128,42 @@ int main( int argc, char **argv )
 	//
 	// Re-bin particles
 	//
+	int index;
+	for (int b=0; b<binNum; b++) { // The bth bin
+	   for (int i=0; i<binParticleNum[b]; i++) { // The ith particle in bth bin
+	      
+	      // Check if particle shld be moved to another bin	  
+              xIdx = (*binArray[b][i].x)/subBlockLen; 
+              yIdx = (*binArray[b][i].y)/subBlockLen;
+	      index = yIdx+(xIdx*subBlockNum); // Map 2D to 1D index
+	      if (index != b) { // Particle has moved out of of the bin
+
+                 // Store into first non-NULL index in array
+		 bdx = 0;
+                 while (binArray[index][bdx]!=NULL) {
+	            bdx++;
+                    if (bdx > 500) {
+                       printf("ERROR: Overflow \n");
+                       return -1;
+		    }	 
+		 }
+                 binArray[index][bdx] = binArray[b][i]; // Add element into first non-NULL index   	
+		 binArray[b][i] = NULL;
+		 binParticleNum[b]--;
+		 binParticleNum[index]++;
+	      }
+	   }
+	}
+
+	// Check count
+	count = 0;
+	for (int b; b<binNum; b++) {
+	   count += binParticleNum[b];
+	}
+	printf("The count is %d \n", count); // Check count, should be 500
+
+
+
 
 
 
