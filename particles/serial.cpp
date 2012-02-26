@@ -4,7 +4,7 @@
 #include <math.h>
 #include "common.h"
 
-#define cutoff 0.01
+#define cutoff 0.01 // Was defined in common.cpp
 
 
 //
@@ -102,6 +102,7 @@ int main( int argc, char **argv )
 	double topBnd;
 	double bottomBnd;
 	int bLeft, bRight, bTop, bBottom;
+	int bLeftTop, bLeftBottom; bRightTop, bRightBottom
 	for (int b=0; b<binNum; b++) { // The bth bin
 
 	   idx=0;
@@ -125,17 +126,71 @@ int main( int argc, char **argv )
 	      topBnd = yIdx*subBlockLen;
 	      bottomBnd = yIdx*subBlockLen + subBlockLen;
 
-              // Particle at left boundary of subBlock 
-              if ((*binArray[b][idx]).x - leftBnd < cutoff*cutoff) { 	
-	     	 bLeft = b - subBlockLen; // Find index of left subBlock in 1D array
-		 if (bLeft>=0) { // Index is valid
+	      leftDist = fabs((*binArray[b][idx]).x - leftBnd);
+	      rightDist = fabs((*binArray[b][idx]).x - rightBnd);
+	      topDist = fabs((*binArray[b][idx]).y - topBnd);
+	      bottomDist = fabs((*binArray[b][idx]).y - bottomBnd);
+
+	      // Particle at top left boundary
+	      if ((leftDist<cutoff) && (topDist<cutoff) ) { 
+
+	         bLeft = b - subBlockLen; // Find index of left subBlock in 1D array
+		 if ((bLeft>=0) && (bLeft<binNum)) { // Left subBlock index is valid
 	            kdx=0;
-     	            for (int k=0; k<binParticleNum[bLeft]; k++) { // The jth particle in bth bin
+     	            for (int k=0; k<binParticleNum[bLeft]; k++) { 
      	               while ((binArray[bLeft][kdx])==NULL) { kdx++; }
 		       apply_force(*binArray[b][idx],*binArray[bLeft][kdx]);
 	            }
-		 } 
+	         }
+		     
+		 if ((bLeft-1>=0) && (bLeft-1<binNum)) { // Top left subBlock index is valid
+	            kdx=0;
+     	            for (int k=0; k<binParticleNum[bLeft-1]; k++) { 
+     	               while ((binArray[bLeft-1][kdx])==NULL) { kdx++; }
+		       apply_force(*binArray[b][idx],*binArray[bLeft-1][kdx]);
+	            }
+	         }
+
+        	 if ((b-1>=0) && (b-1<binNum)) { // Top subBlock index is valid
+	            kdx=0;
+     	            for (int k=0; k<binParticleNum[b-1]; k++) { 
+     	               while ((binArray[b-1][kdx])==NULL) { kdx++; }
+		       apply_force(*binArray[b][idx],*binArray[b-1][kdx]);
+	            }
+	         }
 	      }
+
+	      // Particle at bottom left boundary
+	      else if ((leftDist<cutoff) && (bottomDist<cutoff) ) { 
+
+	         bLeft = b - subBlockLen; // Find index of left subBlock in 1D array
+		 if ((bLeft>=0) && (bLeft<binNum)) { // Left subBlock index is valid
+	            kdx=0;
+     	            for (int k=0; k<binParticleNum[bLeft]; k++) { 
+     	               while ((binArray[bLeft][kdx])==NULL) { kdx++; }
+		       apply_force(*binArray[b][idx],*binArray[bLeft][kdx]);
+	            }
+	         }
+		     
+		 if ((bLeft+1>=0) && (bLeft+1<binNum)) { // Bottom left subBlock index is valid
+	            kdx=0;
+     	            for (int k=0; k<binParticleNum[bLeft+1]; k++) { 
+     	               while ((binArray[bLeft+1][kdx])==NULL) { kdx++; }
+		       apply_force(*binArray[b][idx],*binArray[bLeft+1][kdx]);
+	            }
+	         }
+
+        	 if ((b+1>=0) && (b+1<binNum)) { // Bottom subBlock index is valid
+	            kdx=0;
+     	            for (int k=0; k<binParticleNum[b+1]; k++) { 
+     	               while ((binArray[b+1][kdx])==NULL) { kdx++; }
+		       apply_force(*binArray[b][idx],*binArray[b+1][kdx]);
+	            }
+	         }
+	      }
+	      else {
+	      }
+
 
 
 
