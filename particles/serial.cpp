@@ -158,13 +158,14 @@ int main( int argc, char **argv )
 		 }
 	      }
 
-	      /*
+	      
 
 
 	      if (rightDist<cutoff) {
 		 if (rightBnd!=boxSize) { 
   		    bRight = b + subBlockNum; 
-	 	    kdx=0;
+		    printf("bRight is %d \n", bRight);
+		    kdx=0;
 		    for (int k=0; k<binParticleNum[bRight]; k++) { 
 		       while ((binArray[bRight][kdx])==NULL) { kdx++; }
 		       apply_force(*binArray[b][idx],*binArray[bRight][kdx]);
@@ -175,6 +176,7 @@ int main( int argc, char **argv )
 	      if (topDist<cutoff) {
 		 if (topBnd!=0) { 
 		    bTop = b - 1; 
+		    printf("bTop is %d \n", bTop);
   		    kdx=0;
 		    for (int k=0; k<binParticleNum[bTop]; k++) { 
 		       while ((binArray[bRight][kdx])==NULL) { kdx++; }
@@ -185,7 +187,8 @@ int main( int argc, char **argv )
 
 	      if (botDist<cutoff) {
 		 if (botBnd!=boxSize) {
-       		    bBottom = b + 1; 
+       		    bBottom = b + 1;
+		    printf("bBottom is %d \n", bBottom);
      		    kdx=0;
 		    for (int k=0; k<binParticleNum[bBottom]; k++) { 
 		       while ((binArray[bBottom][kdx])==NULL) { kdx++; }
@@ -193,7 +196,7 @@ int main( int argc, char **argv )
 		    }
 		 }
 	      }
-
+/*
 	      if (topDist<cutoff && leftDist<cutoff) { 
 		 if (topBnd!=0 && leftBnd !=0) {
 		    bTopLeft = b-subBlockNum-1;     
