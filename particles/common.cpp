@@ -97,9 +97,9 @@ void apply_force( particle_t &particle, particle_t &neighbor )
         return;
     r2 = fmax( r2, min_r*min_r );
     double r = sqrt( r2 );
-    if (particle.globalID != neighbor.globalID) {
+//    if (particle.globalID != neighbor.globalID) {
        printf("PING parti at %d, neigh at =%d \n", particle.globalID, neighbor.globalID);
-    }
+//    }
     //
     //  very simple short-range repulsive force
     //
