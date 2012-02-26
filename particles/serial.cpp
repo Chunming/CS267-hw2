@@ -57,7 +57,7 @@ int main( int argc, char **argv )
                return -1;
             }
     	    
-	    memset(binArray[b][i], NULL, 8*100); // sizeof(binArray[b][i]) is 8 bytes
+	    memset(binArray[b], NULL, 8*100); // sizeof(binArray[b][i]) is 8 bytes
     }
 
     // Initialize particles 
