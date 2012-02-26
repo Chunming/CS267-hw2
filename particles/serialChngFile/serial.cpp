@@ -73,7 +73,9 @@ int main( int argc, char **argv )
 
     for (int ndx=0; ndx<n; ndx++) { // For each particle
        xIdx = (particles[ndx].x)/subBlockLen; 
+       printf("xIdx is %d \n", xIdx);
        yIdx = (particles[ndx].y)/subBlockLen;
+       printf("yIdx is %d \n", yIdx);
        bdx = 0;
        // Store into first non-NULL index in array
        while (binArray[yIdx+(xIdx*subBlockNum)][bdx]!=NULL) {

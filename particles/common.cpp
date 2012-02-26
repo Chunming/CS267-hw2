@@ -125,9 +125,8 @@ void move( particle_t &p )
     //
     //  bounce from walls
     //
-    while( p.x < 0 || p.x > size )
-    {
-        p.x  = p.x < 0 ? -p.x : 2*size-p.x;
+    while( p.x < 0 || p.x > size )    {
+        p.x  = p.x < 0 ? -p.x : 2*size-p.x;  // condition ? value_if_true : value_if_false
         p.vx = -p.vx;
     }
     while( p.y < 0 || p.y > size )
