@@ -46,16 +46,16 @@ int main( int argc, char **argv )
        return -1;
     }
 
-    for (int idx=0; idx<binNum; idx++) { 
-	    binParticleNum[idx] = 0;
-	    binArray[idx] = new particle_t* [100]; // Set it to max 100 particles first
-            if (binArray[idx] == NULL) {
+    for (int b=0; b<binNum; b++) { 
+	    binParticleNum[b] = 0;
+	    binArray[b] = new particle_t* [100]; // Set it to max 100 particles first
+            if (binArray[b] == NULL) {
                printf("ERROR binArray index  mem alloc failed \n");
                return -1;
             }
     
-	    for (int kdx=0; kdx<100; kdx++) {
-	       binArray[idx][kdx] = NULL; // Set all ptrs to NULL
+	    for (int i=0; i<100; i++) {
+	       binArray[b][i] = NULL; // Set all ptrs to NULL
 	    }
     }
     printf("Bins are allocated, error check done \n");
@@ -86,22 +86,27 @@ int main( int argc, char **argv )
     //
     double simulation_time = read_timer( );
     int count;
+    int idx;
+    int jdx;
     for( int step = 0; step < NSTEPS; step++ )
     {
         //
         //  Compute forces
         //
-	count = 0;
+	idx=0;
+	jdx=0;
 	for (int b=0; b<binNum; b++) { // The bth bin
-	   count += binParticleNum[b];	
+
 	   for (int i=0; i<binParticleNum[b]; i++) { // The ith particle in bth bin
-	      (*binArray[b][i]).ax = (*binArray[b][i]).ay = 0;
+     	      while ((binArray[b][idx])==NULL) { idx++; }
+      	      (*binArray[b][idx]).ax = (*binArray[b][idx]).ay = 0;
+
      	      for (int j=0; j<binParticleNum[b]; j++) { // The jth particle in bth bin
-	         apply_force(*binArray[b][i],*binArray[b][j]);
+     	         while ((binArray[b][jdx])==NULL) { jdx++; }
+		 apply_force(*binArray[b][idx],*binArray[b][jdx]);
 	      }
             }
 	}
-	//printf("The count is %d \n", count); // Check count, should be 500
 
 	/*
 	// Orginal apply_force function
@@ -187,8 +192,8 @@ int main( int argc, char **argv )
     printf( "n = %d, simulation time = %g seconds\n", n, simulation_time );
    
     delete [] binParticleNum;
-    for (int idx=0; idx<binNum; idx++) {
-       delete [] binArray[idx];
+    for (int b=0; b<binNum; b++) {
+       delete [] binArray[b];
     }
     delete binArray;
 
