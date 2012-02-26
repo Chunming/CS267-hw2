@@ -1,0 +1,35 @@
+\documentclass[11pt]{amsart}
+\usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   % ... or a4paper or a5paper or ... 
+%\geometry{landscape}                % Activate for for rotated page geometry
+%\usepackage[parfill]{parskip}    % Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\title{CS267 Assignment 2: Parallelize Particle}
+\author{Chun Ming Chin, Chris Melgaard, Viraj Kulkarni }
+%\date{}                                           % Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+%\section{}
+%\subsection{}
+
+
+
+The box is segmented into subBlockNum number of subBlocks. Each subBlock is represented as a bin in the binArray.
+
+The binArray is a 2D static array data structure, where we allocate binNum number of elements to represent the number of subBlocks in the box. 
+
+Each binArray[idx], where 0 <= idx < binNum, is a pointer to an array of particlet pointers. Dereferencing binArray[idx][jdx], where 0<=jdx<maxN gives a particlet object. We determine the upper bound, maxN using a mathematical argument. 
+
+To check if a target particle collides with its neighboring particles, we only check a subset of all n particles. This subset comprises the following: 
+\begin{enumerate}
+\item Particles that belong to the same bin as the target particle
+\item Particles that belong to the left, right, bottom, top, topLeft, topRight, bottomLeft or bottomRight subBlocks with respect to the original subBlock where the target particle is located. 
+\end{enumerate}
+
+
+\end{document}  
