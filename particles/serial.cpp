@@ -4,6 +4,9 @@
 #include <math.h>
 #include "common.h"
 
+#define cutoff 0.01
+
+
 //
 //  benchmarking program
 //
@@ -88,6 +91,7 @@ int main( int argc, char **argv )
     int count;
     int idx;
     int jdx;
+    int kdx;
     for( int step = 0; step < NSTEPS; step++ )
     {
         //
