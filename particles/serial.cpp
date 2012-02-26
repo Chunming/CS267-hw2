@@ -177,9 +177,10 @@ int main( int argc, char **argv )
   		    kdx=0;
 		    for (int k=0; k<binParticleNum[bTop]; k++) { 
 		       while ((binArray[bRight][kdx])==NULL) { kdx++; }
-		       printf("Check 1 \n");
+		       printf("Check 1 %f \n", binArray[b][idx]);
+		       printf("Check 2 %f \n", binArray[bTop][kdx]);
 		       apply_force(*binArray[b][idx],*binArray[bTop][kdx]);
-		       printf("Check 2 \n");
+		       printf("Check 3 \n");
 		    }
 		 }
 	      }
