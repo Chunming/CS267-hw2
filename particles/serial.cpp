@@ -76,11 +76,6 @@ int main( int argc, char **argv )
        // Store into first non-NULL index in array
        while (binArray[yIdx+(xIdx*subBlockNum)][bdx]!=NULL) {
           bdx++; 
-          printf("bdx is %d \n", bdx); 
-          if (bdx > 500) {
-             printf("ERROR: Overflow \n");
-             return -1;
-          }
        }
        binArray[yIdx+(xIdx*subBlockNum)][bdx] = &particles[ndx];
        binParticleNum[yIdx+(xIdx*subBlockNum)]++; // Increment bin count
