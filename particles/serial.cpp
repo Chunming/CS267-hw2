@@ -164,7 +164,7 @@ int main( int argc, char **argv )
 
 
 	      // Consider 8 different adjacent subBlocks
-	      if (leftDist<cutoff) {
+	      if (leftDist<=2*cutoff) {
 		 if (leftBnd!=0) { // Left subBlock index is valid
 		    bLeft = b - subBlockNum; // subBlockLen=0.1, subBlockNum = 5 
 		    //printf("bLeft is %d \n", bLeft);
@@ -176,7 +176,7 @@ int main( int argc, char **argv )
 		 }
 	      }
 
-	      if (rightDist<cutoff) {
+	      if (rightDist<=2*cutoff) {
 		 if (rightBnd!=boxSize) { 
   		    bRight = b + subBlockNum; 
 		    //printf("bRight is %d \n", bRight);
@@ -188,7 +188,7 @@ int main( int argc, char **argv )
 		 }
 	      }
 
-	      if (topDist<cutoff) {
+	      if (topDist<=2*cutoff) {
 		 if (topBnd!=0) { 
 		    bTop = b - 1; 
 		    //printf("bTop is %d \n", bTop);
@@ -200,7 +200,7 @@ int main( int argc, char **argv )
 		 }
 	      }
 
-	      if (botDist<cutoff) {
+	      if (botDist<=2*cutoff) {
 		 if (botBnd!=boxSize) {
        		    bBottom = b + 1;
 		    //printf("bBottom is %d \n", bBottom);
@@ -212,7 +212,7 @@ int main( int argc, char **argv )
 		 }
 	      }
 
-	      if (topDist<cutoff && leftDist<cutoff) { 
+	      if (topDist<=2*cutoff && leftDist<=2*cutoff) { 
 		 if (topBnd!=0 && leftBnd !=0) {
 		    bTopLeft = b-subBlockNum-1;     
 		    kdx=0;
@@ -223,7 +223,7 @@ int main( int argc, char **argv )
 		 }
 	      }
 
-	      if (botDist<cutoff && leftDist<cutoff) { 
+	      if (botDist<=2*cutoff && leftDist<=2*cutoff) { 
 		 if (botBnd!=boxSize && leftBnd!=0) { 
 		    bBotLeft = b-subBlockNum+1;     
      		    kdx=0;
@@ -234,7 +234,7 @@ int main( int argc, char **argv )
 		 }
 	      }
 
-	      if (topDist<cutoff && rightDist<cutoff) { 
+	      if (topDist<=2*cutoff && rightDist<=2*cutoff) { 
 		 if (topBnd!=0 && rightBnd!=boxSize) {
 		    bTopRight = b+subBlockNum-1;     
      		    kdx=0;
@@ -245,7 +245,7 @@ int main( int argc, char **argv )
 		 }
 	      }
 
-	      if (botDist<cutoff && rightDist<cutoff) { 
+	      if (botDist<=2*cutoff && rightDist<=2*cutoff) { 
 		 if (botBnd!=boxSize && rightBnd!=boxSize) {
    		    bBotRight = b+subBlockNum+1;     
      		    kdx=0;
