@@ -127,9 +127,9 @@ int main( int argc, char **argv )
 
 	      // Check particles to the left/right/top/bottom subBlocks of bth subBlock	 
 	      xIdx = (*binArray[b][idx]).x/subBlockLen;
-	      printf("xIdx is %d \n", xIdx);
+	      //printf("xIdx is %d \n", xIdx);
 	      yIdx = (*binArray[b][idx]).y/subBlockLen;
-	      printf("yIdx is %d \n", yIdx);
+	      //printf("yIdx is %d \n", yIdx);
 
 	      leftBnd = xIdx*subBlockLen;
 	      //printf("leftBnd is %f \n", leftBnd);
