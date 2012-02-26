@@ -143,12 +143,12 @@ int main( int argc, char **argv )
 
 	      botDist = fabs((*binArray[b][idx]).y - botBnd);
 	      printf("botDist is %f \n", botDist);
-/*
+
 
 	      // Consider 8 different adjacent subBlocks
 	      if (leftDist<cutoff) {
 		 if (leftBnd!=0) { // Left subBlock index is valid
-		    bLeft = b - subBlockLen; // Find index of left subBlock in 1D array
+		    bLeft = b - subBlockNum; // subBlockLen=0.1, subBlockNum = 5 
 		    kdx=0;
 		    for (int k=0; k<binParticleNum[bLeft]; k++) { 
 		       while ((binArray[bLeft][kdx])==NULL) { kdx++; }
@@ -156,6 +156,8 @@ int main( int argc, char **argv )
 		    }
 		 }
 	      }
+
+/*
 
 	      if (rightDist<cutoff) {
 		 if (rightBnd!=boxSize) { 
