@@ -193,7 +193,7 @@ int main( int argc, char **argv )
 		    }
 		 }
 	      }
-/*
+
 	      if (topDist<cutoff && leftDist<cutoff) { 
 		 if (topBnd!=0 && leftBnd !=0) {
 		    bTopLeft = b-subBlockNum-1;     
@@ -237,7 +237,7 @@ int main( int argc, char **argv )
 		    }
 		 }
 	      }
-*/
+
 	      
 
             }
