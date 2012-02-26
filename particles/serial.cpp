@@ -157,6 +157,7 @@ int main( int argc, char **argv )
 		 }
 	      }
 
+	      /*
 
 
 	      if (rightDist<cutoff) {
@@ -235,7 +236,7 @@ int main( int argc, char **argv )
 		    }
 		 }
 	      }
-
+*/
 	      
 
             }
