@@ -97,7 +97,7 @@ void apply_force( particle_t &particle, particle_t &neighbor )
         return;
     r2 = fmax( r2, min_r*min_r );
     double r = sqrt( r2 );
-
+    printf("The Global ID is %d \n", neighbor.globalID);
     //
     //  very simple short-range repulsive force
     //
