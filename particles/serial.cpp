@@ -37,13 +37,13 @@ int main( int argc, char **argv )
     int* binParticleNum = new int [binNum]; // No. of particles in each bin
     if (binParticleNum == NULL) {
        printf("ERROR binParticleNum mem alloc failed \n");
-       return =1;
+       return -1;
     }
 
     particle_t*** binArray = new particle_t** [binNum]; // Array of ptrs to particle*
     if (binArray == NULL) {
        printf("ERROR binArray mem alloc failed \n");
-       return =1;
+       return -1;
     }
 
     for (int idx=0; idx<binNum; idx++) { 
@@ -51,7 +51,7 @@ int main( int argc, char **argv )
 	    binArray[idx] = new particle_t* [100]; // Set it to max 100 particles first
             if (binArray[idx] == NULL) {
                printf("ERROR binArray index  mem alloc failed \n");
-               return =1;
+               return -1;
             }
     
 	    for (int kdx=0; kdx<100; kdx++) {
