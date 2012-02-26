@@ -35,10 +35,25 @@ int main( int argc, char **argv )
     // Set no. of blocks as 5 x 5
     int binNum = 25; // No. of bins
     int* binParticleNum = new int [binNum]; // No. of particles in each bin
+    if (binParticleNum == NULL) {
+       printf("ERROR binParticleNum mem alloc failed \n");
+       return =1;
+    }
+
     particle_t*** binArray = new particle_t** [binNum]; // Array of ptrs to particle*
+    if (binArray == NULL) {
+       printf("ERROR binArray mem alloc failed \n");
+       return =1;
+    }
+
     for (int idx=0; idx<binNum; idx++) { 
 	    binParticleNum[idx] = 0;
 	    binArray[idx] = new particle_t* [100]; // Set it to max 100 particles first
+            if (binArray[idx] == NULL) {
+               printf("ERROR binArray index  mem alloc failed \n");
+               return =1;
+            }
+    
 	    for (int kdx=0; kdx<100; kdx++) {
 	       binArray[idx][kdx] = NULL; // Set all ptrs to NULL
 	    }
@@ -77,21 +92,27 @@ int main( int argc, char **argv )
     double simulation_time = read_timer( );
     for( int step = 0; step < NSTEPS; step++ )
     {
-
-
-	    
         //
-        //  compute forces
+        //  Compute forces
         //
-        for( int i = 0; i < n; i++ )
-        {
-            particles[i].ax = particles[i].ay = 0;
-            for (int j = 0; j < n; j++ )
-                apply_force( particles[i], particles[j] );
-        }
+	for (int b=0; b<binNum; b++) { // The bth bin
+	   for (int i=0; i<binParticleNum[b]; i++) { // The ith particle in bth bin
+	      (*binArray[b][i]).ax = (*binArray[b][i]).ay = 0;
+     	      for (int j=0; j<binParticleNum[b]; j++) { // The jth particle in bth bin
+	         apply_force(*binArray[b][i],*binArray[b][j]);
+	      }
+            }
+	}
+
+        //for( int i = 0; i < n; i++ )
+        //{
+        //    particles[i].ax = particles[i].ay = 0;
+        //    for (int j = 0; j < n; j++ )
+        //        apply_force( particles[i], particles[j] );
+        //}
         
         //
-        //  move particles
+        //  Move particles
         //
         for( int i = 0; i < n; i++ ) 
             move( particles[i] );
