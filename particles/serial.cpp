@@ -116,7 +116,7 @@ int main( int argc, char **argv )
 	double leftBnd, rightBnd, topBnd, botBnd;
 	double leftDist, rightDist, topDist, botDist;
 	int bLeft, bRight, bBottom, bTop, bTopLeft, bTopRight, bBotLeft, bBotRight;
-
+        int idxCount = 0;
 	for (int b=0; b<binNum; b++) { // The bth bin
 
 	   idx=0;
@@ -259,8 +259,11 @@ int main( int argc, char **argv )
 	      
 
             }
+
+	   idxCount += binParticleNum[b];
 	}
 
+        printf("The idxCount is %d \n", idxCount);
         
 	
 	//
@@ -308,8 +311,7 @@ int main( int argc, char **argv )
 	for (int b=0; b<binNum; b++) {
 	   count += binParticleNum[b];
 	}
-	//printf("The count is %d \n", count); // Check count, should be 500
-
+	printf("The count is %d \n", count); // Check count, should be 500
 
         //
         //  save if necessary
