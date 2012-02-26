@@ -36,7 +36,6 @@ int main( int argc, char **argv )
     int binNum = 25; // No. of bins
     int* binParticleNum = new int [binNum]; // No. of particles in each bin
     particle_t*** binArray = new particle_t** [binNum]; // Array of ptrs to particle*
-   
     for (int idx=0; idx<binNum; idx++) { 
 	    binParticleNum[idx] = 0;
 	    binArray[idx] = new particle_t* [100]; // Set it to max 100 particles first
@@ -44,16 +43,17 @@ int main( int argc, char **argv )
 	       binArray[idx][kdx] = NULL; // Set all ptrs to NULL
 	    }
     }
-    
     printf("Bins are allocated \n");
 
     // Initialize particles 
     init_particles( n, particles );
 
-
-
-
     // Initialize particle binning
+    int xIdx, yIdx; // x/y index in 1D array
+    int bdx; 
+    double subBlockLen = 0.1;
+    int subBlockNum = 5; // No. of sub blocks along a row/column
+
     for (int ndx=0; ndx<n; ndx++) { // For each particle
        xIdx = (particles[ndx].x)/subBlockLen; 
        yIdx = (particles[ndx].y)/subBlockLen;
@@ -71,14 +71,9 @@ int main( int argc, char **argv )
        binParticleNum[yIdx+(xIdx*subBlockNum)]++; // Increment bin count
     }
 
-
     //
-    //  simulate a number of time steps
+    //  Simulate a number of time steps
     //
-    int xIdx, yIdx; // x/y index in 1D array
-    int bdx; 
-    double subBlockLen = 0.1;
-    int subBlockNum = 5; // No. of sub blocks along a row/column
     double simulation_time = read_timer( );
     for( int step = 0; step < NSTEPS; step++ )
     {
