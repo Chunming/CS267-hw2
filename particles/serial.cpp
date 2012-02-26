@@ -127,7 +127,9 @@ int main( int argc, char **argv )
 	      rightDist = fabs((*binArray[b][idx]).x - rightBnd);
 	      topDist = fabs((*binArray[b][idx]).y - topBnd);
 	      botDist = fabs((*binArray[b][idx]).y - botBnd);
-	      
+	     
+/*
+
 	      // Consider 8 different adjacent subBlocks
 	      if (leftDist<cutoff) {
 		 if (leftBnd!=0) { // Left subBlock index is valid
@@ -216,6 +218,9 @@ int main( int argc, char **argv )
 		    }
 		 }
 	      }
+
+	      */
+
             }
 	}
 
