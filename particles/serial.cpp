@@ -97,7 +97,7 @@ int main( int argc, char **argv )
 
 	   idx=0;
 	   for (int i=0; i<binParticleNum[b]; i++) { // The ith particle in bth bin
-     	      while ((binArray[b][idx])==NULL) { idx++; }
+     	      while ((binArray[b][idx])==NULL) { idx++; } // Index skips NULL values
       	      (*binArray[b][idx]).ax = (*binArray[b][idx]).ay = 0;
 
 	      jdx=0;
