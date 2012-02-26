@@ -136,7 +136,6 @@ int main( int argc, char **argv )
 	      
 	      // Check if particle shld be moved to another bin	  
 
-	      printf("Check 1 \n");
      	      while ((binArray[b][idx])==NULL) { idx++; }
 	      xIdx = (*binArray[b][idx]).x/subBlockLen;
               yIdx = (*binArray[b][idx]).y/subBlockLen;
@@ -152,15 +151,10 @@ int main( int argc, char **argv )
                        return -1;
 		    }	 
 		 }
-		 printf("Check 4 \n");
                  binArray[index][bdx] = binArray[b][idx]; // Add element into first non-NULL index   	
-		 printf("Check 5 \n");
 		 binArray[b][idx] = NULL;
-		 printf("Check 6 \n");
 		 binParticleNum[b]--;
-		 printf("Check 7 \n");
 		 binParticleNum[index]++;
-		 printf("Check 8 \n");
 
 	      }
 	   }
