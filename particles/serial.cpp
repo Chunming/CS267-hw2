@@ -60,7 +60,7 @@ int main( int argc, char **argv )
 	       binArray[b][i] = NULL; // Set all ptrs to NULL
 	    }
     }
-    printf("Bins are allocated, error check done \n");
+    //printf("Bins are allocated, error check done \n");
 
     // Initialize particles 
     init_particles( n, particles );

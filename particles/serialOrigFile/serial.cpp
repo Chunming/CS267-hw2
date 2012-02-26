@@ -54,7 +54,7 @@ int main( int argc, char **argv )
         //
         if( fsave && (step%SAVEFREQ) == 0 ) {
 
-	    printf("The time step is %d \n", step);
+	    //printf("The time step is %d \n", step);
             save( fsave, n, particles );
 
          }
