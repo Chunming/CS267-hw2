@@ -27,8 +27,8 @@ int main( int argc, char **argv )
     set_size( n );
 
     double boxSize = sqrt(0.0005*n); // Density is set at 0.0005
-    printf("The value of n is  %d \n", n);
-    printf("The box size is %f \n", boxSize); // Box size is 0.5
+    //printf("The value of n is  %d \n", n);
+    //printf("The box size is %f \n", boxSize); // Box size is 0.5
      
 	      
     // Determine number of sublocks, represent as a vector;
@@ -58,7 +58,7 @@ int main( int argc, char **argv )
 	       binArray[idx][kdx] = NULL; // Set all ptrs to NULL
 	    }
     }
-    printf("Bins are allocated \n");
+    printf("Bins are allocated, error check done \n");
 
     // Initialize particles 
     init_particles( n, particles );
@@ -90,12 +90,17 @@ int main( int argc, char **argv )
     //  Simulate a number of time steps
     //
     double simulation_time = read_timer( );
+    int count;
     for( int step = 0; step < NSTEPS; step++ )
     {
         //
         //  Compute forces
         //
+	count = 0;
 	for (int b=0; b<binNum; b++) { // The bth bin
+
+	   count += binParticleNum[b];	
+
 	   for (int i=0; i<binParticleNum[b]; i++) { // The ith particle in bth bin
 	      (*binArray[b][i]).ax = (*binArray[b][i]).ay = 0;
      	      for (int j=0; j<binParticleNum[b]; j++) { // The jth particle in bth bin
@@ -103,26 +108,36 @@ int main( int argc, char **argv )
 	      }
             }
 	}
+	printf("The count is %d \n", count);
 
-        //for( int i = 0; i < n; i++ )
-        //{
-        //    particles[i].ax = particles[i].ay = 0;
-        //    for (int j = 0; j < n; j++ )
-        //        apply_force( particles[i], particles[j] );
-        //}
+	/*
+        for( int i = 0; i < n; i++ )
+        {
+            particles[i].ax = particles[i].ay = 0;
+            for (int j = 0; j < n; j++ )
+                apply_force( particles[i], particles[j] );
+        }
+	*/        
         
-        //
+	
+	//
         //  Move particles
         //
         for( int i = 0; i < n; i++ ) 
             move( particles[i] );
         
+	//
+	// Re-bin particles
+	//
+
+
+
         //
         //  save if necessary
         //
         if( fsave && (step%SAVEFREQ) == 0 ) {
 
-	    printf("The time step is %d \n", step);
+	    //printf("The time step is %d \n", step);
             save( fsave, n, particles );
 
          }
