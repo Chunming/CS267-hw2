@@ -97,10 +97,8 @@ int main( int argc, char **argv )
         //
         //  Compute forces
         //
-	double leftBnd;
-	double rightBnd;
-	double topBnd;
-	double bottomBnd;
+	double leftBnd, rightBnd, topBnd, bottomBnd;
+	double leftDist, rightDist, topDist, bottomDist;
 	int bLeft, bRight, bTop, bBottom;
 	for (int b=0; b<binNum; b++) { // The bth bin
 
