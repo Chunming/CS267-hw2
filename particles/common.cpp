@@ -149,7 +149,7 @@ void save( FILE *f, int n, particle_t *p )
         first = false;
     }
     for( int i = 0; i < n; i++ )
-        fprintf( f, "%10.8f %f10.8\n", p[i].x, p[i].y );
+        fprintf( f, "%10.8f %10.8f\n", p[i].x, p[i].y );
 }
 
 //

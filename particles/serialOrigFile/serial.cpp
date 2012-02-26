@@ -38,7 +38,6 @@ int main( int argc, char **argv )
         //
         for( int i = 0; i < n; i++ )
         {
-	    printf("TARGET particle has globalID = %d", particles[i].globalID);
             particles[i].ax = particles[i].ay = 0;
             for (int j = 0; j < n; j++ )
                 apply_force( particles[i], particles[j] );
