@@ -133,8 +133,8 @@ int main( int argc, char **argv )
 	   for (int i=0; i<binParticleNum[b]; i++) { // The ith particle in bth bin
 	      
 	      // Check if particle shld be moved to another bin	  
-              xIdx = (*binArray[b][i].x)/subBlockLen; 
-              yIdx = (*binArray[b][i].y)/subBlockLen;
+              xIdx = (*binArray[b][i]).x/subBlockLen; 
+              yIdx = (*binArray[b][i]).y/subBlockLen;
 	      index = yIdx+(xIdx*subBlockNum); // Map 2D to 1D index
 	      if (index != b) { // Particle has moved out of of the bin
 
@@ -157,7 +157,7 @@ int main( int argc, char **argv )
 
 	// Check count
 	count = 0;
-	for (int b; b<binNum; b++) {
+	for (int b=0; b<binNum; b++) {
 	   count += binParticleNum[b];
 	}
 	printf("The count is %d \n", count); // Check count, should be 500
