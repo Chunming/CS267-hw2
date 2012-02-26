@@ -32,4 +32,27 @@ To check if a target particle collides with its neighboring particles, we only c
 \end{enumerate}
 
 
+\section{Pseudocode for serial.cpp O(n) implementation}
+
+Initialize particle binning
+
+for each time step {
+
+   // Compute forces for each particle in each bin
+   
+   for each bin {
+   
+      for each particle in current bin {
+         Compare with other particles in current subBlock.
+         Compare with other particles in adjacent 8 subBlocks.
+      }    
+   }
+   
+   // Move particles
+   
+   // Re-bin particles
+   
+}
+
+
 \end{document}  
