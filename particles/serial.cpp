@@ -129,6 +129,7 @@ int main( int argc, char **argv )
 	      jdx=0;
      	      for (int j=0; j<binParticleNum[b]; j++) { // The jth particle in bth bin
      	         while ((binArray[b][jdx])==NULL) { jdx++; }
+		 printf("Apply force \n");
 		 apply_force(*binArray[b][idx],*binArray[b][jdx]);
 	      }
 
