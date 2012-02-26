@@ -123,6 +123,8 @@ int main( int argc, char **argv )
 	//
 	// Re-bin particles
 	//
+	
+	/*
 	int index;
 	for (int b=0; b<binNum; b++) { // The bth bin
 	   for (int i=0; i<binParticleNum[b]; i++) { // The ith particle in bth bin
@@ -150,6 +152,7 @@ int main( int argc, char **argv )
 	   }
 	}
 
+	*/
 	// Check count
 	count = 0;
 	for (int b=0; b<binNum; b++) {
