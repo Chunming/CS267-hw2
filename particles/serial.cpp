@@ -176,11 +176,8 @@ int main( int argc, char **argv )
 		    printf("bTop is %d \n", bTop);
   		    kdx=0;
 		    for (int k=0; k<binParticleNum[bTop]; k++) { 
-		       while ((binArray[bRight][kdx])==NULL) { kdx++; }
-		       printf("Check 1 %f \n", binArray[b][idx]);
-		       printf("Check 2 %f \n", binArray[bTop][kdx]);
+		       while ((binArray[bTop][kdx])==NULL) { kdx++; }
 		       apply_force(*binArray[b][idx],*binArray[bTop][kdx]);
-		       printf("Check 3 \n");
 		    }
 		 }
 	      }
