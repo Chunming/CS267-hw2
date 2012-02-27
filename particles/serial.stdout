@@ -1,0 +1,122 @@
+Warning: no access to tty (Bad file descriptor).
+Thus no job control in this shell.
+The time step is 0 
+The time step is 1 
+The time step is 2 
+The time step is 3 
+The time step is 4 
+The time step is 5 
+The time step is 6 
+The time step is 7 
+The time step is 8 
+The time step is 9 
+The time step is 10 
+The time step is 11 
+The time step is 12 
+The time step is 13 
+The time step is 14 
+The time step is 15 
+The time step is 16 
+The time step is 17 
+The time step is 18 
+The time step is 19 
+The time step is 20 
+The time step is 21 
+The time step is 22 
+The time step is 23 
+The time step is 24 
+The time step is 25 
+The time step is 26 
+The time step is 27 
+The time step is 28 
+The time step is 29 
+The time step is 30 
+The time step is 31 
+The time step is 32 
+The time step is 33 
+The time step is 34 
+The time step is 35 
+The time step is 36 
+The time step is 37 
+The time step is 38 
+The time step is 39 
+The time step is 40 
+The time step is 41 
+The time step is 42 
+The time step is 43 
+The time step is 44 
+The time step is 45 
+The time step is 46 
+The time step is 47 
+The time step is 48 
+The time step is 49 
+The time step is 50 
+The time step is 51 
+The time step is 52 
+The time step is 53 
+The time step is 54 
+The time step is 55 
+The time step is 56 
+The time step is 57 
+The time step is 58 
+The time step is 59 
+The time step is 60 
+The time step is 61 
+The time step is 62 
+The time step is 63 
+The time step is 64 
+The time step is 65 
+The time step is 66 
+The time step is 67 
+The time step is 68 
+The time step is 69 
+The time step is 70 
+The time step is 71 
+The time step is 72 
+The time step is 73 
+The time step is 74 
+The time step is 75 
+The time step is 76 
+The time step is 77 
+The time step is 78 
+The time step is 79 
+The time step is 80 
+The time step is 81 
+The time step is 82 
+The time step is 83 
+The time step is 84 
+The time step is 85 
+The time step is 86 
+The time step is 87 
+The time step is 88 
+The time step is 89 
+The time step is 90 
+The time step is 91 
+The time step is 92 
+The time step is 93 
+The time step is 94 
+The time step is 95 
+The time step is 96 
+The time step is 97 
+The time step is 98 
+The time step is 99 
+n = 500, simulation time = 0.220404 seconds
+Application 6059862 resources: utime ~0s, stime ~0s
+
+ + --------------------------------------------------------------------------
+ +        Job name: job-hopper-serial
+ +          Job Id: 1328561.sdb
+ +          System: hopper
+ +     Queued Time: Sun Feb 26 22:05:18 2012
+ +      Start Time: Sun Feb 26 22:05:52 2012
+ + Completion Time: Sun Feb 26 22:05:55 2012
+ +            User: cmchin
+ +        MOM Host: nid04944
+ +           Queue: debug
+ +  Req. Resources: other=QSUBPID:4535:hopper01,walltime=00:10:00
+ +  Used Resources: cput=00:00:00,mem=0kb,vmem=0kb,walltime=00:00:03
+ +     Acct String: mp309
+ +   PBS_O_WORKDIR: /global/homes/c/cmchin/franklin/CS267-hw2/particles
+ +     Submit Args: job-hopper-serial
+ + --------------------------------------------------------------------------
+
