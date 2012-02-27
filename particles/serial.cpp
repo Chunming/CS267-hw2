@@ -49,14 +49,25 @@ int main( int argc, char **argv )
        return -1;
     }
 
-   memset(binParticleNum, 0, 4*binNum); // sizeof(binParticleNum[b] is 4 bytes
+
+   for (int i = 0; i<binNum; i++) {
+      binParticleNum[i] = 0; // sizeof(binParticleNum[b] is 4 bytes
+   }	   
+
+   //memset(binParticleNum, 0, 4*binNum); // sizeof(binParticleNum[b] is 4 bytes
+
+
    for (int b=0; b<binNum; b++) { 
 	    binArray[b] = new particle_t* [100]; // Set it to max 100 particles first
             if (binArray[b] == NULL) {
                printf("ERROR binArray index  mem alloc failed \n");
                return -1;
             }
-	    memset(binArray[b], NULL, 8*100); // sizeof(binArray[b][i]) is 8 bytes
+          
+            for (int i=0; i<100; i++) {
+	       binArray[b][i] = NULL;
+	    }
+	    //memset(binArray[b], NULL, 8*100); // sizeof(binArray[b][i]) is 8 bytes
     }
 
     // Initialize particles 
