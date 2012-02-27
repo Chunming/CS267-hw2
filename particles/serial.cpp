@@ -329,7 +329,7 @@ int main( int argc, char **argv )
 	for (int b=0; b<binNum; b++) {
 	   count += binParticleNum[b];
 	}
-	printf("The count is %d \n", count); // Check count, should be 500
+	//printf("The count is %d \n", count); // Check count, should be 500
 
         //
         //  save if necessary
