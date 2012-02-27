@@ -264,7 +264,7 @@ int main( int argc, char **argv )
 	   idxCount += binParticleNum[b];
 	}
 
-        printf("The idxCount is %d \n", idxCount);
+        //printf("The idxCount is %d \n", idxCount);
         
 	
 	//
