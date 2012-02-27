@@ -139,6 +139,7 @@ int main( int argc, char **argv )
      	      for (int j=0; j<binParticleNum[b]; j++) { // The jth particle in bth bin
      	         while ((binArray[b][jdx])==NULL) { jdx++; }
 		 apply_force(*binArray[b][idx],*binArray[b][jdx]);
+		 jdx++;
 	      }
 
 	      // Check particles to the left/right/top/bottom subBlocks of bth subBlock	 
@@ -181,6 +182,7 @@ int main( int argc, char **argv )
 		    for (int k=0; k<binParticleNum[bLeft]; k++) { 
 		       while ((binArray[bLeft][kdx])==NULL) { kdx++; }
 		       apply_force(*binArray[b][idx],*binArray[bLeft][kdx]);
+		       kdx++;
 		    }
 		 }
 	      }
@@ -193,6 +195,7 @@ int main( int argc, char **argv )
 		    for (int k=0; k<binParticleNum[bRight]; k++) { 
 		       while ((binArray[bRight][kdx])==NULL) { kdx++; }
 		       apply_force(*binArray[b][idx],*binArray[bRight][kdx]);
+		       kdx++;
 		    }
 		 }
 	      }
@@ -205,6 +208,7 @@ int main( int argc, char **argv )
 		    for (int k=0; k<binParticleNum[bTop]; k++) { 
 		       while ((binArray[bTop][kdx])==NULL) { kdx++; }
 		       apply_force(*binArray[b][idx],*binArray[bTop][kdx]);
+		       kdx++;
 		    }
 		 }
 	      }
@@ -217,6 +221,7 @@ int main( int argc, char **argv )
 		    for (int k=0; k<binParticleNum[bBottom]; k++) { 
 		       while ((binArray[bBottom][kdx])==NULL) { kdx++; }
 		       apply_force(*binArray[b][idx],*binArray[bBottom][kdx]);
+		       kdx++;
 		    }
 		 }
 	      }
@@ -228,6 +233,7 @@ int main( int argc, char **argv )
 		    for (int k=0; k<binParticleNum[bTopLeft]; k++) { 
 		       while ((binArray[bTopLeft][kdx])==NULL) { kdx++; }
 		       apply_force(*binArray[b][idx],*binArray[bTopLeft][kdx]);
+		       kdx++;
 		    }
 		 }
 	      }
@@ -239,6 +245,7 @@ int main( int argc, char **argv )
 		    for (int k=0; k<binParticleNum[bBotLeft]; k++) { 
 		       while ((binArray[bBotLeft][kdx])==NULL) { kdx++; }
 		       apply_force(*binArray[b][idx],*binArray[bBotLeft][kdx]);
+		       kdx++;
 		    }
 		 }
 	      }
@@ -250,6 +257,7 @@ int main( int argc, char **argv )
 		    for (int k=0; k<binParticleNum[bTopRight]; k++) { 
 		       while ((binArray[bTopRight][kdx])==NULL) { kdx++; }
 		       apply_force(*binArray[b][idx],*binArray[bTopRight][kdx]);
+		       kdx++;
 		    }
 		 }
 	      }
@@ -261,12 +269,13 @@ int main( int argc, char **argv )
 		    for (int k=0; k<binParticleNum[bBotRight]; k++) { 
 		       while ((binArray[bBotRight][kdx])==NULL) { kdx++; }
 		       apply_force(*binArray[b][idx],*binArray[bBotRight][kdx]);
+		       kdx++
 		    }
 		 }
 	      }
 
 	      
-
+               idx++;
             }
 
 	   idxCount += binParticleNum[b];
