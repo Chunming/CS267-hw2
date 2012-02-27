@@ -321,6 +321,7 @@ int main( int argc, char **argv )
 		 binParticleNum[index]++;
 
 	      }
+	      idx++;
 	   }
 	}
 
