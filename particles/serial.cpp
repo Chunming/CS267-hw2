@@ -56,7 +56,6 @@ int main( int argc, char **argv )
                printf("ERROR binArray index  mem alloc failed \n");
                return -1;
             }
-    	    
 	    memset(binArray[b], NULL, 8*100); // sizeof(binArray[b][i]) is 8 bytes
     }
 
@@ -111,6 +110,11 @@ int main( int argc, char **argv )
         }
 	*/
 
+        // Set particle accelerations to 0 before using apply_force
+        for( int i = 0; i < 500; i++ ) 
+		particles[i].ax = particles[i].ay = 0;
+
+	// Compute Forces
 	double leftBnd, rightBnd, topBnd, botBnd;
 	double leftDist, rightDist, topDist, botDist;
 	int bLeft, bRight, bBottom, bTop, bTopLeft, bTopRight, bBotLeft, bBotRight;
@@ -120,8 +124,7 @@ int main( int argc, char **argv )
 	   idx=0;
 	   for (int i=0; i<binParticleNum[b]; i++) { // The ith particle in bth bin
      	      while ((binArray[b][idx])==NULL) { idx++; } // Index skips NULL values
-      	      (*binArray[b][idx]).ax = (*binArray[b][idx]).ay = 0;
-
+      	      // (*binArray[b][idx]).ax = (*binArray[b][idx]).ay = 0;
 
 	      // Check all particles in bth subBlock
 	      jdx=0;
