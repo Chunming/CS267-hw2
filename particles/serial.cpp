@@ -269,7 +269,7 @@ int main( int argc, char **argv )
 		    for (int k=0; k<binParticleNum[bBotRight]; k++) { 
 		       while ((binArray[bBotRight][kdx])==NULL) { kdx++; }
 		       apply_force(*binArray[b][idx],*binArray[bBotRight][kdx]);
-		       kdx++
+		       kdx++;
 		    }
 		 }
 	      }
