@@ -6,7 +6,7 @@
 #include <string.h>
 
 #define cutoff 0.01 // Was defined in common.cpp
-
+#define density 0.0005
 //
 //  benchmarking program
 //
@@ -29,7 +29,7 @@ int main( int argc, char **argv )
     particle_t *particles = (particle_t*) malloc( n * sizeof(particle_t) );
     set_size( n );
 
-    double boxSize = sqrt(0.0005*n); // Density is set at 0.0005
+    double boxSize = sqrt(density*n); 
     //printf("The value of n is  %d \n", n);
     //printf("The box size is %f \n", boxSize); // Box size is 0.5
      
@@ -54,7 +54,7 @@ int main( int argc, char **argv )
       binParticleNum[i] = 0; // sizeof(binParticleNum[b] is 4 bytes
    }	   
 
-   //memset(binParticleNum, 0, 4*binNum); // sizeof(binParticleNum[b] is 4 bytes
+   memset(binParticleNum, 0, sizeof(int)*binNum); // sizeof(binParticleNum[b] is 4 bytes
 
 
    for (int b=0; b<binNum; b++) { 
@@ -64,10 +64,10 @@ int main( int argc, char **argv )
                return -1;
             }
           
-            for (int i=0; i<100; i++) {
-	       binArray[b][i] = NULL;
-	    }
-	    //memset(binArray[b], NULL, 8*100); // sizeof(binArray[b][i]) is 8 bytes
+            //for (int i=0; i<100; i++) {
+	    //   binArray[b][i] = NULL;
+	    //}
+	    memset(binArray[b], NULL, 100*sizeof(particle_t*));
     }
 
     // Initialize particles 
