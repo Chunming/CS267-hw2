@@ -4,7 +4,7 @@
 CC = CC
 MPCC = CC
 OPENMP = -mp
-CFLAGS = -O3
+CFLAGS = -O3 -g
 LIBS =
 
 
