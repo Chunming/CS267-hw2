@@ -13,9 +13,144 @@ particle_t *particles;
 FILE *fsave;
 pthread_barrier_t barrier;
 
+//VIRAJ
+
+// Duplicating from common.cpp
+#define cutoff  0.01
+#define density 0.0005
+
+double spaceDim = 0.0;
+particle_t **binParticles = NULL;
+unsigned char **binParticlesFlag = NULL;
+int *particlesPerBin = NULL;
+int *freeLocationPerBin = NULL;
+
+int numBins = -1;
+int maxParticlesPerBin = -1;
+double binLength = -1;
+
+int isCloseToEdge(particle_t &particle, double binEdge)
+{
+	double dx = binEdge - particle.x;
+	double r2 = dx * dx;
+	if( r2 > cutoff*cutoff )
+		return 0;
+	return 1;
+}
+
+void setupBins()
+{
+	spaceDim = sqrt( density * n );
+	
+	// setup bins
+	numBins = n_threads;
+	binLength = spaceDim / numBins;
+
+	// find maximum no of particles per bin
+	double bin_area = (spaceDim*spaceDim) / numBins; // area of space = size * size 
+	maxParticlesPerBin = (int)( bin_area / (3.14 * (cutoff/2) * (cutoff/2)) ); // radius of particle = cutoff/2
+
+	// allocate memory
+	particlesPerBin = (int*) malloc(sizeof(int) * numBins);
+	freeLocationPerBin = (int*) malloc(sizeof(int) * numBins);
+	binParticles = (particle_t**) malloc(sizeof(particle_t*) * numBins);
+	binParticlesFlag = (unsigned char**) malloc(sizeof(unsigned char*) * numBins);
+	for(int i=0; i<numBins; i++)
+	{
+		particlesPerBin[i] = 0;
+		freeLocationPerBin[i] = 0;
+		binParticles[i] = (particle_t*) malloc(sizeof(particle_t) * maxParticlesPerBin);
+		memset(binParticles[i], 0, sizeof(particle_t) * maxParticlesPerBin);
+		binParticlesFlag[i] = (unsigned char*) malloc(sizeof(unsigned char) * maxParticlesPerBin);
+		memset(binParticlesFlag[i], 0, sizeof(unsigned char) * maxParticlesPerBin);
+	}
+}
+
+void freeBins()
+{
+	for(int i=0; i<numBins; i++)
+	{
+		free(binParticles[i]);
+		free(binParticlesFlag[i]);
+	}
+	free(binParticles);
+	free(binParticlesFlag);
+	
+	free(particlesPerBin);
+	free(freeLocationPerBin);
+}
+
+int getFreeLocation(int bin)
+{
+	int loc = freeLocationPerBin[bin];
+	if(binParticlesFlag[bin][loc] != 0)
+	{
+		// Error check
+		printf("\ngetFreeLocation(): RED FLAG! @ binParticlesFlag[bin][loc] != 0");
+	}	
+	return loc;
+}
+
+void copyParticleToBin(particle_t particle, int bin)
+{
+	if(particlesPerBin[bin] > maxParticlesPerBin)
+		printf("\ncopyParticleToBin(): RED FLAG! THIS SHOULD NEVER HAPPEN");
+	
+	// copy particle data into binParticles[][] and update everything
+	
+	int loc = getFreeLocation(bin); // get index of first free location
+
+	binParticles[bin][loc] = particle; // copy data
+	binParticlesFlag[bin][loc] = 1; // set presence flag
+	particlesPerBin[bin]++; // increment particles per bin
+	
+	// update freeLocationPerBin[bin]
+	int i = freeLocationPerBin[bin];
+	
+	while(binParticlesFlag[bin][i] != 0)
+	{
+		i++; // search for next free location
+		if(i == maxParticlesPerBin) 
+		{
+			i=0; // reset if pointer reaches end of bin
+			printf("\ncopyParticleToBin(): Pointer reached end of bin! That's surprising!\n");
+		}
+		
+		if(i == loc)
+		{
+			printf("\ncopyParticleToBin(): RED FLAG! THIS SHOULD NEVER HAPPEN");
+		}
+	}
+}
+
+void doBinning()
+{
+	for(int ndx=0; ndx<n; ndx++) // for each particle
+	{
+		int bin = (particles[ndx].x) / binLength;
+
+		// copy particle data into bin
+		copyParticleToBin(particles[ndx], bin);
+	}
+	
+	// Error check loop
+	// Check if number of particles in bin sums up
+	// REMOVE this code when timing
+	int sum = 0;
+	for(int bin=0; bin<numBins; bin++)
+	{
+		sum += particlesPerBin[bin];
+	}
+	if(sum != n) printf("\ndoBinning(): RED FLAG! Sums don't match\n");
+}
+
+
+//!VIRAJ
+
 //
 //  check that pthreads routine call was successful
 //
+
 #define P( condition ) {if( (condition) != 0 ) { printf( "\n FAILURE in %s, line %d\n", __FILE__, __LINE__ );exit( 1 );}}
 
 //
@@ -99,6 +234,11 @@ int main( int argc, char **argv )
     P( pthread_attr_init( &attr ) );
     P( pthread_barrier_init( &barrier, NULL, n_threads ) );
 
+	// VIRAJ
+	doBinning();
+	// !VIRAJ
+
+	// create threads
     int *thread_ids = (int *) malloc( n_threads * sizeof( int ) );
     for( int i = 0; i < n_threads; i++ ) 
         thread_ids[i] = i;
@@ -130,6 +270,6 @@ int main( int argc, char **argv )
     free( particles );
     if( fsave )
         fclose( fsave );
-    
+
     return 0;
 }

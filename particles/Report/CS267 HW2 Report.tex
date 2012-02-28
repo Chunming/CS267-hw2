@@ -52,11 +52,18 @@ for each time step {
    
    // Re-bin particles
    
+   
 }
 
 \section{Serial Code performance}
 
 The time needed to run the O(Nsquare) serial code takes on average 0.0214294sec for n = 500.
 The time required for our O(n) code takes on average 0.01874sec for n = 500.
+The apply_force function is called about 107,212 times when n = 500. 
+We obtained this number by declaring a static int variable in the apply_force function. This variable is incremented whenever apply_force is called.
+
+
+This is about half as many times as 500*500 = 250,000 times when apply_force is called in the original serial.cpp implementation.
+ 
 
 \end{document}  

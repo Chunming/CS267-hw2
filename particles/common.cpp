@@ -90,10 +90,6 @@ void init_particles( int n, particle_t *p )
 void apply_force( particle_t &particle, particle_t &neighbor )
 {
 
-    static int fCount = 0;
-    fCount++; 
-    printf("Force Count is %d \n", fCount);
-
     double dx = neighbor.x - particle.x;
     double dy = neighbor.y - particle.y;
     double r2 = dx * dx + dy * dy;
