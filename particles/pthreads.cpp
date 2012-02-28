@@ -15,6 +15,11 @@ pthread_barrier_t barrier;
 
 //VIRAJ
 
+// Duplicating from common.cpp
+#define cutoff  0.01
+#define density 0.0005
+
+double spaceDim = 0.0;
 particle_t **binParticles = NULL;
 unsigned char **binParticlesFlag = NULL;
 int *particlesPerBin = NULL;
@@ -35,12 +40,14 @@ int isCloseToEdge(particle_t &particle, double binEdge)
 
 void setupBins()
 {
+	spaceDim = sqrt( density * n );
+	
 	// setup bins
 	numBins = n_threads;
-	binLength = size / numBins;
+	binLength = spaceDim / numBins;
 
 	// find maximum no of particles per bin
-	double bin_area = (size*size) / numBins; // area of space = size * size 
+	double bin_area = (spaceDim*spaceDim) / numBins; // area of space = size * size 
 	maxParticlesPerBin = (int)( bin_area / (3.14 * (cutoff/2) * (cutoff/2)) ); // radius of particle = cutoff/2
 
 	// allocate memory
@@ -79,14 +86,15 @@ int getFreeLocation(int bin)
 	if(binParticlesFlag[bin][loc] != 0)
 	{
 		// Error check
-		printf("\ngetFreeLocation(): RED FLAG! @ binParticlesFlag[bin][loc] != 0")
+		printf("\ngetFreeLocation(): RED FLAG! @ binParticlesFlag[bin][loc] != 0");
 	}	
+	return loc;
 }
 
 void copyParticleToBin(particle_t particle, int bin)
 {
 	if(particlesPerBin[bin] > maxParticlesPerBin)
-		printf("\nputParticleData(): RED FLAG! THIS SHOULD NEVER HAPPEN");
+		printf("\ncopyParticleToBin(): RED FLAG! THIS SHOULD NEVER HAPPEN");
 	
 	// copy particle data into binParticles[][] and update everything
 	
@@ -105,12 +113,12 @@ void copyParticleToBin(particle_t particle, int bin)
 		if(i == maxParticlesPerBin) 
 		{
 			i=0; // reset if pointer reaches end of bin
-			printf("\putParticleData(): Pointer reached end of bin! That's surprising!\n");
+			printf("\ncopyParticleToBin(): Pointer reached end of bin! That's surprising!\n");
 		}
 		
 		if(i == loc)
 		{
-			printf("\nputParticleData(): RED FLAG! THIS SHOULD NEVER HAPPEN");
+			printf("\ncopyParticleToBin(): RED FLAG! THIS SHOULD NEVER HAPPEN");
 		}
 	}
 }
@@ -135,6 +143,7 @@ void doBinning()
 	}
 	if(sum != n) printf("\ndoBinning(): RED FLAG! Sums don't match\n");
 }
+
 
 //!VIRAJ
 
