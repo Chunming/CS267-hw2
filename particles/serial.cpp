@@ -7,6 +7,8 @@
 
 #define cutoff 0.01 // Was defined in common.cpp
 #define density 0.0005
+#define subBlockLen 0.1
+
 //
 //  benchmarking program
 //
@@ -30,12 +32,14 @@ int main( int argc, char **argv )
     set_size( n );
 
     double boxSize = sqrt(density*n); // Length on each side of box 
+    int subBlockNum = boxSize/subBlockLen; // No. of sub blocks along a row/column
+    int binNum = subBlockNum*subBlockNum; // No. of bins
     //printf("The value of n is  %d \n", n);
     //printf("The box size is %f \n", boxSize); // Box size is 0.5
-	      
+
+
     // Determine number of sublocks, represent as a vector;
     // Set no. of blocks as 5 x 5
-    int binNum = 25; // No. of bins
     int* binParticleNum = new int [binNum]; // No. of particles in each bin
     if (binParticleNum == NULL) {
        printf("ERROR binParticleNum mem alloc failed \n");
@@ -75,8 +79,6 @@ int main( int argc, char **argv )
     // Initialize particle binning
     int xIdx, yIdx; // x/y index in 1D array
     int bdx; 
-    double subBlockLen = 0.1;
-    int subBlockNum = 5; // No. of sub blocks along a row/column
 
     for (int ndx=0; ndx<n; ndx++) { // For each particle
        xIdx = (particles[ndx].x)/subBlockLen; // Takes values 0-4
@@ -118,8 +120,8 @@ int main( int argc, char **argv )
 	*/
 
         // Set particle accelerations to 0 before using apply_force
-        for( int i = 0; i < 500; i++ ) 
-		particles[i].ax = particles[i].ay = 0;
+//        for( int i = 0; i < 500; i++ ) 
+//		particles[i].ax = particles[i].ay = 0;
 
 	// Compute Forces
 	double leftBnd, rightBnd, topBnd, botBnd;
@@ -130,8 +132,9 @@ int main( int argc, char **argv )
 
 	   idx=0;
 	   for (int i=0; i<binParticleNum[b]; i++) { // The ith particle in bth bin
-     	      while ((binArray[b][idx])==NULL) { idx++; } // Index skips NULL values
-      	      // (*binArray[b][idx]).ax = (*binArray[b][idx]).ay = 0;
+	
+	       while ((binArray[b][idx])==NULL) { idx++; } // Index skips NULL values
+      	       (*binArray[b][idx]).ax = (*binArray[b][idx]).ay = 0;
 
 	      // Check all particles in bth subBlock
 	      jdx=0;
