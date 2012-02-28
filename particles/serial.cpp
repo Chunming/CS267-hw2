@@ -29,10 +29,9 @@ int main( int argc, char **argv )
     particle_t *particles = (particle_t*) malloc( n * sizeof(particle_t) );
     set_size( n );
 
-    double boxSize = sqrt(density*n); 
+    double boxSize = sqrt(density*n); // Length on each side of box 
     //printf("The value of n is  %d \n", n);
     //printf("The box size is %f \n", boxSize); // Box size is 0.5
-     
 	      
     // Determine number of sublocks, represent as a vector;
     // Set no. of blocks as 5 x 5
@@ -143,35 +142,22 @@ int main( int argc, char **argv )
 	      }
 
 	      // Check particles to the left/right/top/bottom subBlocks of bth subBlock	 
-	      xIdx = (*binArray[b][idx]).x/subBlockLen;
 	      //printf("xIdx is %d \n", xIdx);
+	      xIdx = (*binArray[b][idx]).x/subBlockLen;
 	      yIdx = (*binArray[b][idx]).y/subBlockLen;
-	      //printf("yIdx is %d \n", yIdx);
 
-	      leftBnd = xIdx*subBlockLen;
-	      //printf("leftBnd is %f \n", leftBnd);
 
-	      rightBnd = (xIdx*subBlockLen) + subBlockLen;
-	      //printf("rightBnd is %f \n", rightBnd);
-
-	      topBnd = yIdx*subBlockLen;
-	      //printf("topBnd is %f \n", topBnd);
-
-	      botBnd = yIdx*subBlockLen + subBlockLen;
 	      //printf("botBnd is %f \n", botBnd);
+	      leftBnd = xIdx*subBlockLen;
+	      rightBnd = (xIdx*subBlockLen) + subBlockLen;
+	      topBnd = yIdx*subBlockLen;
+	      botBnd = yIdx*subBlockLen + subBlockLen;
 
-	      leftDist = fabs((*binArray[b][idx]).x - leftBnd);
-	      //printf("leftDist is %f \n", leftDist);
-
-	      rightDist = fabs((*binArray[b][idx]).x - rightBnd);
-	      //printf("rightDist is %f \n", rightDist);
-
-	      topDist = fabs((*binArray[b][idx]).y - topBnd);
-	      //printf("topDist is %f \n", topDist);
-
-	      botDist = fabs((*binArray[b][idx]).y - botBnd);
 	      //printf("botDist is %f \n", botDist);
-
+	      leftDist = fabs((*binArray[b][idx]).x - leftBnd);
+	      rightDist = fabs((*binArray[b][idx]).x - rightBnd);
+	      topDist = fabs((*binArray[b][idx]).y - topBnd);
+	      botDist = fabs((*binArray[b][idx]).y - botBnd);
 
 	      // Consider 8 different adjacent subBlocks
 	      if (leftDist<=cutoff) {
