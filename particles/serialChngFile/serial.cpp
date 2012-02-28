@@ -81,12 +81,12 @@ int main( int argc, char **argv )
     for (int ndx=0; ndx<n; ndx++) { // For each particle
        xIdx = (particles[ndx].x)/subBlockLen; // Takes values 0-4
        yIdx = (particles[ndx].y)/subBlockLen; // Takes values 0-4
-       bdx = 0;
-       // Store into first non-NULL index in array
-       while (binArray[yIdx+(xIdx*subBlockNum)][bdx]!=NULL) {
-          bdx++;
-       }
+//       bdx = 0;
+//       while (binArray[yIdx+(xIdx*subBlockNum)][bdx]!=NULL) {
+//          bdx++;
+//       }
 //       printf("Bin index is %d \n", yIdx+xIdx*subBlockNum);
+       bdx = binParticleNum[yIdx+(xIdx*subBlockNum)];
        binArray[yIdx+(xIdx*subBlockNum)][bdx] = &particles[ndx];
        binParticleNum[yIdx+(xIdx*subBlockNum)]++; // Increment bin count
     }
