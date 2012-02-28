@@ -98,11 +98,11 @@ void copyParticleToBin(particle_t particle, int bin)
 	
 	// copy particle data into binParticles[][] and update everything
 	
-	int loc = getFreeLocation(bin); // get index of first free location
+	int loc = getFreeLocation(bin);			// get index of first free location
 
-	binParticles[bin][loc] = particle; // copy data
-	binParticlesFlag[bin][loc] = 1; // set presence flag
-	particlesPerBin[bin]++; // increment particles per bin
+	binParticles[bin][loc] = particle; 		// copy data
+	binParticlesFlag[bin][loc] = 1; 		// set presence flag
+	particlesPerBin[bin]++; 				// increment particles per bin
 	
 	// update freeLocationPerBin[bin]
 	int i = freeLocationPerBin[bin];
@@ -121,6 +121,13 @@ void copyParticleToBin(particle_t particle, int bin)
 			printf("\ncopyParticleToBin(): RED FLAG! THIS SHOULD NEVER HAPPEN");
 		}
 	}
+}
+
+void removeParticleFromBin(int bin, int loc)
+{
+//	binParticles[bin][loc] = 0;			// reset particle data -> we dont need to do this
+	binParticlesFlag[bin][loc] = 0; 	// set presence flag to false
+	particlesPerBin[bin]--; 			// decrement counter
 }
 
 void doBinning()
@@ -144,6 +151,154 @@ void doBinning()
 	if(sum != n) printf("\ndoBinning(): RED FLAG! Sums don't match\n");
 }
 
+void collectParticlesFromBins()
+{
+	// Iterate over all bins and copy each particle to its correct location in the original particles array
+	
+	for(int bin=0; bin<numBins; bin++) // for each bin
+	{
+		particle_t *bin = binParticles[bdx];
+		unsigned char *flags = binParticlesFlag[bdx];
+		int numParticles = particlesPerBin[bdx];
+				
+		int loc_p = 0;
+		for(int p=0; p<numParticles; p++)// for each particle in the bin
+		{
+			while(flags[loc_p]==0) loc_p++;
+			
+			if(loc_p >= maxParticlesPerBin)
+				printf("\ncollectParticlesFromBins(): RED FLAG! THIS SHOULD NEVER HAPPEN");
+			
+			particle_t particle = bin[loc_p];
+			int id = particle.globalID;
+			
+			// Write particle to original particles array
+			particles[id] = particle;
+		}
+	}
+}
+
+void thread_routine(void *pthread_id)
+{
+	int threadIdx = *(int*) pthread_id;
+	int bdx = threadIdx;
+
+	// bin represents the bin array for this particular thread
+	particle_t *bin = binParticles[bdx];
+	unsigned char *flags = binParticlesFlag[bdx];
+	int numParticles = particlesPerBin[bdx];
+
+	for( int step = 0; step < NSTEPS; step++ )
+	{
+		//
+		// Compute O(n2) particle-particle interactions within the bin
+		//
+
+		int loc_i = 0;
+		int loc_j = 0;
+		for(int i=0; i<numParticles-1; i++) // for each particle in bin
+		{
+			// Find first valid particle
+			while(flags[loc_i]==0) loc_i++;
+			
+			loc_j = loc_i+1;
+			for(int j=i; j<numParticles; j++) // again, for each particle
+			{	
+				while(flags[loc_j]==0) loc_j++;
+				
+				apply_force(bin[i], bin[j]);
+				apply_force(bin[j], bin[i]);
+			}
+		}
+
+
+		//
+		// Handle particles close to the edge of the bin
+		//
+
+		// TODO
+
+		//
+		// For now, compute interactions with all particles from previous and next bins
+		//
+
+		if(bdx != 0)
+		{
+			particle_t *prevBin = binParticles[bdx-1];
+			int prevNumParticles = particlesPerBin[bdx-1];
+			unsigned char *prevFlags = binParticlesFlag[bdx-1];
+
+			int loc_i = 0;
+			int loc_j = 0;
+			for(int i=0; i<numParticles; i++) // for each particle in THIS bin
+			{
+				while(flags[loc_i]==0) loc_i++;
+				
+				loc_j = 0;
+				for(int j=0; j<prevNumParticles; j++) // for each particle in PREV bin
+				{
+					while(prevFlags[loc_j]==0) loc_j++;
+					apply_force(bin[i], prevBin[j]);
+				}
+			}
+		}
+
+		if(bdx != numBins)
+		{
+			particle_t *nextBin = binParticles[bdx+1];
+			int nextNumParticles = particlesPerBin[bdx+1];
+			unsigned char *nextFlags = binParticlesFlag[bdx+1];
+
+			int loc_i = 0;
+			int loc_j = 0;
+			for(int i=0; i<numParticles; i++) // for each particle in THIS bin
+			{
+				while(flags[loc_i]==0) loc_i++;
+				for(int j=0; j<nextNumParticles; j++) // for each particle in NEXT bin
+				{
+					while(nextFlags[loc_j]==0) loc_j++;
+					apply_force(bin[i], nextBin[j]);
+				}
+			}
+		}
+
+		// Wait for all threads to finish computing interactions
+		pthread_barrier_wait(&barrier);
+
+		//
+		// Move particles about
+		//
+
+		for(int i=0; i<numParticles; i++) // for each particle in this bin
+		{
+			move(bin[i]); // move particle
+
+			int newBdx = (bin[i].x) / binLength; // find if particle crossed bin boundries
+
+			if(bdx != newBdx) // if bin has changed
+			{
+				// copy particle to new bin
+				copyParticleToBin(bin[i], newBdx);
+
+				// remove particle from current bin
+				removeParticleFromBin(bin, i);
+			}
+		}
+
+		// Wait for all threads to finish moving particles
+		pthread_barrier_wait(&barrier);
+
+		//
+		// Collect particles and their states to disk
+		//
+		if(threadIdx == 0 && fsave && (step%SAVEFREQ) == 0 )
+		{
+			collectParticlesFromBins();
+			save(fsave, n, particles);
+		}
+	}	
+}
+
 
 //!VIRAJ
 
@@ -156,7 +311,7 @@ void doBinning()
 //
 //  This is where the action happens
 //
-void *thread_routine( void *pthread_id )
+void *thread_routine_orig( void *pthread_id )
 {
     int thread_id = *(int*)pthread_id;
 
@@ -235,10 +390,12 @@ int main( int argc, char **argv )
     P( pthread_barrier_init( &barrier, NULL, n_threads ) );
 
 	// VIRAJ
+	setupBins();
 	doBinning();
 	// !VIRAJ
 
-	// create threads
+	// setup threads
+
     int *thread_ids = (int *) malloc( n_threads * sizeof( int ) );
     for( int i = 0; i < n_threads; i++ ) 
         thread_ids[i] = i;
@@ -257,6 +414,8 @@ int main( int argc, char **argv )
     for( int i = 1; i < n_threads; i++ ) 
         P( pthread_join( threads[i], NULL ) );
     simulation_time = read_timer( ) - simulation_time;
+
+	//VIRAJ
     
     printf( "n = %d, n_threads = %d, simulation time = %g seconds\n", n, n_threads, simulation_time );
     
