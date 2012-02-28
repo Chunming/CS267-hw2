@@ -7,7 +7,7 @@
 
 #define cutoff 0.01 // Was defined in common.cpp
 #define density 0.0005
-#define subBlockLen = 0.1;
+#define subBlockLen 0.1
 
 //
 //  benchmarking program
