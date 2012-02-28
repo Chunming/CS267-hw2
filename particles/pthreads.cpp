@@ -155,7 +155,7 @@ void collectParticlesFromBins()
 {
 	// Iterate over all bins and copy each particle to its correct location in the original particles array
 	
-	for(int bin=0; bin<numBins; bin++) // for each bin
+	for(int bdx=0; bdx<numBins; bdx++) // for each bin
 	{
 		particle_t *bin = binParticles[bdx];
 		unsigned char *flags = binParticlesFlag[bdx];
@@ -178,7 +178,7 @@ void collectParticlesFromBins()
 	}
 }
 
-void thread_routine(void *pthread_id)
+void* thread_routine(void *pthread_id)
 {
 	int threadIdx = *(int*) pthread_id;
 	int bdx = threadIdx;
@@ -281,7 +281,7 @@ void thread_routine(void *pthread_id)
 				copyParticleToBin(bin[i], newBdx);
 
 				// remove particle from current bin
-				removeParticleFromBin(bin, i);
+				removeParticleFromBin(bdx, i);
 			}
 		}
 
@@ -297,6 +297,8 @@ void thread_routine(void *pthread_id)
 			save(fsave, n, particles);
 		}
 	}	
+	
+	return NULL;
 }
 
 
