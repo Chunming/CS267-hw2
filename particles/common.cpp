@@ -97,9 +97,7 @@ void apply_force( particle_t &particle, particle_t &neighbor )
         return;
     r2 = fmax( r2, min_r*min_r );
     double r = sqrt( r2 );
-    if (particle.globalID != neighbor.globalID) {
-       //printf("PING parti at %d, neigh at =%d \n", particle.globalID, neighbor.globalID);
-    }
+
     //
     //  very simple short-range repulsive force
     //
@@ -125,8 +123,9 @@ void move( particle_t &p )
     //
     //  bounce from walls
     //
-    while( p.x < 0 || p.x > size )    {
-        p.x  = p.x < 0 ? -p.x : 2*size-p.x;  // condition ? value_if_true : value_if_false
+    while( p.x < 0 || p.x > size )
+    {
+        p.x  = p.x < 0 ? -p.x : 2*size-p.x;
         p.vx = -p.vx;
     }
     while( p.y < 0 || p.y > size )
