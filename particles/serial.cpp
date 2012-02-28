@@ -7,7 +7,7 @@
 
 #define cutoff 0.01 // Was defined in common.cpp
 #define density 0.0005
-#define subBlockLen 0.1
+#define subBlockLen 0.01
 
 //
 //  benchmarking program
@@ -32,11 +32,8 @@ int main( int argc, char **argv )
     set_size( n );
 
     double boxSize = sqrt(density*n); // Length on each side of box 
-    int subBlockNum = boxSize/subBlockLen; // No. of sub blocks along a row/column
+    int subBlockNum = boxSize/subBlockLen; // No. of sub blocks along a row/column (Default: 5)
     int binNum = subBlockNum*subBlockNum; // No. of bins
-    //printf("The value of n is  %d \n", n);
-    //printf("The box size is %f \n", boxSize); // Box size is 0.5
-
 
     // Determine number of sublocks, represent as a vector;
     // Set no. of blocks as 5 x 5
@@ -104,7 +101,6 @@ int main( int argc, char **argv )
     for( int step = 0; step < NSTEPS; step++ )
     {
 	    
-	printf("The time step is %d \n", step);
 
 	//
         //  Compute forces
@@ -165,7 +161,7 @@ int main( int argc, char **argv )
 	      // Consider 8 different adjacent subBlocks
 	      if (leftDist<=cutoff) {
 		 if (leftBnd!=0) { // Left subBlock index is valid
-		    bLeft = b - subBlockNum; // subBlockLen=0.1, subBlockNum = 5 
+		    bLeft = b - subBlockNum; 
 		    //printf("bLeft is %d \n", bLeft);
 		    kdx=0;
 		    for (int k=0; k<binParticleNum[bLeft]; k++) { 
@@ -299,7 +295,7 @@ int main( int argc, char **argv )
 		 bdx = 0;
                  while (binArray[index][bdx]!=NULL) {
 	            bdx++;
-                    if (bdx > 500) {
+                    if (bdx > n) {
                        printf("ERROR: Overflow \n");
                        return -1;
 		    }	 
@@ -319,7 +315,6 @@ int main( int argc, char **argv )
 	for (int b=0; b<binNum; b++) {
 	   count += binParticleNum[b];
 	}
-	//printf("The count is %d \n", count); // Check count, should be 500
 
         //
         //  save if necessary
