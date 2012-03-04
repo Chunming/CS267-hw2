@@ -92,7 +92,8 @@ int main( int argc, char **argv )
 
 	// 
         //  collect all global data locally (not good idea to do)
-        //
+        //  gathers data from all tasks & deliver combined data to all tasks
+	//
 	MPI_Allgatherv( local, nlocal, PARTICLE, particles, partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
 
 
