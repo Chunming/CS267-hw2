@@ -44,12 +44,21 @@ int isCloseToEdge(particle_t &particle, double binEdge)
 
 void setupBins()
 {
-	printf("\nsetupBins(): Entered\n");
 	spaceDim = sqrt(density * n);
 	
 	// setup bins
 	numBins = n_threads;
 	binLength = spaceDim / numBins;
+	
+#ifdef __VIRAJ_DEBUG
+	printf("\nsetupBins(): Entered\n");
+	printf("\nBox Size = %f\n", binLength);
+	
+	if(binLength <= cutoff)
+	{
+		printf("\nsetupBins(): RED FLAG! Box size is smaller than cutoff!\n");
+	}
+#endif
 
 	// find maximum no of particles per bin
 	double bin_area = (spaceDim*spaceDim) / numBins; // area of space = size * size 
@@ -114,38 +123,22 @@ int getFreeLocation(int bin)
 {
 	int loc = freeLocationPerBin[bin];
 	
-	#ifdef __VIRAJ_DEBUG
+#ifdef __VIRAJ_DEBUG
 		if(binParticlesFlag[bin][loc] != 0)
 			printf("\ngetFreeLocation(): RED FLAG! @ binParticlesFlag[bin=%d][loc=%d] = %d, should be 0", bin, loc, binParticlesFlag[bin][loc]);		
-	#endif
+#endif
 		
 	return loc;
-	
-	// Manually find free location
-	
-	// int loc = 0;
-	// unsigned char *flags = binParticlesFlag[bin];
-	// 
-	// while(flags[loc] == 0)
-	// {
-	// 	loc++;
-	// 	if(loc == maxParticlesPerBin)
-	// 	{
-	// 		printf("getFreeLocation(): Bin Full! No point in continuing!\n");
-	// 	}
-	// }
-	// 
-	// return loc;
 }
 
 void copyParticleToBin(particle_t& particle, int bdx)
 {	
-//	pthread_mutex_lock(&binMutexes[bdx]);
+	// MUST BE CALLED FROM A THREAD SAFE CONTEXT
 	
-	#ifdef __VIRAJ_DEBUG
+#ifdef __VIRAJ_DEBUG
 	if(particlesPerBin[bdx] > maxParticlesPerBin)
 		printf("\ncopyParticleToBin(): RED FLAG! More particlesPerBin[bdx=%d], maxParticlesPerBin=%d\n", bdx, maxParticlesPerBin);
-	#endif
+#endif
 	
 	// copy particle data into binParticles[][] and update everything
 	
@@ -155,10 +148,12 @@ void copyParticleToBin(particle_t& particle, int bdx)
 	binParticlesFlag[bdx][loc] = 1; 		// set presence flag
 	particlesPerBin[bdx]++; 				// increment particles per bin
 	
+#ifdef __VIRAJ_DEBUG
 	if(particlesPerBin[bdx] == maxParticlesPerBin)
 	{
-		printf("\ncopyParticleToBin(): BIN FULL! particlesPerBin[bdx=%d] = maxParticlesPerBin = %d\n", bdx, maxParticlesPerBin);
+		printf("\ncopyParticleToBin(): RED FLAG! BIN FULL! particlesPerBin[bdx=%d] = maxParticlesPerBin = %d\n", bdx, maxParticlesPerBin);
 	}
+#endif
 		
 	// update freeLocationPerBin[bin]
 	int i = loc;
@@ -166,57 +161,49 @@ void copyParticleToBin(particle_t& particle, int bdx)
 	while(binParticlesFlag[bdx][i] != 0)
 	{	
 		i++; // search for next free location
-		if(i == maxParticlesPerBin) 
-		{
-			printf("\ncopyParticleToBin(): RED FLAG! Pointer reached end of bin! loc=%d, i=%d\n", loc, i);
-			i=0; // reset if pointer reaches end of bin
-		}
+		if(i == maxParticlesPerBin) i = 0;
 		
-		#ifdef __VIRAJ_DEBUG
+#ifdef __VIRAJ_DEBUG
 		if(i == loc)
-			printf("\ncopyParticleToBin(): RED FLAG! No space left in bin!!");
-		#endif
+			printf("\ncopyParticleToBin(): RED FLAG! No space left in bin!!\n");
+#endif
 
 	}
 	
 	freeLocationPerBin[bdx] = i; // update freeLocationPerBin[bin]
-//	pthread_mutex_unlock(&binMutexes[bdx]);
 }
 
 void removeParticleFromBin(int bdx, int loc)
 {
-//	pthread_mutex_lock(&binMutexes[bdx]);
 //	binParticles[bin][loc] = 0;			// reset particle data -> we dont need to do this
 	binParticlesFlag[bdx][loc] = 0; 	// set presence flag to false
 	particlesPerBin[bdx]--; 			// decrement counter
-//	pthread_mutex_unlock(&binMutexes[bdx]);
 }
 
 void doBinning()
 {
+#ifdef __VIRAJ_DEBUG
 	printf("\ndoBinning(): Entered\n");
+#endif
+
 	int ndx = 0;
 	for(ndx=0; ndx<n; ndx++) // for each particle
 	{
 		int bdx = (particles[ndx].x) / binLength;
-		
-		// printf("\ndoBinning(): Binning particle with id = %d to bin_no = %d\n", particles[ndx].globalID, bdx);
-		
-		if(bdx >= numBins)
-		{
-			printf("\ndoBinning(): RED FLAG! Particle binned exceed bounds\n");
-		}
-
-		// copy particle data into bin
 		copyParticleToBin(particles[ndx], bdx);
 	}
 	
+#ifdef __VIRAJ_DEBUG
 	printf("\ndoBinning(): Binned %d particles\n", ndx);
+#endif
 }
 
 void collectParticlesFromBins()
 {
+#ifdef __VIRAJ_DEBUG
 	printf("\ncollectParticlesFromBins(): Entered\n");
+#endif
+
 	// Iterate over all bins and copy each particle to its correct location in the original particles array
 	int particlesCollected = 0; // check variable
 	for(int bdx=0; bdx<numBins; bdx++) // for each bin
@@ -229,10 +216,12 @@ void collectParticlesFromBins()
 		for(int p=0; p<numParticles; p++) // for each particle in the bin
 		{
 			while(flags[loc_p]==0) loc_p++; // find next valid particle in the bin
-			
+		
+#ifdef __VIRAJ_DEBUG	
 			if(loc_p >= maxParticlesPerBin)
 				printf("\ncollectParticlesFromBins(): RED FLAG! THIS SHOULD NEVER HAPPEN");
-			
+#endif
+		
 			particle_t particle = bin[loc_p];
 			int id = particle.globalID;
 			
@@ -247,11 +236,13 @@ void collectParticlesFromBins()
 		}
 	}
 	
+#ifdef __VIRAJ_DEBUG
 	if(particlesCollected != n)
 	{
 		// We collected less particles than n - we missed some
-		printf("\ncollectParticlesFromBins(): RED FLAG! We missed some! particles collected = %d, total = %d\n", particlesCollected, n);
+		printf("\ncollectParticlesFromBins(): RED FLAG! We missed some! num of particles collected = %d, total = %d\n", particlesCollected, n);
 	}
+#endif
 }
 
 //
@@ -261,15 +252,14 @@ void collectParticlesFromBins()
 
 void markForMove(int particleIdx, int targetBinIdx, int *particleArray, int *targetBinsArray, int& moveParticleCounter)
 {
-	// Must be threadsafe
 	particleArray[moveParticleCounter] = particleIdx;
 	targetBinsArray[moveParticleCounter] = targetBinIdx;
 	moveParticleCounter++;
 	
-	#ifdef __VIRAJ_DEBUG
+#ifdef __VIRAJ_DEBUG
 	if(moveParticleCounter >= maxParticlesPerBin)
 		printf("\nmarkForMove(): RED FLAG! moveParticleCounter = %d exceeds bounds\n", moveParticleCounter);
-	#endif
+#endif
 }
 
 //
@@ -288,12 +278,11 @@ void moveBetweenBins(int fromBinIdx, int *particleArray, int *targetBinsArray, i
 		int pIdx = particleArray[i];
 		int toBinIdx = targetBinsArray[i];
 		
+		// THREAD_SAFE: Acquire exclusive access to bin (toBinIdx)
 		pthread_mutex_lock(&binMutexes[toBinIdx]);
-		
-		// copy particle to new bin
-		copyParticleToBin(bin[pIdx], toBinIdx);
-		
+		copyParticleToBin(bin[pIdx], toBinIdx); // COPY particle to bin
 		pthread_mutex_unlock(&binMutexes[toBinIdx]);
+		// THREAD_SAFE: Release mutex
 
 		// remove particle from current bin
 		removeParticleFromBin(fromBinIdx, pIdx);
@@ -305,6 +294,8 @@ void moveBetweenBins(int fromBinIdx, int *particleArray, int *targetBinsArray, i
 
 void compactBin(int bdx)
 {
+	// MUST BE THREADSAFE
+	
 	pthread_mutex_lock(&binMutexes[bdx]);
 	particle_t *bin = binParticles[bdx];
 	unsigned char *flags = binParticlesFlag[bdx];
@@ -327,9 +318,7 @@ void compactBin(int bdx)
 
 void printBin(int bdx)
 {
-	// particle_t *bin = binParticles[bdx];
-	// unsigned char *flags = binParticlesFlag[bdx];
-	// int numParticles = particlesPerBin[bdx];
+	// DEBUG CODE - Function should not be called while measuring performance
 	
 	printf("\nthreadRoutine(): # particlesPerBin[bdx=%d] = %d, maxParticlesPerBin=%d\n", bdx, particlesPerBin[bdx], maxParticlesPerBin);
 	for(int z=0; z<maxParticlesPerBin; z++)
@@ -339,6 +328,10 @@ void printBin(int bdx)
 	
 }
 
+// 
+// The REAL action
+//
+
 void* thread_routine(void *pthread_id)
 {
 	int threadIdx = *(int*) pthread_id;
@@ -347,9 +340,8 @@ void* thread_routine(void *pthread_id)
 	// bin represents the bin array for this particular thread
 	particle_t *bin = binParticles[bdx];
 	unsigned char *flags = binParticlesFlag[bdx];
-	int numParticles = particlesPerBin[bdx];
+	int numParticles = particlesPerBin[bdx]; // !must be updated on every iteration of STEP loop
 	
-	// move calls must be threadsafe 
 	// THESE ARE LOCAL THREAD VARIABLES
 	int *moveParticleIdx = (int*) malloc(sizeof(int) * maxParticlesPerBin);
 	int *moveTargetBinIdx = (int*) malloc(sizeof(int) * maxParticlesPerBin);
@@ -359,7 +351,8 @@ void* thread_routine(void *pthread_id)
 	{
 		// printf("\nThread: %d, step: %d, ENTERING STEP LOOP\n", threadIdx, step);
 		
-		#ifdef __VIRAJ_DEBUG
+#ifdef __VIRAJ_DEBUG
+		// Check if we lost some particles
 		
 		if(threadIdx == 0)
 		{
@@ -374,20 +367,23 @@ void* thread_routine(void *pthread_id)
 				printf("\nthreadRoutine(): (TID=0) RED FLAG! Sum does not match!\n");
 		}
 
-		#endif
+#endif
 		
-		// update number of particles
+		// update number of particles in THIS bin
 		numParticles = particlesPerBin[bdx];
 		
-		// compact bins after a few iterations
-		// if(step%10 == 0) compactBin(bdx);
-		compactBin(bdx); // Do this everytime
-		pthread_barrier_wait(&barrier);	
+		//
+		// DEFRAGMENT bins after a every NUM iterations
+		// Defragmentation occurs every SAVEFREQ iterations anyways
+		// For good perf, SAVEFREQ should be a multiple of NUM
+		//
+		if(step % (1) == 0) compactBin(bdx); //todo
 		
-		//printf("\nthreadRoutine(): (TID=%d, STEP=%d) Starting SELF Loop\n", threadIdx, step);
+		// THREAD_SYNC
+		pthread_barrier_wait(&barrier);	
 
 		//
-		// Compute O(n2) particle-particle interactions within the bin
+		// SELF_LOOP - Compute O(n2) particle-particle interactions within the bin
 		//
 
 		int loc_i = 0;
@@ -397,10 +393,9 @@ void* thread_routine(void *pthread_id)
 			// Find next valid particle
 			while(flags[loc_i]==0) loc_i++;
 			
-			#ifdef __VIRAJ_DEBUG
+#ifdef __VIRAJ_DEBUG
 			if(loc_i >= maxParticlesPerBin) printf("\nthreadRoutine(): RED FLAG! (SELF) SegFault: loc_i, threadId= %d, loc_i=%d, num_particles=%d\n", threadIdx, loc_i, numParticles);
-			#endif
-			
+#endif		
 			// for each particle, reset forces first time
 			bin[loc_i].ax = bin[loc_i].ay = 0;
 			
@@ -409,11 +404,10 @@ void* thread_routine(void *pthread_id)
 			{	
 				while(flags[loc_j]==0) loc_j++;
 				
-				#ifdef __VIRAJ_DEBUG
+#ifdef __VIRAJ_DEBUG
 				if(loc_j >= maxParticlesPerBin) printf("\nthreadRoutine(): RED FLAG! (SELF) SegFault: loc_j, threadId= %d, loc_i=%d, loc_j=%d, j=%d, num_particles=%d\n", threadIdx, loc_i, loc_j, j, numParticles);
-				#endif
-				
-				// if(loc_i == loc_j) continue; // trivial case
+#endif
+				// if(loc_i == loc_j) continue; // trivial case // todo
 				
 				apply_force(bin[loc_i], bin[loc_j]);
 				loc_j++;
@@ -422,23 +416,18 @@ void* thread_routine(void *pthread_id)
 			loc_i++;
 		}
 		
-		//printf("\nthreadRoutine(): (TID=%d) Apply force called %d times, expected = %d\n", threadIdx, applyForceCounter, numParticles*(numParticles-1));
 		
-		//printf("\nThread: %d, step: %d, FINISHED SELF LOOP\n", threadIdx, step);
-
 		//
 		// Handle particles close to the edge of the bin
 		//
 
 		// TODO
 
-		//
-		// For now, compute interactions with all particles from previous and next bins
-		//
-
 		pthread_barrier_wait(&barrier);	
-		// printf("\nthreadRoutine(): (TID=%d, STEP=%d) Starting NEXT Loop\n", threadIdx, step);
-		
+
+		//
+		// PREV LOOP: Compute interactions with particles from previous bin
+		//
 		if(bdx != 0)
 		{		
 			particle_t *prevBin = binParticles[bdx-1];
@@ -451,19 +440,17 @@ void* thread_routine(void *pthread_id)
 			{
 				while(flags[loc_i]==0) loc_i++;
 				
-				#ifdef __VIRAJ_DEBUG
+#ifdef __VIRAJ_DEBUG
 				if(loc_i >= maxParticlesPerBin) printf("\nthreadRoutine(): RED flag! (PREV) SEG_FAULT loc_i\n");
-				#endif
-				
+#endif			
 				loc_j = 0;
 				for(int j=0; j<prevNumParticles; j++) // for each particle in PREV bin
 				{
 					while(prevFlags[loc_j]==0) loc_j++;
 					
-					#ifdef __VIRAJ_DEBUG
+#ifdef __VIRAJ_DEBUG
 					if(loc_j >= maxParticlesPerBin) printf("\nthreadRoutine(): RED flag! SEG_FAULT for PREV bin at loc_j\n");
-					#endif
-					
+#endif
 					apply_force(bin[loc_i], prevBin[loc_j]);
 					loc_j++;
 				}
@@ -472,11 +459,12 @@ void* thread_routine(void *pthread_id)
 			}
 		}
 		
-		//printf("\nThread: %d, step: %d, FINISHED PREV LOOP\n", threadIdx, step);				
+
 		pthread_barrier_wait(&barrier);	
 		
-		// printf("\nthreadRoutine(): (TID=%d, STEP=%d) Starting NEXT Loop\n", threadIdx, step);
-
+		//
+		// NEXT LOOP: Compute interactions with particles from next bin
+		//
 		if(bdx != (numBins-1))
 		{
 			particle_t *nextBin = binParticles[bdx+1];
@@ -489,19 +477,17 @@ void* thread_routine(void *pthread_id)
 			{
 				while(flags[loc_i]==0) loc_i++;
 				
-				#ifdef __VIRAJ_DEBUG
+#ifdef __VIRAJ_DEBUG
 				if(loc_i >= maxParticlesPerBin) printf("\nthreadRoutine(): RED flag! SEG_FAULT for NEXT bin at loc_i\n");
-				#endif
-				
+#endif
 				loc_j = 0;
 				for(int j=0; j<nextNumParticles; j++) // for each particle in NEXT bin
 				{
 					while(nextFlags[loc_j]==0) loc_j++;
 					
-					#ifdef __VIRAJ_DEBUG
+#ifdef __VIRAJ_DEBUG
 					if(loc_j >= maxParticlesPerBin) printf("\nthreadRoutine(): (TID=%d) RED flag! (NEXT) SEG_FAULT at loc_j = %d, nextNumParticles = %d\n", threadIdx, loc_j, nextNumParticles);
-					#endif
-					
+#endif
 					apply_force(bin[loc_i], nextBin[loc_j]);
 					loc_j++;
 				}
@@ -509,27 +495,25 @@ void* thread_routine(void *pthread_id)
 				loc_i++;
 			}
 		}
-
-		// printf("\nThread: %d, step: %d, FINISHED NEXT LOOP\n", threadIdx, step);
 		
-		// Wait for all threads to finish computing interactions
 		pthread_barrier_wait(&barrier);		
 		
 		
 		//
-		// Find which particles should be moved
+		// MOVE_MARK LOOP: Find which particles should be moved
 		//
-
+		numMoveParticles = 0; // keeps a track of how many particles have been marked for move
+		
 		loc_i = 0;
-		numMoveParticles = 0;
 		for(int i=0; i<numParticles; i++) // for each particle in this bin
 		{
 			while(flags[loc_i]==0) loc_i++;
+			
 			move(bin[loc_i]); // move particle
 
 			int newBdx = (bin[loc_i].x) / binLength; // find if particle crossed bin boundries
 
-			if(bdx != newBdx) // if bin has changed
+			if(bdx != newBdx) // if it did cross bin boundaries
 			{	
 				// Mark for Move PARTICLE (loc_i) to BIN (newBinIdx)
 				markForMove(loc_i, newBdx, moveParticleIdx, moveTargetBinIdx, numMoveParticles);
@@ -537,25 +521,23 @@ void* thread_routine(void *pthread_id)
 			
 			loc_i++;
 		}
-		
-		// printf("\nthreadRoutine(): (TID=%d) No. of particles marked for move: %d\n", numMoveParticles);
-		
-	//	printBin(bdx);
-		
-		// Wait for all threads to finish marking particles to be moved
+	
 		pthread_barrier_wait(&barrier);
-			
+		
+		//
+		// TRANSFER particles between bins
+		//
 		moveBetweenBins(bdx, moveParticleIdx, moveTargetBinIdx, numMoveParticles);
 		
 		pthread_barrier_wait(&barrier);
 
-	//	printBin(bdx);
-		
-		// printf("\nthreadRoutine(): (TID=%d, STEP=%d) Starting SAVE Loop\n", threadIdx, step);
-		
 		//
 		// Collect particles and their states to disk
 		//
+		if(fsave && (step%SAVEFREQ) == 0)
+		{
+			compactBin(bdx);
+		}
 		if(threadIdx == 0 && fsave && (step%SAVEFREQ) == 0 )
 		{
 			printf("\nthreadRoutine(): SAVE FILES\n");
@@ -571,7 +553,6 @@ void* thread_routine(void *pthread_id)
 	free(moveTargetBinIdx);
 	return NULL;
 }
-
 
 //!VIRAJ
 
