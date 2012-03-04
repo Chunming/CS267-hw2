@@ -44,22 +44,22 @@ int main( int argc, char **argv )
     }
 
     particle_t*** binArray = new particle_t** [binNum]; // Array of ptrs to particle*
-    if (binArray == NULL) {
+    if (NULL == binArray) {
        printf("ERROR binArray mem alloc failed \n");
        return -1;
     }
 
 
-   for (int i = 0; i<binNum; i++) {
+   for (int i = 0; i<binNum; ++i) {
       binParticleNum[i] = 0; // sizeof(binParticleNum[b] is 4 bytes
    }	   
 
    memset(binParticleNum, 0, sizeof(int)*binNum); // sizeof(binParticleNum[b] is 4 bytes
 
 
-   for (int b=0; b<binNum; b++) { 
+   for (int b=0; b<binNum; ++b) { 
 	    binArray[b] = new particle_t* [100]; // Set it to max 100 particles first
-            if (binArray[b] == NULL) {
+            if (NULL == binArray[b]) {
                printf("ERROR binArray index  mem alloc failed \n");
                return -1;
             }
@@ -77,7 +77,7 @@ int main( int argc, char **argv )
     int xIdx, yIdx; // x/y index in 1D array
     int bdx; 
 
-    for (int ndx=0; ndx<n; ndx++) { // For each particle
+    for (int ndx=0; ndx<n; ++ndx) { // For each particle
        xIdx = (particles[ndx].x)/subBlockLen; // Takes values 0-4
        yIdx = (particles[ndx].y)/subBlockLen; // Takes values 0-4
 //       bdx = 0;
@@ -124,18 +124,18 @@ int main( int argc, char **argv )
 	double leftDist, rightDist, topDist, botDist;
 	int bLeft, bRight, bBottom, bTop, bTopLeft, bTopRight, bBotLeft, bBotRight;
         int idxCount = 0;
-	for (int b=0; b<binNum; b++) { // The bth bin
+	for (int b=0; b<binNum; ++b) { // The bth bin
 
 	   idx=0;
-	   for (int i=0; i<binParticleNum[b]; i++) { // The ith particle in bth bin
+	   for (int i=0; i<binParticleNum[b]; ++i) { // The ith particle in bth bin
 	
-	       while ((binArray[b][idx])==NULL) { idx++; } // Index skips NULL values
+	       while ((NULL == binArray[b][idx])) { idx++; } // Index skips NULL values
       	       (*binArray[b][idx]).ax = (*binArray[b][idx]).ay = 0;
 
 	      // Check all particles in bth subBlock
 	      jdx=0;
-     	      for (int j=0; j<binParticleNum[b]; j++) { // The jth particle in bth bin
-     	         while ((binArray[b][jdx])==NULL) { jdx++; }
+     	      for (int j=0; j<binParticleNum[b]; ++j) { // The jth particle in bth bin
+     	         while (NULL == (binArray[b][jdx])) { jdx++; }
 		 apply_force(*binArray[b][idx],*binArray[b][jdx]);
 		 jdx++;
 	      }
@@ -164,8 +164,8 @@ int main( int argc, char **argv )
 		    bLeft = b - subBlockNum; 
 		    //printf("bLeft is %d \n", bLeft);
 		    kdx=0;
-		    for (int k=0; k<binParticleNum[bLeft]; k++) { 
-		       while ((binArray[bLeft][kdx])==NULL) { kdx++; }
+		    for (int k=0; k<binParticleNum[bLeft]; ++k) { 
+		       while (NULL == (binArray[bLeft][kdx])) { kdx++; }
 		       apply_force(*binArray[b][idx],*binArray[bLeft][kdx]);
 		       kdx++;
 		    }
@@ -177,8 +177,8 @@ int main( int argc, char **argv )
   		    bRight = b + subBlockNum; 
 		    //printf("bRight is %d \n", bRight);
 		    kdx=0;
-		    for (int k=0; k<binParticleNum[bRight]; k++) { 
-		       while ((binArray[bRight][kdx])==NULL) { kdx++; }
+		    for (int k=0; k<binParticleNum[bRight]; ++k) { 
+		       while (NULL == (binArray[bRight][kdx])) { kdx++; }
 		       apply_force(*binArray[b][idx],*binArray[bRight][kdx]);
 		       kdx++;
 		    }
@@ -190,8 +190,8 @@ int main( int argc, char **argv )
 		    bTop = b - 1; 
 		    //printf("bTop is %d \n", bTop);
   		    kdx=0;
-		    for (int k=0; k<binParticleNum[bTop]; k++) { 
-		       while ((binArray[bTop][kdx])==NULL) { kdx++; }
+		    for (int k=0; k<binParticleNum[bTop]; ++k) { 
+		       while (NULL == (binArray[bTop][kdx])) { kdx++; }
 		       apply_force(*binArray[b][idx],*binArray[bTop][kdx]);
 		       kdx++;
 		    }
@@ -203,8 +203,8 @@ int main( int argc, char **argv )
        		    bBottom = b + 1;
 		    //printf("bBottom is %d \n", bBottom);
      		    kdx=0;
-		    for (int k=0; k<binParticleNum[bBottom]; k++) { 
-		       while ((binArray[bBottom][kdx])==NULL) { kdx++; }
+		    for (int k=0; k<binParticleNum[bBottom]; ++k) { 
+		       while (NULL == (binArray[bBottom][kdx])) { kdx++; }
 		       apply_force(*binArray[b][idx],*binArray[bBottom][kdx]);
 		       kdx++;
 		    }
@@ -215,8 +215,8 @@ int main( int argc, char **argv )
 		 if (topBnd!=0 && leftBnd !=0) {
 		    bTopLeft = b-subBlockNum-1;     
 		    kdx=0;
-		    for (int k=0; k<binParticleNum[bTopLeft]; k++) { 
-		       while ((binArray[bTopLeft][kdx])==NULL) { kdx++; }
+		    for (int k=0; k<binParticleNum[bTopLeft]; ++k) { 
+		       while (NULL == (binArray[bTopLeft][kdx])) { kdx++; }
 		       apply_force(*binArray[b][idx],*binArray[bTopLeft][kdx]);
 		       kdx++;
 		    }
@@ -227,8 +227,8 @@ int main( int argc, char **argv )
 		 if (botBnd!=boxSize && leftBnd!=0) { 
 		    bBotLeft = b-subBlockNum+1;     
      		    kdx=0;
-		    for (int k=0; k<binParticleNum[bBotLeft]; k++) { 
-		       while ((binArray[bBotLeft][kdx])==NULL) { kdx++; }
+		    for (int k=0; k<binParticleNum[bBotLeft]; ++k) { 
+		       while (NULL == (binArray[bBotLeft][kdx])) { kdx++; }
 		       apply_force(*binArray[b][idx],*binArray[bBotLeft][kdx]);
 		       kdx++;
 		    }
@@ -239,8 +239,8 @@ int main( int argc, char **argv )
 		 if (topBnd!=0 && rightBnd!=boxSize) {
 		    bTopRight = b+subBlockNum-1;     
      		    kdx=0;
-		    for (int k=0; k<binParticleNum[bTopRight]; k++) { 
-		       while ((binArray[bTopRight][kdx])==NULL) { kdx++; }
+		    for (int k=0; k<binParticleNum[bTopRight]; ++k) { 
+		       while (NULL == (binArray[bTopRight][kdx])) { kdx++; }
 		       apply_force(*binArray[b][idx],*binArray[bTopRight][kdx]);
 		       kdx++;
 		    }
@@ -251,8 +251,8 @@ int main( int argc, char **argv )
 		 if (botBnd!=boxSize && rightBnd!=boxSize) {
    		    bBotRight = b+subBlockNum+1;     
      		    kdx=0;
-		    for (int k=0; k<binParticleNum[bBotRight]; k++) { 
-		       while ((binArray[bBotRight][kdx])==NULL) { kdx++; }
+		    for (int k=0; k<binParticleNum[bBotRight]; ++k) { 
+		       while (NULL == (binArray[bBotRight][kdx])) { kdx++; }
 		       apply_force(*binArray[b][idx],*binArray[bBotRight][kdx]);
 		       kdx++;
 		    }
@@ -285,7 +285,7 @@ int main( int argc, char **argv )
 	      
 	      // Check if particle shld be moved to another bin	  
 
-     	      while ((binArray[b][idx])==NULL) { idx++; }
+     	      while (NULL == (binArray[b][idx])) { idx++; }
 	      xIdx = (*binArray[b][idx]).x/subBlockLen;
               yIdx = (*binArray[b][idx]).y/subBlockLen;
 	      index = yIdx+(xIdx*subBlockNum); // Map 2D to 1D index
@@ -293,7 +293,7 @@ int main( int argc, char **argv )
 
                  // Store into first non-NULL index in array
 		 bdx = 0;
-                 while (binArray[index][bdx]!=NULL) {
+                 while (NULL != binArray[index][bdx]) {
 	            bdx++;
                     if (bdx > n) {
                        printf("ERROR: Overflow \n");
@@ -312,7 +312,7 @@ int main( int argc, char **argv )
 
 	// Check count
 	count = 0;
-	for (int b=0; b<binNum; b++) {
+	for (int b=0; b<binNum; ++b) {
 	   count += binParticleNum[b];
 	}
 
@@ -330,7 +330,7 @@ int main( int argc, char **argv )
     printf( "n = %d, simulation time = %g seconds\n", n, simulation_time );
    
     delete [] binParticleNum;
-    for (int b=0; b<binNum; b++) {
+    for (int b=0; b<binNum; ++b) {
        delete [] binArray[b];
     }
     delete binArray;
