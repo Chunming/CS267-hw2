@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include "common.h"
-#include "math.h"
+#include <math.h>
 
 // Global variables
 #define cutoff 0.01
@@ -107,9 +107,9 @@ int main( int argc, char **argv )
     int nlocal = 0; // Same as particlesPerBin
 
     particle_t *local = (particle_t*) malloc( nlocalMax * sizeof(particle_t) ); // Same as binParticles
-    memset(local, 0, sizeof(particle_t) * nlocal);
+    memset(local, NULL, nlocal*sizeof(particle_t));
     unsigned char *localFlag = (unsigned char *) malloc( nlocal * sizeof(unsigned char)  ); // Same as binPariclesFlag
-    memset(localFlag, 0, sizeof(unsigned char) * nlocal);
+    memset(localFlag, NULL, nlocal*sizeof(unsigned char));
 
 
     //
