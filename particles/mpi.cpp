@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include "common.h"
+#include "math.h"
 
 // Global variables
 #define cutoff 0.01
@@ -31,7 +32,7 @@ void copyParticleToBin(particle_t *src, particle_t *dst, unsigned char *localFla
 
    int i = freeIdx;
    while (0 != localFlag[i]) {
-      i++ // search for next free location
+      i++; // search for next free location
       if (i == nlocalMax) {i = 0;}
    }
    freeIdx = i;
