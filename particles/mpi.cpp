@@ -4,6 +4,7 @@
 #include <assert.h>
 #include "common.h"
 #include <math.h>
+#include <string.h>
 
 // Global variables
 #define cutoff 0.01
