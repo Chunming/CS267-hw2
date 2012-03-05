@@ -24,7 +24,7 @@ double binLength = -1;
 // nlocal       : No. of particles in specific bin/processor
 // nlocalMax    : Max no. of particles allowed in bin/processor 
 // freeIdx : Local free location
-void copyParticleToBin(particle_t *src, particle_t *dst, int bdx, int &nlocal, int &nlocalMax, int &freeIdx) {
+void copyParticleToBin(particle_t *src, particle_t *dst, unsigned char *localFlag, int bdx, int &nlocal, int &nlocalMax, int &freeIdx) {
    dst[freeIdx] = *src;
    localFlag[freeIdx] = 1;
    nlocal++;
@@ -147,7 +147,7 @@ int main( int argc, char **argv )
    for (ndx=0; ndx<n; ndx++) {
       int bdx = (particles[ndx].y / binLength);
       if (bdx == rank) {
-         copyParticleToBin(particles[ndx], local, bdx, nlocal, nlocalMax, localFreeLoc);
+         copyParticleToBin(particles[ndx], local, localFlag, bdx, nlocal, nlocalMax, localFreeLoc);
       }
    }
 
