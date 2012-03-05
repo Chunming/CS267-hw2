@@ -108,9 +108,9 @@ int main( int argc, char **argv )
     int nlocal = 0; // Same as particlesPerBin
 
     particle_t *local = (particle_t*) malloc( nlocalMax * sizeof(particle_t) ); // Same as binParticles
-    memset(local, NULL, nlocal*sizeof(particle_t));
+    memset(local, 0, nlocal*sizeof(particle_t));
     unsigned char *localFlag = (unsigned char *) malloc( nlocal * sizeof(unsigned char)  ); // Same as binPariclesFlag
-    memset(localFlag, NULL, nlocal*sizeof(unsigned char));
+    memset(localFlag, 0, nlocal*sizeof(unsigned char));
 
 
     //
@@ -149,7 +149,7 @@ int main( int argc, char **argv )
    for (ndx=0; ndx<n; ndx++) {
       int bdx = (particles[ndx].y / binLength);
       if (bdx == rank) {
-         copyParticleToBin(particles[ndx], local, localFlag, bdx, nlocal, nlocalMax, localFreeLoc);
+         copyParticleToBin(&particles[ndx], local, localFlag, bdx, nlocal, nlocalMax, localFreeLoc);
       }
    }
 
