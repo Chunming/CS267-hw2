@@ -162,19 +162,71 @@ int main( int argc, char **argv )
     //
     double simulation_time = read_timer( );
     for( int step = 0; step < NSTEPS; step++ )
-    {
+    {   
+        // 
+	// MPI send particles to adjacent bins
+	//
+	void* sStart = local;
+	int sCount = nlocal; // No. of elems in local bin
+	int sTag = rank; // Message identity
+	if (rank-1 >= 0) // Check if top bin exists 
+	   MPI_SEND(sStart, sCount, PARTICLE, rank-1, sTag, MPI_COMM_WORLD); // Send to top bin	  
+
+	if (rank+1 <= 23) // Check if bottom bin exists
+	   MPI_SEND(sStart, sCount, PARTICLE, rank+1, sTag, MPI_COMM_WORLD); // Send to bot bin
+
+	//
+	// MPI receive from adjacent bins
+	//
+	void* rStart1 = prevBin; // The top bin
+	void* rStart2 = nextBin; // The bot bin
+	int rCount = nlocalMax; // Set buffer size to max possible particles
+	int rSrc1 = max(rank-1, 0); // 1st receive source
+	int rSrc2 = min(rank+1, 24); // 2nd receive source
+	int rTag1 = rank-1; // 1st receive tag
+	int rTag2 = rank+1; // 2nd receive tag
+        MPI_Status status; 
+	if (rank-1 >= 0) // Check if top bin exists	
+	   MPI_RECV(rStart1, rCount, PARTICLE, rSrc1, rTag1, MPI_COMM_WORLD, &status); //Recv from top bin
+	
+	if (rank+1 <= 23)
+	   MPI_RECV(rStart2, rCount, PARTICLE, rSrc2, rTag2, MPI_COMM_WORLD, &status); // Recv from bot bin
+
+	//
+	// SELF LOOP - Compute interactions with particles within the bin
+	//
+	int loc_i = 0;
+	int loc_j = 0;
+	for (int i=0; i<nlocal; i++) { // For each particle in bin
+           while (localFlag[loc_i]==0) loc_i++;
+           local[loc_i].ax = local[loc_i].ay = 0;
+           
+	   loc_j = 0;
+	   for (int j=0; j<nlocal; j++) {
+	      while(localFlag[loc_j==0]) loc_j++;
+	      apply_force (local[loc_i], local[loc_j]);
+	      loc_j++; 
+	   }
+	   loc_i++;
+	}
+
+	//
+	// PREV LOOP Compute interactions with particles from top bin
+	//
+	
+	/*
         //
         //  compute all forces
         //
-        // nlocal is the no. of particles in a specific bin/processor per time step
         for( int i = 0; i < nlocal; i++ ) 
         {
             local[i].ax = local[i].ay = 0;
             for (int j = 0; j < n; j++ )
                 apply_force( local[i], particles[j] );
         }
+	*/
         
-        //
+	//
         //  move particles
         //
         for( int i = 0; i < nlocal; i++ )
