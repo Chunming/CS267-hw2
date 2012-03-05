@@ -170,10 +170,10 @@ int main( int argc, char **argv )
 	int sCount = nlocal; // No. of elems in local bin
 	int sTag = rank; // Message identity
 	if (rank-1 >= 0) // Check if top bin exists 
-	   MPI_SEND(sStart, sCount, PARTICLE, rank-1, sTag, MPI_COMM_WORLD); // Send to top bin	  
+	   MPI_Send(sStart, sCount, PARTICLE, rank-1, sTag, MPI_COMM_WORLD); // Send to top bin	  
 
 	if (rank+1 <= 23) // Check if bottom bin exists
-	   MPI_SEND(sStart, sCount, PARTICLE, rank+1, sTag, MPI_COMM_WORLD); // Send to bot bin
+	   MPI_Send(sStart, sCount, PARTICLE, rank+1, sTag, MPI_COMM_WORLD); // Send to bot bin
 
 	//
 	// MPI receive from adjacent bins
@@ -187,10 +187,10 @@ int main( int argc, char **argv )
 	int rTag2 = rank+1; // 2nd receive tag
         MPI_Status status; 
 	if (rank-1 >= 0) // Check if top bin exists	
-	   MPI_RECV(rStart1, rCount, PARTICLE, rSrc1, rTag1, MPI_COMM_WORLD, &status); //Recv from top bin
+	   MPI_Recv(rStart1, rCount, PARTICLE, rSrc1, rTag1, MPI_COMM_WORLD, &status); //Recv from top bin
 	
 	if (rank+1 <= 23)
-	   MPI_RECV(rStart2, rCount, PARTICLE, rSrc2, rTag2, MPI_COMM_WORLD, &status); // Recv from bot bin
+	   MPI_Recv(rStart2, rCount, PARTICLE, rSrc2, rTag2, MPI_COMM_WORLD, &status); // Recv from bot bin
 
 	//
 	// SELF LOOP - Compute interactions with particles within the bin
