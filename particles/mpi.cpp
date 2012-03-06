@@ -360,6 +360,7 @@ int main( int argc, char **argv )
 	nPrevBin = 0;
 	nNextBin = 0;
 
+	printf("COMPLETED Apply Force in rank %d \n" rank);
 
 	// 
 	// 3. Move Particles
@@ -370,8 +371,7 @@ int main( int argc, char **argv )
 	   move( localBin[loc_i] );
 	   loc_i++;
 	}
-
-	printf("MOVED particles in rank %d", rank);
+	printf("MOVED particles in rank %d \n", rank);
 
 
 	//
@@ -381,7 +381,7 @@ int main( int argc, char **argv )
 	idx = 0;
 	fPrevCheck = 0;
 	fNextCheck = 0;
-	for (int i=0; i<(*nlocal); i++) {
+	for (int i=0; i<(*nlocal); ++i) { // Analyze each particle in localBin
 	   while(localFlags[idx]==0) idx++;
            int bdx = (localBin[idx].y / binLength);
            if (bdx == rank) { // If particle is still in same bin, do nothing
