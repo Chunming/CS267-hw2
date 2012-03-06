@@ -111,7 +111,7 @@ int main( int argc, char **argv )
     int numBins = n_proc; // No. of bins 
     double binLength = spaceDim / numBins; // 0.5 / 24 default
 
-    printf("binLength is %f \n",binLength);
+    printf("binLength is %f \n",binLength); // 0.020833
 
     double bin_area = (spaceDim*spaceDim) / numBins; // Find max no. of particles per bin
     int nlocalMax = 3* (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per processor
@@ -230,7 +230,7 @@ int main( int argc, char **argv )
     for( int step = 0; step < NSTEPS; step++ )
     {  
 	printf("Time step is %d \n", step);
-	    
+	printf("nlocal from rank %d is %d \n", rank, *nlocal);	    
         // 
 	// 1. MPI send/receive particles to/from adjacent bins
 	// MPI_Send(void* start, int numElem, DATA_TYPE, int source, int tag, COMM)
@@ -336,7 +336,6 @@ int main( int argc, char **argv )
 
 	   else if (bdx == rank-1) { // Particle moved to top bin
 	      MPI_Send(&localBin[idx], 1, PARTICLE, rank-1, tag4, MPI_COMM_WORLD); //Send to top bin
-
 	      printf("Sent3 from %d \n", rank);   
 	  
 	      localFlags[idx] = 0;
@@ -345,7 +344,6 @@ int main( int argc, char **argv )
 
 	   else { // (bdx == rank+1) Particle moved to bot bin
 	      MPI_Send(&localBin[idx], 1, PARTICLE, rank+1, tag4, MPI_COMM_WORLD); //Send to bot bin
-
 	      printf("Sent4 from %d \n", rank);   
 
 	      localFlags[idx] = 0;
