@@ -340,8 +340,9 @@ int main( int argc, char **argv )
 	   *recvSig = 0; // Initialize
 
 	   printf("Size of int is %d, size of MPI_INT is %d \n", sizeof(int), sizeof(MPI_INT));
-
-	   MPI_Recv(recvSig, 1, MPI_INT, rank+1, 0, MPI_COMM_WORLD, &status);
+	
+	  int buffer;
+	   MPI_Recv(&buffer, 1, MPI_INT, rank+1, 0, MPI_COMM_WORLD, &status);
 	   printf("Whats after status? \n");
 	   if (*recvSig == 1) {
 	      MPI_Recv(nextBin, nlocalMax, PARTICLE, rank+1, tag1, MPI_COMM_WORLD, &status); // Recv from bot bin
