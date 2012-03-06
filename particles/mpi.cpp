@@ -276,9 +276,9 @@ int main( int argc, char **argv )
 	   MPI_Recv(&recvSig, 1, MPI_INT, rank-1, tag1+1, MPI_COMM_WORLD, &status);
 	   if (recvSig == 1) {
 	      MPI_Recv(prevBin, nlocalMax, PARTICLE, rank-1, tag1, MPI_COMM_WORLD, &status); //Recv from top bin
-	      printf("Receive1 by %d \n", rank);
 	      MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
-              nPrevBin = adjCount; 
+	      printf("Received1 %d elements in %d from %d \n", adjCount, rank, rank-1);
+	      nPrevBin = adjCount; 
 	   }
 	   else {
 	      nPrevBin = 0;
@@ -313,9 +313,9 @@ int main( int argc, char **argv )
 	   MPI_Recv(&recvSig, 1, MPI_INT, rank+1, tag1+1, MPI_COMM_WORLD, &status);
 	   if (recvSig == 1) {
 	      MPI_Recv(nextBin, nlocalMax, PARTICLE, rank+1, tag1, MPI_COMM_WORLD, &status); // Recv from bot bin
-	      printf("Receive2 by %d \n", rank);
 	      MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
-              nNextBin = adjCount; 
+	      printf("Received2 %d elements in %d from %d \n", adjCount, rank, rank+1);
+	      nNextBin = adjCount; 
 	   }
 	   else {
 	      nNextBin = 0;
@@ -360,7 +360,7 @@ int main( int argc, char **argv )
 	nPrevBin = 0;
 	nNextBin = 0;
 
-	printf("COMPLETED Apply Force in rank %d \n", rank);
+	//printf("COMPLETED Apply Force in rank %d \n", rank);
 
 	// 
 	// 3. Move Particles
@@ -371,7 +371,7 @@ int main( int argc, char **argv )
 	   move( localBin[loc_i] );
 	   loc_i++;
 	}
-	printf("MOVED particles in rank %d \n", rank);
+	//printf("MOVED particles in rank %d \n", rank);
 
 /*
 	//
