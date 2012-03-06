@@ -35,7 +35,7 @@ void compactBin(particle_t* local, unsigned char* localFlags, int &nlocal) {
 	 while (0 == localFlags[nextLoc]) nextLoc++;
 	 local[loc] = local[nextLoc];
 	 localFlags[loc] = 1;
-	 localFlags[nextLoc] = 0
+	 localFlags[nextLoc] = 0;
       }
    }
 }
@@ -192,7 +192,7 @@ int main( int argc, char **argv )
         
 	int sTag1 = 100; // Message ID
 	int adjCount; // Received count from adjacent bins
-        int nPrevBin;
+        int nPrevBin; // No. of elems from prevBin
 	int nNextBin;	
         MPI_Status status; 
 	if (rank-1 >= 0) { // Check if top bin exists 
@@ -200,7 +200,6 @@ int main( int argc, char **argv )
 	   MPI_Recv(prevBin, nlocalMax, PARTICLE, rank-1, sTag1, MPI_COMM_WORLD, &status); //Recv from top bin
 	   MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
            nPrevBin = adjCount; 
-
 	}
 
 	if (rank+1 <= 23) { // Check if bottom bin exists
@@ -230,8 +229,10 @@ int main( int argc, char **argv )
 	   for (int j=0; j<nNextBin; ++j) {
 	      apply_force (local[i], nextBin[j]);
 	   }
-
 	}
+	
+	memset(prevBin, 0, nPrevBin*sizeof(particle_t)); // Reset prevBin ptr for next itereation
+	memset(nextBin, 0, nNextBin*sizeof(particle_t)); // Reset nextBin ptr for next itereation
 
 	// 
 	// 3. Move Particles
@@ -285,8 +286,6 @@ int main( int argc, char **argv )
 	//
 	// 5. Compact Particles
 	//
-	
-
         compactBin(local, localFlags, nlocal);
 	 
 	// 
