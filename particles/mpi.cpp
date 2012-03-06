@@ -263,9 +263,9 @@ int main( int argc, char **argv )
     //  simulate a number of time steps
     //
     double simulation_time = read_timer( );
-    int recvSig = 0;
-    int prevSig = 0;
-    int nextSig = 0;
+    //int recvSig = 0;
+    //int prevSig = 0;
+    //int nextSig = 0;
     for( int step = 0; step < NSTEPS; step++ )
     {  
 	printf("Time step is %d from rank %d \n", step, rank);
