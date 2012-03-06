@@ -114,7 +114,7 @@ int main( int argc, char **argv )
     printf("binLength is %f \n",binLength); // 0.020833
 
     double bin_area = (spaceDim*spaceDim) / numBins; // Find max no. of particles per bin
-    int nlocalMax = 3* (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per processor
+    int nlocalMax = (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per processor
 
     int particle_per_proc = 3* (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per processor
     // int particle_per_proc = (n + n_proc - 1) / n_proc;
@@ -137,6 +137,8 @@ int main( int argc, char **argv )
         partition_sizes[i] = partition_offsets[i+1] - partition_offsets[i];
 
     //int nlocalMax= partition_sizes[rank]; // Same as maxParticlesPerBin
+
+   printf("Intermediate check from rank %d \n", rank);
 
 
     int localFreeLoc = 0; // Same as freeLocationPerBin
@@ -236,7 +238,7 @@ int main( int argc, char **argv )
     int nextSig = 0;
     for( int step = 0; step < NSTEPS; step++ )
     {  
-	printf("Time step is %d \n", step);
+	printf("Time step is %d from rank %d \n", step, rank);
 	printf("AFT nlocal from rank %d is %d \n", rank, *nlocal);	    
         // 
 	// 1. MPI send/receive particles to/from adjacent bins
