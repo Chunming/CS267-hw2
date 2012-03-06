@@ -320,7 +320,7 @@ int main( int argc, char **argv )
 	   //if (recvSig == 1) {
 	      MPI_Recv(prevBin, nlocalMax, PARTICLE, rank-1, tag1, MPI_COMM_WORLD, &status); //Recv from top bin
 	      MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
-	      //printf("Received1 %d elements in %d from %d \n", adjCount, rank, rank-1);
+	      printf("Received1 %d elements in %d from %d \n", adjCount, rank, rank-1);
 	      nPrevBin = adjCount; 
 	   //}
 	   //else {
@@ -363,7 +363,7 @@ int main( int argc, char **argv )
 	   //if (recvSig == 1) {
 	      MPI_Recv(nextBin, nlocalMax, PARTICLE, rank+1, tag1, MPI_COMM_WORLD, &status); // Recv from bot bin
 	      MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
-	      //printf("Received2 %d elements in %d from %d \n", adjCount, rank, rank+1);
+	      printf("Received2 %d elements in %d from %d \n", adjCount, rank, rank+1);
 	      nNextBin = adjCount; 
 	   //}
 	   //else {
