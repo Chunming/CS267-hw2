@@ -336,7 +336,7 @@ int main( int argc, char **argv )
 	   // Check receive signal from nextBin
 	   *recvSig = 0; // Initialize
 
-	   printf("Whats before status? \n");
+	   printf("Size of int is %d, size of MPI_INT is %d \n", sizeof(int), sizeof(MPI_INT));
 
 	   MPI_Recv(recvSig, 1, MPI_INT, rank+1, tag1+1, MPI_COMM_WORLD, &status);
 	   printf("Whats after status? \n");
