@@ -165,12 +165,12 @@ int main( int argc, char **argv )
     }
     memset(nextBin, 0, nlocalMax*sizeof(particle_t));
 
-    unsigned char *localFlags = (unsigned char *) malloc( (*nlocal) * sizeof(unsigned char)  ); // Same as binPariclesFlag
+    unsigned char *localFlags = (unsigned char *) malloc( nlocalMax * sizeof(unsigned char)  ); // Same as binPariclesFlag
     if (NULL == localFlags) {
        printf("ERR allocating *localFlags \n");
        return -1;
     }
-    memset(localFlags, 0, (*nlocal)*sizeof(unsigned char));
+    memset(localFlags, 0, nlocalMax*sizeof(unsigned char));
 
     //
     //  Initialize and distribute the particles (that's fine to leave it unoptimized)
@@ -384,6 +384,7 @@ int main( int argc, char **argv )
     //  release resources
     //
     free( nlocal );
+    free( totalN );
     free( partition_offsets );
     free( partition_sizes );
     free( localBin );
