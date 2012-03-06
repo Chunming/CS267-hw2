@@ -101,20 +101,26 @@ int main( int argc, char **argv )
 
 
 
-   int sendSig[2];
-   sendSig[0] = 1;
-   sendSig[1] = 2;
+   int sendSig[4];
+   sendSig[0] = 0;
+   sendSig[1] = 1;
+   sendSig[2] = 2;
+   sendSig[3] = 3;
+
    int recSig[2];
    int testCount;
    MPI_Status tStatus;
 
    if (rank == 0) {
-      MPI_Send(sendSig, 2, MPI_INT, 1, 5, MPI_COMM_WORLD);
-      //MPI_Send(sendSig+1, 1, MPI_INT, 1, 5, MPI_COMM_WORLD);
+      MPI_Send(sendSig, 1, MPI_INT, 1, 5, MPI_COMM_WORLD);
+      MPI_Send(sendSig+1, 1, MPI_INT, 1, 5, MPI_COMM_WORLD);
+      MPI_Send(sendSig+2, 1, MPI_INT, 1, 5, MPI_COMM_WORLD);
+      MPI_Send(sendSig+3, 1, MPI_INT, 1, 5, MPI_COMM_WORLD);
+
    }
 
    if (rank == 1) {
-      MPI_Recv(recSig, 2, MPI_INT, 0, 5, MPI_COMM_WORLD, &tStatus); //Recv from top bin
+      MPI_Recv(recSig, 10, MPI_INT, 0, 5, MPI_COMM_WORLD, &tStatus); //Recv from top bin
       MPI_Get_count(&tStatus, MPI_INT, &testCount); // Get received count
       printf("Received %d elements in %d from %d \n", testCount, rank, rank-1);
    }
@@ -262,7 +268,7 @@ int main( int argc, char **argv )
     for( int step = 0; step < NSTEPS; step++ )
     {  
 	printf("Time step is %d from rank %d \n", step, rank);
-	printf("AFT nlocal from rank %d is %d \n", rank, *nlocal);	    
+	//printf("AFT nlocal from rank %d is %d \n", rank, *nlocal);	    
         // 
 	// 1. MPI send/receive particles to/from adjacent bins
 	// MPI_Send(void* start, int numElem, DATA_TYPE, int source, int tag, COMM)
@@ -489,7 +495,7 @@ int main( int argc, char **argv )
 
 	*/
 
-	printf("COMPACT particles in rank %d \n", rank);
+	//printf("COMPACT particles in rank %d \n", rank);
 	//
 	// 5. Compact Particles
 	//
