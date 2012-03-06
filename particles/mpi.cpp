@@ -123,7 +123,7 @@ int main( int argc, char **argv )
     int nlocal = 0; // Same as particlesPerBin
 
     particle_t *localBin = (particle_t*) malloc( nlocalMax * sizeof(particle_t) ); // Same as binParticles
-    memset(local, 0, nlocalMax*sizeof(particle_t));
+    memset(localBin, 0, nlocalMax*sizeof(particle_t));
 
     particle_t *prevBin = (particle_t*) malloc( nlocalMax * sizeof(particle_t) );
     memset(prevBin, 0, nlocalMax*sizeof(particle_t));
@@ -218,7 +218,7 @@ int main( int argc, char **argv )
 
 	   
 	   // SELF LOOP - Compute interactions with particles within the bin
-	   int loc_j = 0;
+	   loc_j = 0;
 	   for (int j=0; j<nlocal; ++j) {
 	      while(localFlags[loc_j]==0) loc_j++;
 	      apply_force (localBin[loc_i], localBin[loc_j]);
