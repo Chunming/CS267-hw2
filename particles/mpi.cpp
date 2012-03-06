@@ -305,6 +305,9 @@ int main( int argc, char **argv )
 	      MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
               nPrevBin = adjCount; 
 	   }
+	   else {
+	      nPrevBin = 0;
+	   }
 	}
 
 	if (rank+1 <= 23) { // Check if bottom bin exists
@@ -338,6 +341,9 @@ int main( int argc, char **argv )
 	      printf("Receive2 by %d \n", rank);
 	      MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
               nNextBin = adjCount; 
+	   }
+	   else {
+	      nNextBin = 0;
 	   }
 	}
 
@@ -467,6 +473,9 @@ int main( int argc, char **argv )
     //
     //  release resources
     //
+    free( nextSig );
+    free( prevSig );
+    free( recvSig );
     free( nlocal );
     free( totalN );
     free( partition_offsets );
