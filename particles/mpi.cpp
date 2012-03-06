@@ -311,7 +311,6 @@ int main( int argc, char **argv )
 	      prevSig = 1;	   
 	      MPI_Send(&prevSig, 1, MPI_INT, rank-1, tag1+1, MPI_COMM_WORLD); // Open comms with prevBin
 	   }
-
 	   else { // (0==fPrevCheck), // Comms with prev bin is not req
 	      prevSig = 0; 
 	      MPI_Send(&prevSig, 1, MPI_INT, rank-1, tag1+1, MPI_COMM_WORLD); // Close comms with prevBin
@@ -350,7 +349,7 @@ int main( int argc, char **argv )
 	   }
 
 	   if (1==fNextCheck) { // Comms with nextBin not req
-	      nextSig = 0; 
+	      nextSig = 1; 
 	      MPI_Send(&nextSig, 1, MPI_INT, rank+1, tag1+1, MPI_COMM_WORLD); // Close comms with prevBin
 	   }
 	   else { // (0==fNextCheck) { // Comms with nextBin not req
