@@ -2,7 +2,7 @@
 #PBS -l mppwidth=24
 #PBS -l mppnppn=24
 #PBS -l mppdepth=1
-#PBS -l walltime=0:02:00
+#PBS -l walltime=0:10:00
 #PBS -o mpi24.stdout
 #PBS -j oe
 

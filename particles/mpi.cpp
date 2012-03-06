@@ -211,10 +211,6 @@ int main( int argc, char **argv )
       }
    }
 
-
-   printf("nlocalMax is %d \n", nlocalMax);
-
-
     //
     //  simulate a number of time steps
     //
@@ -236,11 +232,11 @@ int main( int argc, char **argv )
 
 	   MPI_Send(localBin, *nlocal, PARTICLE, rank-1, tag1, MPI_COMM_WORLD); // Send to top bin	  
 
-	   printf("Sent1 from %d \n", rank);   
+	   //printf("Sent1 from %d \n", rank);   
 
 	   MPI_Recv(prevBin, nlocalMax, PARTICLE, rank-1, tag1, MPI_COMM_WORLD, &status); //Recv from top bin
 
-	   printf("Received1 by %d \n", rank);
+	   //printf("Received1 by %d \n", rank);
 
 	   MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
            nPrevBin = adjCount; 
@@ -249,11 +245,11 @@ int main( int argc, char **argv )
 	if (rank+1 <= 23) { // Check if bottom bin exists
 	   MPI_Send(localBin, *nlocal, PARTICLE, rank+1, tag1, MPI_COMM_WORLD); // Send to bot bin
 
-           printf("Sent2 from %d \n", rank);
+           //printf("Sent2 from %d \n", rank);
 
 	   MPI_Recv(nextBin, nlocalMax, PARTICLE, rank+1, tag1, MPI_COMM_WORLD, &status); // Recv from bot bin
 
-	   printf("Received2 by %d \n", rank);
+	   //printf("Received2 by %d \n", rank);
 
 	   MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
            nNextBin = adjCount; 
@@ -318,7 +314,7 @@ int main( int argc, char **argv )
 	   else if (bdx == rank-1) { // Particle moved to top bin
 	      MPI_Send(&localBin[idx], 1, PARTICLE, rank-1, tag4, MPI_COMM_WORLD); //Send to top bin
 
-	      printf("Sent3 from %d \n", rank);   
+	      //printf("Sent3 from %d \n", rank);   
 	  
 	      localFlags[idx] = 0;
 	      (*nlocal)--;
@@ -327,7 +323,7 @@ int main( int argc, char **argv )
 	   else { // (bdx == rank+1) Particle moved to bot bin
 	      MPI_Send(&localBin[idx], 1, PARTICLE, rank+1, tag4, MPI_COMM_WORLD); //Send to bot bin
 
-	      printf("Sent4 from %d \n", rank);   
+	      //printf("Sent4 from %d \n", rank);   
 
 	      localFlags[idx] = 0;
 	      (*nlocal)--;
@@ -340,7 +336,7 @@ int main( int argc, char **argv )
 	if (rank-1 >= 0) { // Check if top bin exists	
 	   MPI_Recv(&localBin[idx], nlocalMax, PARTICLE, rank-1, tag4, MPI_COMM_WORLD, &status); //Recv from top bin
 
-	   printf("Receive3 from %d \n", rank);   
+	   //printf("Receive3 from %d \n", rank);   
 
 	   MPI_Get_count(&status, PARTICLE, &rebinCount); // Get received count
 	   for (int j=idx; j<rebinCount; ++j) localFlags[j]=1;
@@ -351,7 +347,7 @@ int main( int argc, char **argv )
 	if (rank+1 <= 23) { // Check if bot bin exists
 	   MPI_Recv(&localBin[idx], nlocalMax, PARTICLE, rank+1, tag4, MPI_COMM_WORLD, &status); //Recv from bot bin
 
-	   printf("Receive4 from %d \n", rank);   
+	   //printf("Receive4 from %d \n", rank);   
 
 	   MPI_Get_count(&status, PARTICLE, &rebinCount);
 	   for (int j=idx; j<rebinCount; ++j) localFlags[j]=1;
