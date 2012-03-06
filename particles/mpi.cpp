@@ -99,8 +99,9 @@ int main( int argc, char **argv )
     MPI_Type_contiguous( 7, MPI_DOUBLE, &PARTICLE );
     MPI_Type_commit( &PARTICLE );
 
-
-
+  
+/*    
+   // Test Code
    int sendSig[4];
    sendSig[0] = 0;
    sendSig[1] = 1;
@@ -125,7 +126,7 @@ int main( int argc, char **argv )
       printf("Received %d elements in %d from %d \n", testCount, rank, rank-1);
    }
 
-
+*/
 
 
 
@@ -269,10 +270,15 @@ int main( int argc, char **argv )
     {  
 	printf("Time step is %d from rank %d \n", step, rank);
 	//printf("AFT nlocal from rank %d is %d \n", rank, *nlocal);	    
-        // 
+
+
+	// 
 	// 1. MPI send/receive particles to/from adjacent bins
 	// MPI_Send(void* start, int numElem, DATA_TYPE, int source, int tag, COMM)
 	// MPI_Recv(void* start, int numElem, DATA_TYPE, int source, int tag, COMM, status)
+        // Each MPI_Send must be paired with a MPI_Recv
+        // Cannot call successive MPI_Sends and call just one MPI_Recv
+
 	int tag1 = 100; // Message ID
 	int adjCount; // Received count from adjacent bins
         int nPrevBin=0; // No. of elems from prevBin
@@ -290,17 +296,23 @@ int main( int argc, char **argv )
     	   for (int i=0; i< (*nlocal); ++i) { // Only send particles that are close to edge
 	      while (localFlags[idx]==0) idx++; 
   	      if (isCloseToEdge(localBin[idx], binEdge)) { // Comms with prev bin is req
-		 if (0==fPrevCheck) {
-		    prevSig = 1; 
-	            MPI_Send(&prevSig, 1, MPI_INT, rank-1, tag1+1, MPI_COMM_WORLD); // Open comms with prevBin
+		 //if (0==fPrevCheck) {
+		    //prevSig = 1; 
+	            //MPI_Send(&prevSig, 1, MPI_INT, rank-1, tag1+1, MPI_COMM_WORLD); // Open comms with prevBin
 		    fPrevCheck = 1;
-		 }
-	         MPI_Send(&localBin[idx], 1, PARTICLE, rank-1, tag1, MPI_COMM_WORLD); // Send to top bin	  
+		    break;
+		 //}
+	         //MPI_Send(&localBin[idx], 1, PARTICLE, rank-1, tag1, MPI_COMM_WORLD); // Send to top bin	  
 	      }
 	      idx++;
 	   }
 
-	   if (0==fPrevCheck) { // Comms with prev bin is not req
+	   if (1==fPrevCheck) {
+	      prevSig = 1;	   
+	      MPI_Send(&prevSig, 1, MPI_INT, rank-1, tag1+1, MPI_COMM_WORLD); // Open comms with prevBin
+	   }
+
+	   else { // (0==fPrevCheck), // Comms with prev bin is not req
 	      prevSig = 0; 
 	      MPI_Send(&prevSig, 1, MPI_INT, rank-1, tag1+1, MPI_COMM_WORLD); // Close comms with prevBin
 	   }
@@ -326,21 +338,25 @@ int main( int argc, char **argv )
 	   for (int i=0; i< (*nlocal); ++i) { // Only send particles that are close to edge
      	      while (localFlags[idx]==0) idx++;
 	      if (isCloseToEdge(localBin[idx], binEdge)) {
-		 if (0==fNextCheck) {
-		    nextSig = 1;	 
-	            MPI_Send(&nextSig, 1, MPI_INT, rank+1, tag1+1, MPI_COMM_WORLD); // Send to top bin	  
+		 //if (0==fNextCheck) {
+		    //nextSig = 1;	 
+	            //MPI_Send(&nextSig, 1, MPI_INT, rank+1, tag1+1, MPI_COMM_WORLD); // Send to top bin	  
 		    fNextCheck = 1;
-		 }
-		 MPI_Send(&localBin[idx], 1, PARTICLE, rank+1, tag1, MPI_COMM_WORLD); // Send to bot bin
+		    break;
+		 //}
+		 //MPI_Send(&localBin[idx], 1, PARTICLE, rank+1, tag1, MPI_COMM_WORLD); // Send to bot bin
 	      }
 	      idx++;
 	   }
 
-	   if (0==fNextCheck) { // Comms with nextBin not req
+	   if (1==fNextCheck) { // Comms with nextBin not req
 	      nextSig = 0; 
 	      MPI_Send(&nextSig, 1, MPI_INT, rank+1, tag1+1, MPI_COMM_WORLD); // Close comms with prevBin
 	   }
-
+	   else { // (0==fNextCheck) { // Comms with nextBin not req
+	      nextSig = 0; 
+	      MPI_Send(&nextSig, 1, MPI_INT, rank+1, tag1+1, MPI_COMM_WORLD); // Close comms with prevBin
+	   }
            //printf("Sent2 from %d \n", rank);
 
 	   // Check receive signal from nextBin
