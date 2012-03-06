@@ -277,6 +277,7 @@ int main( int argc, char **argv )
            
 	   // Check if comms with prev bin is req
 	   idx = 0;
+	   fPrevCheck = 0;
     	   for (int i=0; i< (*nlocal); ++i) { // Only send particles that are close to edge
 	      while (localFlags[idx]==0) idx++; 
   	      if (isCloseToEdge(localBin[idx], binEdge)) { // Comms with prev bin is req
@@ -312,8 +313,10 @@ int main( int argc, char **argv )
 
 	if (rank+1 <= 23) { // Check if bottom bin exists
 	   idx = 0;
+	   fNextCheck = 0;
 	   for (int i=0; i< (*nlocal); ++i) { // Only send particles that are close to edge
-	      while (localFlags[idx]==0) idx++;
+              printf("Check if it ever goes in \n");
+     	      while (localFlags[idx]==0) idx++;
 	      if (isCloseToEdge(localBin[idx], binEdge)) {
 		 if (0==fNextCheck) {
 		    *nextSig = 1;	 
