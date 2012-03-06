@@ -77,6 +77,10 @@ int main( int argc, char **argv )
     //
     FILE *fsave = savename && rank == 0 ? fopen( savename, "w" ) : NULL;
     particle_t *particles = (particle_t*) malloc( n * sizeof(particle_t) );
+    if (NULL == particles) {
+       printf("ERR allocating *particles \n");
+       return -1;
+    }
     
     MPI_Datatype PARTICLE;
     MPI_Type_contiguous( 7, MPI_DOUBLE, &PARTICLE );
@@ -104,10 +108,19 @@ int main( int argc, char **argv )
     // int particle_per_proc = (n + n_proc - 1) / n_proc;
     
     int *partition_offsets = (int*) malloc( (n_proc+1) * sizeof(int) );
+    if (NULL == partition_offsets) {
+       printf("ERR allocating *partition_offsets \n");
+       return -1;
+    }
     for( int i = 0; i < n_proc+1; i++ )
         partition_offsets[i] = min( i * particle_per_proc, n );
     
     int *partition_sizes = (int*) malloc( n_proc * sizeof(int) );
+    if (NULL == partition_sizes) {
+       printf("ERR allocating *partition_sizes \n");
+       return -1;
+    }
+
     for( int i = 0; i < n_proc; i++ )
         partition_sizes[i] = partition_offsets[i+1] - partition_offsets[i];
 
@@ -116,19 +129,47 @@ int main( int argc, char **argv )
 
     int localFreeLoc = 0; // Same as freeLocationPerBin
     int* nlocal = (int*) malloc (sizeof(int)) ; // Same as particlesPerBin
+    if (NULL == nlocal) {
+       printf("ERR allocating *nlocal \n");
+       return -1;
+    }
+
     int* totalN = NULL;
-    if (rank == 0) totalN = (int*) malloc(sizeof(int));
+    if (rank == 0) { 
+       totalN = (int*) malloc(sizeof(int));
+       if (NULL == totalN) {
+          printf("ERR allocating *totalN \n");
+          return -1;
+       }
+
+    }
 
     particle_t *localBin = (particle_t*) malloc( nlocalMax * sizeof(particle_t) ); // Same as binParticles
+    if (NULL == localBin) {
+       printf("ERR allocating *localBin \n");
+       return -1;
+    }
     memset(localBin, 0, nlocalMax*sizeof(particle_t));
 
     particle_t *prevBin = (particle_t*) malloc( nlocalMax * sizeof(particle_t) );
+    if (NULL == prevBin) {
+       printf("ERR allocating *prevBin \n");
+       return -1;
+    }
     memset(prevBin, 0, nlocalMax*sizeof(particle_t));
 
     particle_t *nextBin = (particle_t*) malloc( nlocalMax * sizeof(particle_t) );
+    if (NULL == nextBin) {
+       printf("ERR allocating *nextBin \n");
+       return -1;
+    }
     memset(nextBin, 0, nlocalMax*sizeof(particle_t));
 
-    unsigned char *localFlags = (unsigned char *) malloc( (*nlocal) * sizeof(unsigned char)  ); // Same as binPariclesFlag
+    unsigned char *localFlags = (unsigned char *) malloc( nlocalMax * sizeof(unsigned char)  ); // Same as binPariclesFlag
+    if (NULL == localFlags) {
+       printf("ERR allocating *localFlags \n");
+       return -1;
+    }
     memset(localFlags, 0, (*nlocal)*sizeof(unsigned char));
 
     //
