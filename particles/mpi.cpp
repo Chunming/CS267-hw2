@@ -360,7 +360,7 @@ int main( int argc, char **argv )
 	nPrevBin = 0;
 	nNextBin = 0;
 
-	printf("COMPLETED Apply Force in rank %d \n" rank);
+	printf("COMPLETED Apply Force in rank %d \n", rank);
 
 	// 
 	// 3. Move Particles
