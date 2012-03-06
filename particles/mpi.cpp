@@ -419,7 +419,8 @@ int main( int argc, char **argv )
 	// 4. Re-bin Particles
 	//
 	int bdx;
-	idx = 0; jdx = 0; kdx = 0;
+	int jdx = 0; int kdx = 0;
+	idx = 0; 
 	for (int i=0; i<(*nlocal); ++i) { // Analyze each particle in localBin
 	   while(localFlags[idx]==0) idx++;
            bdx = (localBin[idx].y / binLength);
