@@ -109,8 +109,8 @@ int main( int argc, char **argv )
    MPI_Status tStatus;
 
    if (rank == 0) {
-      MPI_Send(sendSig, 1, MPI_INT, 1, 5, MPI_COMM_WORLD);
-      MPI_Send(sendSig+1, 1, MPI_INT, 1, 5, MPI_COMM_WORLD);
+      MPI_Send(sendSig, 2, MPI_INT, 1, 5, MPI_COMM_WORLD);
+      //MPI_Send(sendSig+1, 1, MPI_INT, 1, 5, MPI_COMM_WORLD);
    }
 
    if (rank == 1) {
