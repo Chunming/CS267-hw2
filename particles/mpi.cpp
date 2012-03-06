@@ -297,8 +297,9 @@ int main( int argc, char **argv )
 	   printf("Sent1 from %d \n", rank);
 	  
 	   // Check receive signal from prevBin
-	   MPI_Recv(recvSig, 1, MPI_INT, rank-1, tag1+1, MPI_COMM_WORLD);
-	   if (recvSig==1) {
+	   *recvSig = 0; // Initialize
+	   MPI_Recv(recvSig, 1, MPI_INT, rank-1, tag1+1, MPI_COMM_WORLD, &status);
+	   if (*recvSig == 1) {
 	      MPI_Recv(prevBin, nlocalMax, PARTICLE, rank-1, tag1, MPI_COMM_WORLD, &status); //Recv from top bin
 	      printf("Receive1 by %d \n", rank);
 	      MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
@@ -328,9 +329,11 @@ int main( int argc, char **argv )
 
            printf("Sent2 from %d \n", rank);
 
+
 	   // Check receive signal from nextBin
-	   MPI_Recv(recvSig, 1, MPI_INT, rank+1, tag1+1, MPI_COMM_WORLD);
-	   if (recvSig==1) {
+	   *recvSig = 0; // Initialize
+	   MPI_Recv(recvSig, 1, MPI_INT, rank+1, tag1+1, MPI_COMM_WORLD, &status);
+	   if (*recvSig == 1) {
 	      MPI_Recv(nextBin, nlocalMax, PARTICLE, rank+1, tag1, MPI_COMM_WORLD, &status); // Recv from bot bin
 	      printf("Receive2 by %d \n", rank);
 	      MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
