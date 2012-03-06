@@ -116,7 +116,8 @@ int main( int argc, char **argv )
 
     int localFreeLoc = 0; // Same as freeLocationPerBin
     int* nlocal = (int*) malloc (sizeof(int)) ; // Same as particlesPerBin
-    if (rank == 0) int* totalN = (int*) malloc(sizeof(int));
+    int* totalN = NULL;
+    if (rank == 0) totalN = (int*) malloc(sizeof(int));
 
     particle_t *localBin = (particle_t*) malloc( nlocalMax * sizeof(particle_t) ); // Same as binParticles
     memset(localBin, 0, nlocalMax*sizeof(particle_t));
@@ -128,7 +129,7 @@ int main( int argc, char **argv )
     memset(nextBin, 0, nlocalMax*sizeof(particle_t));
 
     unsigned char *localFlags = (unsigned char *) malloc( (*nlocal) * sizeof(unsigned char)  ); // Same as binPariclesFlag
-    memset(localFlags, 0, nlocal*sizeof(unsigned char));
+    memset(localFlags, 0, (*nlocal)*sizeof(unsigned char));
 
     //
     //  Initialize and distribute the particles (that's fine to leave it unoptimized)
@@ -165,7 +166,7 @@ int main( int argc, char **argv )
    for (int ndx=0; ndx<n; ++ndx) {
       int bdx = (particles[ndx].y / binLength);
       if (bdx == rank) {
-         copyParticleToBin(&particles[ndx], localBin, localFlags, bdx, *nlocal, nlocalMax, localFreeLoc);
+         copyParticleToBin(&particles[ndx], localBin, localFlags, bdx, nlocal, nlocalMax, localFreeLoc);
       }
    }
 
@@ -320,7 +321,7 @@ int main( int argc, char **argv )
 	//
 	// 5. Compact Particles
 	//
-        compactBin(localBin, localFlags, (*nlocal));
+        compactBin(localBin, localFlags, nlocal);
 	 
 	// 
         //  Collect all global data locally (not good idea to do)
