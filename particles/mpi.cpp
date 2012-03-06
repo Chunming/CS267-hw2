@@ -458,6 +458,7 @@ int main( int argc, char **argv )
 	   }
 	}
 
+	printf("COMPACT particles in rank %d \n", rank);
 	//
 	// 5. Compact Particles
 	//
