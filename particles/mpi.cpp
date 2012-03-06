@@ -329,7 +329,8 @@ int main( int argc, char **argv )
 	}
 
 	if (rank+1 <= 23) { // Check if bottom bin exists
-	   idx = 0;
+
+     	   idx = 0;
 	   fNextCheck = 0;
 	   for (int i=0; i< (*nlocal); ++i) { // Only send particles that are close to edge
      	      while (localFlags[idx]==0) idx++;
@@ -346,30 +347,21 @@ int main( int argc, char **argv )
 	   }
 
 	   if (1==fNextCheck) { 
-	      //nextSig = 1; 
-	      //MPI_Send(&nextSig, 1, MPI_INT, rank+1, tag1+1, MPI_COMM_WORLD); // Close comms with prevBin
 	      MPI_Send(localBin, *nlocal, PARTICLE, rank+1, tag1, MPI_COMM_WORLD); // Send to bot bin
 	   }
-	   else { // (0==fNextCheck) { // Comms with nextBin not req
-	      //nextSig = 0; 
-	      //MPI_Send(&nextSig, 1, MPI_INT, rank+1, tag1+1, MPI_COMM_WORLD); // Close comms with prevBin
+	   else { // (0==fNextCheck)  Comms with nextBin not req
 	      MPI_Send(localBin, 0, PARTICLE, rank+1, tag1, MPI_COMM_WORLD); // Send to bot bin
 	   }
-           //printf("Sent2 from %d \n", rank);
 
 	   // Check receive signal from nextBin
-	   //recvSig = 0; // Initialize
-	   //MPI_Recv(&recvSig, 1, MPI_INT, rank+1, tag1+1, MPI_COMM_WORLD, &status);
-	   //if (recvSig == 1) {
-	      MPI_Recv(nextBin, nlocalMax, PARTICLE, rank+1, tag1, MPI_COMM_WORLD, &status); // Recv from bot bin
-	      MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
-	      printf("Received2 %d elements in %d from %d \n", adjCount, rank, rank+1);
-	      nNextBin = adjCount; 
-	   //}
-	   //else {
-	   //   nNextBin = 0;
-	   //}
+	   MPI_Recv(nextBin, nlocalMax, PARTICLE, rank+1, tag1, MPI_COMM_WORLD, &status); // Recv from bot bin
+	   MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
+	   printf("Received2 %d elements in %d from %d \n", adjCount, rank, rank+1);
+	   nNextBin = adjCount; 
+
 	}
+
+
 
 
 	//
@@ -422,94 +414,57 @@ int main( int argc, char **argv )
 	}
 	//printf("MOVED particles in rank %d \n", rank);
 
-/*
+
 	//
 	// 4. Re-bin Particles
 	//
-	int tag4 = 400;
 	int bdx;
-	idx = 0;
-
-	fPrevCheck = 0;
+	idx = 0; jdx = 0; kdx = 0;
 	for (int i=0; i<(*nlocal); ++i) { // Analyze each particle in localBin
 	   while(localFlags[idx]==0) idx++;
            bdx = (localBin[idx].y / binLength);
+
 	   if (bdx == rank-1) { // Particle moved to top bin
-	      if (0==fPrevCheck) {
-	         prevSig = 1;
-		 MPI_Send(&prevSig, 1, MPI_INT, rank-1, tag4+1, MPI_COMM_WORLD);
-	         fPrevCheck = 1;
-	      }
-	      MPI_Send(&localBin[idx], 1, PARTICLE, rank-1, tag4, MPI_COMM_WORLD); //Send to top bin
-	      printf("Sent3 from %d \n", rank);   
-	      localFlags[idx] = 0;
+	      localFlags[idx] = 0; // Remove from localBin
+	      prevBin[jdx] = localBin[idx];
+	      jdx++;
+	      nPrevBin++;
+	      (*nlocal)--;
+	   }
+
+	   if (bdx == rank+1) { // Particle moved to top bin
+	      localFlags[idx] = 0; // Remove from localBin
+	      nextBin[kdx] = localBin[idx];
+	      kdx++;
+	      nPrevBin++;
 	      (*nlocal)--;
 	   }
 	   idx++;
 	}
 
-	if(0 == fPrevCheck) {
-	   prevSig = 0;
-	   MPI_Send(&prevSig, 1, MPI_INT, rank-1, tag4+1, MPI_COMM_WORLD);
-	}
-
-	fNextCheck = 0;
-	for (int i=0; i<(*nlocal); ++i) { // Analyze each particle in localBin
-	   while(localFlags[idx]==0) idx++;
-           bdx = (localBin[idx].y / binLength);
-	   if (bdx == rank+1) { // Particle moved to bot bin
-	      if (0==fNextCheck) {
-	         nextSig = 1;
-		 MPI_Send(&nextSig, 1, MPI_INT, rank+1, tag4+1, MPI_COMM_WORLD);
-	         fNextCheck = 1;
-	      }
-     	      MPI_Send(&localBin[idx], 1, PARTICLE, rank+1, tag4, MPI_COMM_WORLD); //Send to bot bin
-	      printf("Sent4 from %d \n", rank);   
-	      localFlags[idx] = 0;
-	      (*nlocal)--;
-	   }
-	   idx++;
-	}
-
-	if(0 == fNextCheck) {
-	   nextSig = 0;
-	   MPI_Send(&nextSig, 1, MPI_INT, rank+1, tag4+1, MPI_COMM_WORLD);
-	}
 
 	// Get particles from adjacent bins
 	int rebinCount;
-	if (rank-1 >= 0) { // Check if top bin exists	
+	int tag4 = 400;
+	if (rank-1 >= 0) { // If top bin exists
+     	   MPI_Send(prevBin, nPrevBin, PARTICLE, rank-1, tag4, MPI_COMM_WORLD); //Send to bot bin
+	   MPI_Recv(&localBin[idx], nlocalMax, PARTICLE, rank-1, tag4, MPI_COMM_WORLD, &status); //Recv from top bin
+	   MPI_Get_count(&status, PARTICLE, &rebinCount); // Get received count
+	   for (int j=idx; j<rebinCount; ++j) localFlags[j]=1;
+	   idx = idx + rebinCount;
+	   (*nlocal) += rebinCount;
+	}
 
-     	   recvSig = 0;
-	   MPI_Recv(&recvSig, 1, MPI_INT, rank-1, tag4+1, MPI_COMM_WORLD, &status);
-	   if (recvSig == 1) {
-	      MPI_Recv(&localBin[idx], nlocalMax, PARTICLE, rank-1, tag4, MPI_COMM_WORLD, &status); //Recv from top bin
-     	      printf("Receive3 from %d \n", rank);   
-	      MPI_Get_count(&status, PARTICLE, &rebinCount); // Get received count
-	      for (int j=idx; j<rebinCount; ++j) localFlags[j]=1;
-	      idx = idx + rebinCount;
-	      (*nlocal) += rebinCount;
-	   }
+	if (rank+1 <= 23) { // Check if bottom bin exists
+     	   MPI_Send(nextBin, nNextBin, PARTICLE, rank+1, tag4, MPI_COMM_WORLD); //Send to bot bin
+ 	   MPI_Recv(&localBin[idx], nlocalMax, PARTICLE, rank+1, tag4, MPI_COMM_WORLD, &status); //Recv from bot bin
+	   MPI_Get_count(&status, PARTICLE, &rebinCount);
+	   for (int j=idx; j<rebinCount; ++j) localFlags[j]=1;
+	   idx = idx + rebinCount;
+	   (*nlocal) += rebinCount;
 	}
 
 
-	if (rank+1 <= 23) { // Check if bot bin exists
-     
-     	   recvSig = 0;
-	   MPI_Recv(&recvSig, 1, MPI_INT, rank+1, tag4+1, MPI_COMM_WORLD, &status);
-	   if (recvSig == 1) {
- 	      MPI_Recv(&localBin[idx], nlocalMax, PARTICLE, rank+1, tag4, MPI_COMM_WORLD, &status); //Recv from bot bin
-	      printf("Receive4 from %d \n", rank);   
-	      MPI_Get_count(&status, PARTICLE, &rebinCount);
-	      for (int j=idx; j<rebinCount; ++j) localFlags[j]=1;
-	      idx = idx + rebinCount;
-	      (*nlocal) += rebinCount;
-	   }
-	}
-
-	*/
-
-	//printf("COMPACT particles in rank %d \n", rank);
 	//
 	// 5. Compact Particles
 	//
