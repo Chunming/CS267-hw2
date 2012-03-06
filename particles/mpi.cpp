@@ -71,7 +71,6 @@ int main( int argc, char **argv )
     int n = read_int( argc, argv, "-n", 1000 );
     char *savename = read_string( argc, argv, "-o", NULL );
     
-    printf("Outside the MPI loop \n");
 
     //
     //  Set up MPI
@@ -174,7 +173,7 @@ int main( int argc, char **argv )
    }
 
 
-
+   printf("nlocalMax is %d \n", nlocalMax);
 
 
     //
@@ -189,8 +188,8 @@ int main( int argc, char **argv )
 	// MPI_Recv(void* start, int numElem, DATA_TYPE, int source, int tag, COMM, status)
 	int tag1 = 100; // Message ID
 	int adjCount; // Received count from adjacent bins
-        int nPrevBin; // No. of elems from prevBin
-	int nNextBin;	
+        int nPrevBin=0; // No. of elems from prevBin
+	int nNextBin=0;	
         MPI_Status status; 
 	if (rank-1 >= 0) { // Check if top bin exists 
 	   MPI_Send(localBin, nlocal, PARTICLE, rank-1, tag1, MPI_COMM_WORLD); // Send to top bin	  
@@ -240,7 +239,8 @@ int main( int argc, char **argv )
 	
 	memset(prevBin, 0, nPrevBin*sizeof(particle_t)); // Reset prevBin ptr for next itereation
 	memset(nextBin, 0, nNextBin*sizeof(particle_t)); // Reset nextBin ptr for next itereation
-
+	nPrevBin = 0;
+	nNextBin = 0;
 	// 
 	// 3. Move Particles
 	//
