@@ -10,13 +10,6 @@
 #define cutoff 0.01
 #define density 0.0005
 double spaceDim = 0.0;
-particle_t **binParticles = NULL;
-unsigned char **binParticlesFlag = NULL;
-int *particlesPerBin = NULL;
-int *freeLocationPerBin = NULL;
-int numBins = -1;
-int maxParticlesPerBin = -1;
-double binLength = -1;
 
 //
 //  benchmarking program
@@ -106,6 +99,8 @@ int main( int argc, char **argv )
     binLength = spaceDim / numBins; // 0.5 / 24 default
 
     double bin_area = (spaceDim*spaceDim) / numBins; // Find max no. of particles per bin
+    int nlocalMax = 3* (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per processor
+/*
     int particle_per_proc = 3* (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per processor
     // int particle_per_proc = (n + n_proc - 1) / n_proc;
     
@@ -118,6 +113,8 @@ int main( int argc, char **argv )
         partition_sizes[i] = partition_offsets[i+1] - partition_offsets[i];
 
     int nlocalMax= partition_sizes[rank]; // Same as maxParticlesPerBin
+*/
+
     int localFreeLoc = 0; // Same as freeLocationPerBin
     int nlocal = 0; // Same as particlesPerBin
 
