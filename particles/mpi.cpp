@@ -408,7 +408,7 @@ int main( int argc, char **argv )
 	for (int i=0; i<(*nlocal); ++i) { // Analyze each particle in localBin
 	   while(localFlags[idx]==0) idx++;
            bdx = (localBin[idx].y / binLength);
-	   if (bdx == rank+1) { Particle moved to bot bin
+	   if (bdx == rank+1) { // Particle moved to bot bin
 	      if (0==fNextCheck) {
 	         nextSig = 1;
 		 MPI_Send(&nextSig, 1, MPI_INT, rank+1, tag4+1, MPI_COMM_WORLD);
