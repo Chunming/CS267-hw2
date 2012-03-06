@@ -150,13 +150,11 @@ int main( int argc, char **argv )
     }
     (*nlocal) = 0;
 
-    int* totalN = NULL;
-    if (rank == 0) { 
-       totalN = (int*) malloc(sizeof(int));
-       if (NULL == totalN) {
-          printf("ERR allocating *totalN \n");
-          return -1;
-       }
+    // totalN is only used by rank = 1
+    int* totalN = (int*) malloc(sizeof(int));
+    if (NULL == totalN) {
+       printf("ERR allocating *totalN \n");
+       return -1;
     }
     (*totalN) = 0;
 
@@ -439,7 +437,7 @@ int main( int argc, char **argv )
         //  gathers data from all tasks & deliver combined data to all tasks
 	//
 	MPI_Allgatherv( localBin, *nlocal, PARTICLE, particles, partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
-	MPI_Reduce(totalN, nlocal, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );
+	MPI_Reduce(nlocal, totalN, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );
         
 	if (rank == 0) printf("Total N is %d \n", totalN);
 
