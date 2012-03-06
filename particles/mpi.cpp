@@ -62,13 +62,13 @@ int main( int argc, char **argv )
    int sendSig[2];
    sendSig[0] = 1;
    sendSig[1] = 2;
-   int recvSig[2];
+   int recSig[2];
    int testCount;
    MPI_Status tStatus;
 
    MPI_Send(sendSig, 1, MPI_INT, 1, 5, MPI_COMM_WORLD);
    MPI_Send(sendSig+1, 1, MPI_INT, 1, 5, MPI_COMM_WORLD);
-   MPI_Recv(recvSig, 2, MPI_INT, 0, 5, MPI_COMM_WORLD, &tStatus); //Recv from top bin
+   MPI_Recv(recSig, 2, MPI_INT, 0, 5, MPI_COMM_WORLD, &tStatus); //Recv from top bin
    MPI_Get_count(&tStatus, MPI_INT, &testCount); // Get received count
    printf("Received1 %d elements in %d from %d \n", testCount, rank, rank-1);
 
