@@ -9,7 +9,6 @@
 // Global variables
 #define cutoff 0.01
 #define density 0.0005
-double spaceDim = 0.0;
 
 //
 //  benchmarking program
@@ -94,9 +93,9 @@ int main( int argc, char **argv )
     // Allocate storage for local partition/ Set up bins
     //
     
-    spaceDim = sqrt(density * n); // 0.5 default
-    numBins = n_proc; // No. of bins 
-    binLength = spaceDim / numBins; // 0.5 / 24 default
+    double spaceDim = sqrt(density * n); // 0.5 default
+    int numBins = n_proc; // No. of bins 
+    double binLength = spaceDim / numBins; // 0.5 / 24 default
 
     double bin_area = (spaceDim*spaceDim) / numBins; // Find max no. of particles per bin
     int nlocalMax = 3* (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per processor
