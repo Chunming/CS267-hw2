@@ -148,24 +148,6 @@ int main( int argc, char **argv )
     }
     (*nlocal) = 0;
 
-    // Allocate mem to see if localBin has to communicate with prevBin
-    int* prevSig = (int*) malloc (sizeof(int)) ; // Same as particlesPerBin
-    if (NULL == prevSig) {
-       printf("ERR allocating *prevSig \n");
-       return -1;
-    }
-    (*prevSig) = 0;
-
-    // Allocate mem to see if localBin has to communicate with nextBin
-    int* nextSig = (int*) malloc (sizeof(int)) ; // Same as particlesPerBin
-    if (NULL == nextSig) {
-       printf("ERR allocating *nextSig \n");
-       return -1;
-    }
-    (*nextSig) = 0;
-
-
-
     int* totalN = NULL;
     if (rank == 0) { 
        totalN = (int*) malloc(sizeof(int));
@@ -250,6 +232,8 @@ int main( int argc, char **argv )
     //
     double simulation_time = read_timer( );
     int recvSig = 0;
+    int prevSig = 0;
+    int nextSig = 0;
     for( int step = 0; step < NSTEPS; step++ )
     {  
 	printf("Time step is %d \n", step);
@@ -332,10 +316,7 @@ int main( int argc, char **argv )
 
 	   // Check receive signal from nextBin
 	   recvSig = 0; // Initialize
-
-	   printf("Size of int is %d, size of MPI_INT is %d \n", sizeof(int), sizeof(MPI_INT));
-
-	   //MPI_Recv(recvSig, 1, MPI_INT, rank+1, tag1+1, MPI_COMM_WORLD, &status);
+	   MPI_Recv(&recvSig, 1, MPI_INT, rank+1, tag1+1, MPI_COMM_WORLD, &status);
 	   printf("Whats after status? \n");
 	   if (recvSig == 1) {
 	      MPI_Recv(nextBin, nlocalMax, PARTICLE, rank+1, tag1, MPI_COMM_WORLD, &status); // Recv from bot bin
