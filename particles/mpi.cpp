@@ -373,7 +373,7 @@ int main( int argc, char **argv )
 	}
 	printf("MOVED particles in rank %d \n", rank);
 
-
+/*
 	//
 	// 4. Re-bin Particles
 	//
@@ -457,6 +457,8 @@ int main( int argc, char **argv )
 	      (*nlocal) += rebinCount;
 	   }
 	}
+
+	*/
 
 	printf("COMPACT particles in rank %d \n", rank);
 	//
