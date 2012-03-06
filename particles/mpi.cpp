@@ -99,7 +99,7 @@ int main( int argc, char **argv )
 
     double bin_area = (spaceDim*spaceDim) / numBins; // Find max no. of particles per bin
     int nlocalMax = 3* (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per processor
-/*
+
     int particle_per_proc = 3* (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per processor
     // int particle_per_proc = (n + n_proc - 1) / n_proc;
     
@@ -111,8 +111,8 @@ int main( int argc, char **argv )
     for( int i = 0; i < n_proc; i++ )
         partition_sizes[i] = partition_offsets[i+1] - partition_offsets[i];
 
-    int nlocalMax= partition_sizes[rank]; // Same as maxParticlesPerBin
-*/
+    //int nlocalMax= partition_sizes[rank]; // Same as maxParticlesPerBin
+
 
     int localFreeLoc = 0; // Same as freeLocationPerBin
     int nlocal = 0; // Same as particlesPerBin
