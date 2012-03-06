@@ -19,6 +19,16 @@
 // nlocalMax    : Max no. of particles allowed in bin/processor 
 // freeIdx : Local free location
 
+int isCloseToEdge(particle_t &particle, double binEdge) {
+   double dy = binEdge - particle.y;
+   double r2 = dy * dy;
+   if (r2 > cutoff * cutoff) 
+      return 0;
+   else 
+      return 1;
+}
+
+
 void compactBin(particle_t* localBin, unsigned char* localFlags, int* nlocal) {
 
    for (int loc=0; loc<(*nlocal); ++loc) {
@@ -100,6 +110,8 @@ int main( int argc, char **argv )
     double spaceDim = sqrt(density * n); // 0.5 default
     int numBins = n_proc; // No. of bins 
     double binLength = spaceDim / numBins; // 0.5 / 24 default
+
+    printf("binLength is %f \n",binLegth);
 
     double bin_area = (spaceDim*spaceDim) / numBins; // Find max no. of particles per bin
     int nlocalMax = 3* (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per processor
@@ -226,16 +238,22 @@ int main( int argc, char **argv )
 	int tag1 = 100; // Message ID
 	int adjCount; // Received count from adjacent bins
         int nPrevBin=0; // No. of elems from prevBin
-	int nNextBin=0;	
+	int nNextBin=0;
+        double binEdge = rank*binLength;
+	int idx = 0;	
         MPI_Status status; 
 	if (rank-1 >= 0) { // Check if top bin exists
-
-	   MPI_Send(localBin, *nlocal, PARTICLE, rank-1, tag1, MPI_COMM_WORLD); // Send to top bin	  
-
+           idx = 0;
+    	   for (int i=0; i< (*nlocal); i++) { // Only send particles that are close to edge
+	      while (localFlags[idx]==0) idx++; 
+  	      if (isCloseToEdge(localBin[idx], binEdge)) {
+	         MPI_Send(&localBin[idx], 1, PARTICLE, rank-1, tag1, MPI_COMM_WORLD); // Send to top bin	  
+	      }
+	      idx++;
+	   }
 	   //printf("Sent1 from %d \n", rank);   
-
+	   
 	   MPI_Recv(prevBin, nlocalMax, PARTICLE, rank-1, tag1, MPI_COMM_WORLD, &status); //Recv from top bin
-
 	   //printf("Received1 by %d \n", rank);
 
 	   MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
@@ -243,12 +261,17 @@ int main( int argc, char **argv )
 	}
 
 	if (rank+1 <= 23) { // Check if bottom bin exists
-	   MPI_Send(localBin, *nlocal, PARTICLE, rank+1, tag1, MPI_COMM_WORLD); // Send to bot bin
-
+	   idx = 0;
+	   for (int i=0; i< (*nlocal); i++) { // Only send particles that are close to edge
+	      while (localFlags[idx]==0) idx++;
+	      if (isCloseToEdge(localBin[idx], binEdge)) {
+		MPI_Send(localBin, *nlocal, PARTICLE, rank+1, tag1, MPI_COMM_WORLD); // Send to bot bin
+	      }
+	      idx++
+	   }
            //printf("Sent2 from %d \n", rank);
 
 	   MPI_Recv(nextBin, nlocalMax, PARTICLE, rank+1, tag1, MPI_COMM_WORLD, &status); // Recv from bot bin
-
 	   //printf("Received2 by %d \n", rank);
 
 	   MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
