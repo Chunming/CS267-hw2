@@ -165,13 +165,6 @@ int main( int argc, char **argv )
     (*nextSig) = 0;
 
 
-    // Allocate mem to check the signals received 
-    int* recvSig = (int*) malloc (sizeof(int)) ; // Same as particlesPerBin
-    if (NULL == recvSig) {
-       printf("ERR allocating *recvSig \n");
-       return -1;
-    }
-    (*recvSig) = 0;
 
     int* totalN = NULL;
     if (rank == 0) { 
@@ -256,6 +249,7 @@ int main( int argc, char **argv )
     //  simulate a number of time steps
     //
     double simulation_time = read_timer( );
+    int recvSig = 0;
     for( int step = 0; step < NSTEPS; step++ )
     {  
 	printf("Time step is %d \n", step);
@@ -298,9 +292,9 @@ int main( int argc, char **argv )
 	   printf("Sent1 from %d \n", rank);
 	  
 	   // Check receive signal from prevBin
-	   *recvSig = 0; // Initialize
-	   MPI_Recv(recvSig, 1, MPI_INT, rank-1, tag1+1, MPI_COMM_WORLD, &status);
-	   if (*recvSig == 1) {
+	   recvSig = 0; // Initialize
+	   MPI_Recv(&recvSig, 1, MPI_INT, rank-1, tag1+1, MPI_COMM_WORLD, &status);
+	   if (recvSig == 1) {
 	      MPI_Recv(prevBin, nlocalMax, PARTICLE, rank-1, tag1, MPI_COMM_WORLD, &status); //Recv from top bin
 	      printf("Receive1 by %d \n", rank);
 	      MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
@@ -337,13 +331,13 @@ int main( int argc, char **argv )
 
 
 	   // Check receive signal from nextBin
-	   *recvSig = 0; // Initialize
+	   recvSig = 0; // Initialize
 
 	   printf("Size of int is %d, size of MPI_INT is %d \n", sizeof(int), sizeof(MPI_INT));
 
 	   //MPI_Recv(recvSig, 1, MPI_INT, rank+1, tag1+1, MPI_COMM_WORLD, &status);
 	   printf("Whats after status? \n");
-	   if (*recvSig == 1) {
+	   if (recvSig == 1) {
 	      MPI_Recv(nextBin, nlocalMax, PARTICLE, rank+1, tag1, MPI_COMM_WORLD, &status); // Recv from bot bin
 	      printf("Receive2 by %d \n", rank);
 	      MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
@@ -482,7 +476,6 @@ int main( int argc, char **argv )
     //
     free( nextSig );
     free( prevSig );
-    free( recvSig );
     free( nlocal );
     free( totalN );
     free( partition_offsets );
