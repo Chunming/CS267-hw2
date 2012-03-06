@@ -260,8 +260,8 @@ int main( int argc, char **argv )
 	      while (localFlags[idx]==0) idx++; 
   	      if (isCloseToEdge(localBin[idx], binEdge)) { // Comms with prev bin is req
 		 if (0==fPrevCheck) {
-		    *prevSig = 1; 
-	            MPI_Send(prevSig, 1, MPI_INT, rank-1, tag1+1, MPI_COMM_WORLD); // Open comms with prevBin
+		    prevSig = 1; 
+	            MPI_Send(&prevSig, 1, MPI_INT, rank-1, tag1+1, MPI_COMM_WORLD); // Open comms with prevBin
 		    fPrevCheck = 1;
 		 }
 	         MPI_Send(&localBin[idx], 1, PARTICLE, rank-1, tag1, MPI_COMM_WORLD); // Send to top bin	  
@@ -270,8 +270,8 @@ int main( int argc, char **argv )
 	   }
 
 	   if (0==fPrevCheck) { // Comms with prev bin is not req
-	      *prevSig = 0; 
-	      MPI_Send(prevSig, 1, MPI_INT, rank-1, tag1+1, MPI_COMM_WORLD); // Close comms with prevBin
+	      prevSig = 0; 
+	      MPI_Send(&prevSig, 1, MPI_INT, rank-1, tag1+1, MPI_COMM_WORLD); // Close comms with prevBin
 	   }
 	   printf("Sent1 from %d \n", rank);
 	  
@@ -297,8 +297,8 @@ int main( int argc, char **argv )
      	      while (localFlags[idx]==0) idx++;
 	      if (isCloseToEdge(localBin[idx], binEdge)) {
 		 if (0==fNextCheck) {
-		    *nextSig = 1;	 
-	            MPI_Send(nextSig, 1, MPI_INT, rank+1, tag1+1, MPI_COMM_WORLD); // Send to top bin	  
+		    nextSig = 1;	 
+	            MPI_Send(&nextSig, 1, MPI_INT, rank+1, tag1+1, MPI_COMM_WORLD); // Send to top bin	  
 		    fNextCheck = 1;
 		 }
 		 MPI_Send(&localBin[idx], 1, PARTICLE, rank+1, tag1, MPI_COMM_WORLD); // Send to bot bin
@@ -307,8 +307,8 @@ int main( int argc, char **argv )
 	   }
 
 	   if (0==fNextCheck) { // Comms with nextBin not req
-	      *nextSig = 0; 
-	      MPI_Send(nextSig, 1, MPI_INT, rank+1, tag1+1, MPI_COMM_WORLD); // Close comms with prevBin
+	      nextSig = 0; 
+	      MPI_Send(&nextSig, 1, MPI_INT, rank+1, tag1+1, MPI_COMM_WORLD); // Close comms with prevBin
 	   }
 
            printf("Sent2 from %d \n", rank);
@@ -455,8 +455,6 @@ int main( int argc, char **argv )
     //
     //  release resources
     //
-    free( nextSig );
-    free( prevSig );
     free( nlocal );
     free( totalN );
     free( partition_offsets );
