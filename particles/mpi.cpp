@@ -111,7 +111,7 @@ int main( int argc, char **argv )
     int numBins = n_proc; // No. of bins 
     double binLength = spaceDim / numBins; // 0.5 / 24 default
 
-    printf("binLength is %f \n",binLegth);
+    printf("binLength is %f \n",binLength);
 
     double bin_area = (spaceDim*spaceDim) / numBins; // Find max no. of particles per bin
     int nlocalMax = 3* (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per processor
@@ -267,7 +267,7 @@ int main( int argc, char **argv )
 	      if (isCloseToEdge(localBin[idx], binEdge)) {
 		MPI_Send(localBin, *nlocal, PARTICLE, rank+1, tag1, MPI_COMM_WORLD); // Send to bot bin
 	      }
-	      idx++
+	      idx++;
 	   }
            printf("Sent2 from %d \n", rank);
 
@@ -328,7 +328,7 @@ int main( int argc, char **argv )
 	// 4. Re-bin Particles
 	//
 	int tag4 = 400;
-	int idx = 0;
+	idx = 0;
 	for (int i=0; i<(*nlocal); i++) {
            int bdx = (localBin[idx].y / binLength);
            if (bdx == rank) { // If particle is still in same bin, do nothing
