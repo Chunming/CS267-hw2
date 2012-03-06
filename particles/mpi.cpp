@@ -191,23 +191,23 @@ int main( int argc, char **argv )
 	// MPI_Recv(void* start, int numElem, DATA_TYPE, int source, int tag, COMM, status)
         
 	int sTag1 = 100; // Message ID
-	int recvdCount;
+	int adjCount; // Received count from adjacent bins
         int nPrevBin;
 	int nNextBin;	
         MPI_Status status; 
 	if (rank-1 >= 0) { // Check if top bin exists 
 	   MPI_Send(local, nlocal, PARTICLE, rank-1, sTag1, MPI_COMM_WORLD); // Send to top bin	  
 	   MPI_Recv(prevBin, nlocalMax, PARTICLE, rank-1, sTag1, MPI_COMM_WORLD, &status); //Recv from top bin
-	   MPI_Get_count(&status, PARTICLE, &recvdCount); // Get received count
-           nPrevBin = recvdCount; 
+	   MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
+           nPrevBin = adjCount; 
 
 	}
 
 	if (rank+1 <= 23) { // Check if bottom bin exists
 	   MPI_Send(local, nlocal, PARTICLE, rank+1, sTag1, MPI_COMM_WORLD); // Send to bot bin
 	   MPI_Recv(nextBin, nlocalMax, PARTICLE, rank+1, rank+1, MPI_COMM_WORLD, &status); // Recv from bot bin
-	   MPI_Get_count(&status, PARTICLE, &recvdCount); // Get received count
-           nNextBin = recvdCount; 
+	   MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
+           nNextBin = adjCount; 
 	}
 
 	//
@@ -265,21 +265,21 @@ int main( int argc, char **argv )
 	}
 	
 	// Beyond current idx value, all other array elements are invalid
-	int recvdCount;
+	int rebinCount;
 	if (rank-1 >= 0) { // Check if top bin exists	
-	   MPI_Recv(local[idx], nlocalMax, PARTICLE, rank-1, tag4, MPI_COMM_WORLD, &status); //Recv from top bin
-	   MPI_Get_count(&status, PARTICLE, &recvdCount); // Get received count
-	   for (int j=idx; j<recvdCount; ++j) localFlags[j]=1;
-	   idx = idx + recvdCount;
-	   nlocal += recvdCount;
+	   MPI_Recv(&local[idx], nlocalMax, PARTICLE, rank-1, tag4, MPI_COMM_WORLD, &status); //Recv from top bin
+	   MPI_Get_count(&status, PARTICLE, &rebinCount); // Get received count
+	   for (int j=idx; j<rebinCount; ++j) localFlags[j]=1;
+	   idx = idx + rebinCount;
+	   nlocal += rebinCount;
 	}
 
 	if (rank+1 <= 23) { // Check if bot bin exists
-	   MPI_Recv(local[i], nlocalMax, PARTICLE, rank+1, tag4, MPI_COMM_WORLD, &status); //Recv from bot bin
-	   MPI_Get_count(&status, PARTICLE, &recvd_count);
-	   for (int j=idx; j<recvdCount; ++j) localFlags[j]=1;
-	   idx = idx + recvdCount;
-	   nlocal += recvdCount;
+	   MPI_Recv(&local[idx], nlocalMax, PARTICLE, rank+1, tag4, MPI_COMM_WORLD, &status); //Recv from bot bin
+	   MPI_Get_count(&status, PARTICLE, &rebinCount);
+	   for (int j=idx; j<rebinCount; ++j) localFlags[j]=1;
+	   idx = idx + rebinCount;
+	   nlocal += rebinCount;
 	}
 
 	//
