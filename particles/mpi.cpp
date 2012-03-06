@@ -330,7 +330,7 @@ int main( int argc, char **argv )
 
 	   if (0==fNextCheck) { // Comms with nextBin not req
 	      *nextSig = 0; 
-	      MPI_Send(nextSig, 1, MPI_INT, rank+1, tag1+1, MPI_COMM_WORLD); // Close comms with prevBin
+	      MPI_Send(nextSig, 1, MPI_INT, rank+1, 0, MPI_COMM_WORLD); // Close comms with prevBin
 	   }
 
            printf("Sent2 from %d \n", rank);
@@ -341,7 +341,7 @@ int main( int argc, char **argv )
 
 	   printf("Size of int is %d, size of MPI_INT is %d \n", sizeof(int), sizeof(MPI_INT));
 
-	   MPI_Recv(recvSig, 1, MPI_INT, rank+1, tag1+1, MPI_COMM_WORLD, &status);
+	   MPI_Recv(recvSig, 1, MPI_INT, rank+1, 0, MPI_COMM_WORLD, &status);
 	   printf("Whats after status? \n");
 	   if (*recvSig == 1) {
 	      MPI_Recv(nextBin, nlocalMax, PARTICLE, rank+1, tag1, MPI_COMM_WORLD, &status); // Recv from bot bin
