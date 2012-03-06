@@ -305,7 +305,7 @@ int main( int argc, char **argv )
 	   if (1==fPrevCheck) { // There are particles close to prev bin 
 	      //prevSig = 1;	   
 	      //MPI_Send(&prevSig, 1, MPI_INT, rank-1, tag1+1, MPI_COMM_WORLD); // Open comms with prevBin
-	      MPI_Send(localBin, nlocal, PARTICLE, rank-1, tag1, MPI_COMM_WORLD); // Send to top bin	  
+	      MPI_Send(localBin, *nlocal, PARTICLE, rank-1, tag1, MPI_COMM_WORLD); // Send to top bin	  
 	   }
 	   else { // (0==fPrevCheck), // Comms with prev bin is not req
 	      //prevSig = 0;
@@ -348,7 +348,7 @@ int main( int argc, char **argv )
 	   if (1==fNextCheck) { 
 	      //nextSig = 1; 
 	      //MPI_Send(&nextSig, 1, MPI_INT, rank+1, tag1+1, MPI_COMM_WORLD); // Close comms with prevBin
-	      MPI_Send(localBin, nlocal, PARTICLE, rank+1, tag1, MPI_COMM_WORLD); // Send to bot bin
+	      MPI_Send(localBin, *nlocal, PARTICLE, rank+1, tag1, MPI_COMM_WORLD); // Send to bot bin
 	   }
 	   else { // (0==fNextCheck) { // Comms with nextBin not req
 	      //nextSig = 0; 
