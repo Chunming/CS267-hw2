@@ -145,6 +145,7 @@ int main( int argc, char **argv )
        printf("ERR allocating *nlocal \n");
        return -1;
     }
+    (*nlocal) = 0;
 
     int* totalN = NULL;
     if (rank == 0) { 
@@ -216,6 +217,8 @@ int main( int argc, char **argv )
    //
    // Do Binning onto local array
    //
+   printf("BEF nlocal from rank %d is %d \n", rank, *nlocal);	    
+
    for (int ndx=0; ndx<n; ++ndx) {
       int bdx = (particles[ndx].y / binLength);
       if (bdx == rank) {
@@ -230,7 +233,7 @@ int main( int argc, char **argv )
     for( int step = 0; step < NSTEPS; step++ )
     {  
 	printf("Time step is %d \n", step);
-	printf("nlocal from rank %d is %d \n", rank, *nlocal);	    
+	printf("AFT nlocal from rank %d is %d \n", rank, *nlocal);	    
         // 
 	// 1. MPI send/receive particles to/from adjacent bins
 	// MPI_Send(void* start, int numElem, DATA_TYPE, int source, int tag, COMM)
@@ -244,7 +247,7 @@ int main( int argc, char **argv )
         MPI_Status status; 
 	if (rank-1 >= 0) { // Check if top bin exists
            idx = 0;
-    	   for (int i=0; i< (*nlocal); i++) { // Only send particles that are close to edge
+    	   for (int i=0; i< (*nlocal); ++i) { // Only send particles that are close to edge
 	      while (localFlags[idx]==0) idx++; 
   	      if (isCloseToEdge(localBin[idx], binEdge)) {
 	         MPI_Send(&localBin[idx], 1, PARTICLE, rank-1, tag1, MPI_COMM_WORLD); // Send to top bin	  
@@ -262,7 +265,7 @@ int main( int argc, char **argv )
 
 	if (rank+1 <= 23) { // Check if bottom bin exists
 	   idx = 0;
-	   for (int i=0; i< (*nlocal); i++) { // Only send particles that are close to edge
+	   for (int i=0; i< (*nlocal); ++i) { // Only send particles that are close to edge
 	      while (localFlags[idx]==0) idx++;
 	      if (isCloseToEdge(localBin[idx], binEdge)) {
 		MPI_Send(localBin, *nlocal, PARTICLE, rank+1, tag1, MPI_COMM_WORLD); // Send to bot bin
