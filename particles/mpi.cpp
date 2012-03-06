@@ -371,6 +371,8 @@ int main( int argc, char **argv )
 	   loc_i++;
 	}
 
+	printf("MOVED particles in rank %d", rank);
+
 
 	//
 	// 4. Re-bin Particles
