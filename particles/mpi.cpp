@@ -378,16 +378,14 @@ int main( int argc, char **argv )
 	// 4. Re-bin Particles
 	//
 	int tag4 = 400;
+	int bdx;
 	idx = 0;
+
 	fPrevCheck = 0;
-	fNextCheck = 0;
 	for (int i=0; i<(*nlocal); ++i) { // Analyze each particle in localBin
 	   while(localFlags[idx]==0) idx++;
-           int bdx = (localBin[idx].y / binLength);
-           if (bdx == rank) { // If particle is still in same bin, do nothing
-	   }
-
-	   else if (bdx == rank-1) { // Particle moved to top bin
+           bdx = (localBin[idx].y / binLength);
+	   if (bdx == rank-1) { // Particle moved to top bin
 	      if (0==fPrevCheck) {
 	         prevSig = 1;
 		 MPI_Send(&prevSig, 1, MPI_INT, rank-1, tag4+1, MPI_COMM_WORLD);
@@ -398,8 +396,19 @@ int main( int argc, char **argv )
 	      localFlags[idx] = 0;
 	      (*nlocal)--;
 	   }
-		
-	   else { // (bdx == rank+1) Particle moved to bot bin
+	   idx++;
+	}
+
+	if(0 == fPrevCheck) {
+	   prevSig = 0;
+	   MPI_Send(&prevSig, 1, MPI_INT, rank-1, tag4+1, MPI_COMM_WORLD);
+	}
+
+	fNextCheck = 0;
+	for (int i=0; i<(*nlocal); ++i) { // Analyze each particle in localBin
+	   while(localFlags[idx]==0) idx++;
+           bdx = (localBin[idx].y / binLength);
+	   if (bdx == rank+1) { Particle moved to bot bin
 	      if (0==fNextCheck) {
 	         nextSig = 1;
 		 MPI_Send(&nextSig, 1, MPI_INT, rank+1, tag4+1, MPI_COMM_WORLD);
@@ -407,16 +416,10 @@ int main( int argc, char **argv )
 	      }
      	      MPI_Send(&localBin[idx], 1, PARTICLE, rank+1, tag4, MPI_COMM_WORLD); //Send to bot bin
 	      printf("Sent4 from %d \n", rank);   
-
 	      localFlags[idx] = 0;
 	      (*nlocal)--;
 	   }
 	   idx++;
-	}
-
-	if(0 == fPrevCheck) {
-	   prevSig = 0;
-	   MPI_Send(&prevSig, 1, MPI_INT, rank-1, tag4+1, MPI_COMM_WORLD);
 	}
 
 	if(0 == fNextCheck) {
@@ -439,6 +442,7 @@ int main( int argc, char **argv )
 	      (*nlocal) += rebinCount;
 	   }
 	}
+
 
 	if (rank+1 <= 23) { // Check if bot bin exists
      
