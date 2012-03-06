@@ -138,9 +138,6 @@ int main( int argc, char **argv )
 
     //int nlocalMax= partition_sizes[rank]; // Same as maxParticlesPerBin
 
-   printf("Intermediate check from rank %d \n", rank);
-
-
     int localFreeLoc = 0; // Same as freeLocationPerBin
 
     int* nlocal = (int*) malloc (sizeof(int)) ; // Same as particlesPerBin
@@ -218,7 +215,6 @@ int main( int argc, char **argv )
    //
    // Do Binning onto local array
    //
-   printf("BEF nlocal from rank %d is %d \n", rank, *nlocal);	    
 
    for (int ndx=0; ndx<n; ++ndx) {
       int bdx = (particles[ndx].y / binLength);
@@ -293,7 +289,6 @@ int main( int argc, char **argv )
 	   idx = 0;
 	   fNextCheck = 0;
 	   for (int i=0; i< (*nlocal); ++i) { // Only send particles that are close to edge
-              printf("Check if it ever goes in \n");
      	      while (localFlags[idx]==0) idx++;
 	      if (isCloseToEdge(localBin[idx], binEdge)) {
 		 if (0==fNextCheck) {
@@ -313,11 +308,9 @@ int main( int argc, char **argv )
 
            printf("Sent2 from %d \n", rank);
 
-
 	   // Check receive signal from nextBin
 	   recvSig = 0; // Initialize
 	   MPI_Recv(&recvSig, 1, MPI_INT, rank+1, tag1+1, MPI_COMM_WORLD, &status);
-	   printf("Whats after status? \n");
 	   if (recvSig == 1) {
 	      MPI_Recv(nextBin, nlocalMax, PARTICLE, rank+1, tag1, MPI_COMM_WORLD, &status); // Recv from bot bin
 	      printf("Receive2 by %d \n", rank);
@@ -380,12 +373,16 @@ int main( int argc, char **argv )
 	//
 	int tag4 = 400;
 	idx = 0;
+	fPrevCheck = 0;
+	fNextCheck = 0;
 	for (int i=0; i<(*nlocal); i++) {
            int bdx = (localBin[idx].y / binLength);
            if (bdx == rank) { // If particle is still in same bin, do nothing
 	   }
 
 	   else if (bdx == rank-1) { // Particle moved to top bin
+
+	      	   
 	      MPI_Send(&localBin[idx], 1, PARTICLE, rank-1, tag4, MPI_COMM_WORLD); //Send to top bin
 	      printf("Sent3 from %d \n", rank);   
 	  
