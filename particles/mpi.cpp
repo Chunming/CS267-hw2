@@ -330,7 +330,7 @@ int main( int argc, char **argv )
 	MPI_Allgatherv( localBin, *nlocal, PARTICLE, particles, partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
 	MPI_Reduce(totalN, nlocal, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );
         
-	if (rank == 0) printf("Total N is %d \n", totaN);
+	if (rank == 0) printf("Total N is %d \n", totalN);
 
 	//
         //  save current step if necessary
