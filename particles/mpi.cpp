@@ -415,10 +415,8 @@ int main( int argc, char **argv )
 
 
 
-        MPI_Reduce(nlocal, totalN, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );        
-        if (rank == 0) printf("Total N is %d \n", *totalN);
 
-/*	
+	
 
 
 	//
@@ -450,7 +448,6 @@ int main( int argc, char **argv )
 	nNextBin = kdx; // No. of elems to shift from nextBin to localBin
 
 
-
 	// Get particles from adjacent bins
 	int rebinCount;
 	int tag4 = 400;
@@ -477,8 +474,10 @@ int main( int argc, char **argv )
 	   idx = idx + rebinCount;
 	   (*nlocal) += rebinCount;
 	}
-*/
+
 	
+        MPI_Reduce(nlocal, totalN, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );        
+        if (rank == 0) printf("Total N is %d \n", *totalN);
 
 	//
 	// 5. Compact Particles
