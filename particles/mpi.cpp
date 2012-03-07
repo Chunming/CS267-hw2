@@ -447,18 +447,24 @@ int main( int argc, char **argv )
 	// Get particles from adjacent bins
 	int rebinCount;
 	int tag4 = 400;
-	if (rank-1 >= 0) { // If top bin exists
+	if (rank-1 >= 0) { // If top bin exists, send
      	   MPI_Send(prevBin, nPrevBin, PARTICLE, rank-1, tag4, MPI_COMM_WORLD); //Send to bot bin
-	   MPI_Recv(&localBin[idx], nlocalMax, PARTICLE, rank-1, tag4, MPI_COMM_WORLD, &status); //Recv from top bin
+	}
+
+	if (rank+1 <= 23) // If bottom bin exists, receive
+	   MPI_Recv(&localBin[idx], nlocalMax, PARTICLE, rank+1, tag4, MPI_COMM_WORLD, &status); //Recv from top bin
 	   MPI_Get_count(&status, PARTICLE, &rebinCount); // Get received count
 	   for (int j=idx; j<rebinCount; ++j) localFlags[j]=1;
 	   idx = idx + rebinCount;
 	   (*nlocal) += rebinCount;
 	}
 
-	if (rank+1 <= 23) { // Check if bottom bin exists
+	if (rank+1 <= 23) { // If bottom bin exists, send 
      	   MPI_Send(nextBin, nNextBin, PARTICLE, rank+1, tag4, MPI_COMM_WORLD); //Send to bot bin
- 	   MPI_Recv(&localBin[idx], nlocalMax, PARTICLE, rank+1, tag4, MPI_COMM_WORLD, &status); //Recv from bot bin
+	}
+
+	if (rank-1 >=0) { // If top bin exists, receive
+	   MPI_Recv(&localBin[idx], nlocalMax, PARTICLE, rank-1, tag4, MPI_COMM_WORLD, &status); //Recv from bot bin
 	   MPI_Get_count(&status, PARTICLE, &rebinCount);
 	   for (int j=idx; j<rebinCount; ++j) localFlags[j]=1;
 	   idx = idx + rebinCount;
