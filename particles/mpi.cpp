@@ -477,6 +477,10 @@ int main( int argc, char **argv )
 	   (*nlocal) += rebinCount;
 	}
 
+	memset(prevBin, 0, nPrevBin*sizeof(particle_t)); // Reset prevBin ptr for next itereation
+	memset(nextBin, 0, nNextBin*sizeof(particle_t)); // Reset nextBin ptr for next itereation
+	nPrevBin = 0; // No. of elems to shift from prevBin to localBin
+	nNextBin = 0; // No. of elems to shift from nextBin to localBin
 	
         MPI_Reduce(nlocal, totalN, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );        
         if (rank == 0) printf("Total N is %d \n", *totalN);
