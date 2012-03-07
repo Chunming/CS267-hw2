@@ -429,7 +429,6 @@ int main( int argc, char **argv )
 	      localFlags[idx] = 0; // Remove from localBin
 	      prevBin[jdx] = localBin[idx];
 	      jdx++;
-	      nPrevBin++;
 	      (*nlocal)--;
 	   }
 
@@ -437,13 +436,14 @@ int main( int argc, char **argv )
 	      localFlags[idx] = 0; // Remove from localBin
 	      nextBin[kdx] = localBin[idx];
 	      kdx++;
-	      nPrevBin++;
 	      (*nlocal)--;
 	   }
 	   idx++;
 	}
+	nPrevBin = jdx - 1; // No. of elems to shift from prevBin to localBin
+	nNextBin = kdx - 1; // No. of elems to shift from nextBin to localBin
 
-/*
+
 	// Get particles from adjacent bins
 	int rebinCount;
 	int tag4 = 400;
@@ -464,7 +464,7 @@ int main( int argc, char **argv )
 	   idx = idx + rebinCount;
 	   (*nlocal) += rebinCount;
 	}
-*/
+
 	
 
 	//
