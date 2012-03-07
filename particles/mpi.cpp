@@ -451,7 +451,7 @@ int main( int argc, char **argv )
      	   MPI_Send(prevBin, nPrevBin, PARTICLE, rank-1, tag4, MPI_COMM_WORLD); //Send to bot bin
 	}
 
-	if (rank+1 <= 23) // If bottom bin exists, receive
+	if (rank+1 <= 23) { // If bottom bin exists, receive
 	   MPI_Recv(&localBin[idx], nlocalMax, PARTICLE, rank+1, tag4, MPI_COMM_WORLD, &status); //Recv from top bin
 	   MPI_Get_count(&status, PARTICLE, &rebinCount); // Get received count
 	   for (int j=idx; j<rebinCount; ++j) localFlags[j]=1;
