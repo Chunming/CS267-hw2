@@ -257,9 +257,12 @@ int main( int argc, char **argv )
       }
    }
 
-
-	MPI_Reduce(nlocal, totalN, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );        
-	if (rank == 0) printf("Total N is %d \n", totalN);
+   MPI_Reduce(nlocal, totalN, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );        
+   if (rank == 0) printf("Total N is %d \n", *totalN);
+   //int one=1;
+   //int oneTotal;
+   //MPI_Reduce(&one, &oneTotal, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );        
+   //if (rank == 0) printf("Total N is %d \n", oneTotal);
 
     //
     //  simulate a number of time steps
