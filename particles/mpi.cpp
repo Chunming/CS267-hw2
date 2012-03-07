@@ -267,7 +267,7 @@ int main( int argc, char **argv )
     //int nextSig = 0;
     for( int step = 0; step < NSTEPS; step++ )
     {  
-	printf("Time step is %d from rank %d \n", step, rank);
+	//printf("Time step is %d from rank %d \n", step, rank);
 	//printf("AFT nlocal from rank %d is %d \n", rank, *nlocal);	    
 
 
@@ -319,7 +319,7 @@ int main( int argc, char **argv )
 	   //if (recvSig == 1) {
 	      MPI_Recv(prevBin, nlocalMax, PARTICLE, rank-1, tag1, MPI_COMM_WORLD, &status); //Recv from top bin
 	      MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
-	      printf("Received1 %d elements in %d from %d \n", adjCount, rank, rank-1);
+	      //printf("Received1 %d elements in %d from %d \n", adjCount, rank, rank-1);
 	      nPrevBin = adjCount; 
 	   //}
 	   //else {
@@ -355,7 +355,7 @@ int main( int argc, char **argv )
 	   // Check receive signal from nextBin
 	   MPI_Recv(nextBin, nlocalMax, PARTICLE, rank+1, tag1, MPI_COMM_WORLD, &status); // Recv from bot bin
 	   MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
-	   printf("Received2 %d elements in %d from %d \n", adjCount, rank, rank+1);
+	   //printf("Received2 %d elements in %d from %d \n", adjCount, rank, rank+1);
 	   nNextBin = adjCount; 
 
 	}
@@ -458,6 +458,7 @@ int main( int argc, char **argv )
 	if (rank+1 <= 23) { // If bottom bin exists, receive
 	   MPI_Recv(&localBin[idx], nlocalMax, PARTICLE, rank+1, tag4, MPI_COMM_WORLD, &status); //Recv from top bin
 	   MPI_Get_count(&status, PARTICLE, &rebinCount); // Get received count
+	   printf("Rebin count1 is %d \n", rebinCount);
 	   for (int j=idx; j<rebinCount; ++j) localFlags[j]=1;
 	   idx = idx + rebinCount;
 	   (*nlocal) += rebinCount;
@@ -470,6 +471,7 @@ int main( int argc, char **argv )
 	if (rank-1 >=0) { // If top bin exists, receive
 	   MPI_Recv(&localBin[idx], nlocalMax, PARTICLE, rank-1, tag4, MPI_COMM_WORLD, &status); //Recv from bot bin
 	   MPI_Get_count(&status, PARTICLE, &rebinCount);
+	   printf("Rebin count2 is %d \n", rebinCount);
 	   for (int j=idx; j<rebinCount; ++j) localFlags[j]=1;
 	   idx = idx + rebinCount;
 	   (*nlocal) += rebinCount;
