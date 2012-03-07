@@ -145,9 +145,7 @@ int main( int argc, char **argv )
     
     double spaceDim = sqrt(density * n); // 0.5 default
     int numBins = n_proc; // No. of bins 
-    double binLength = spaceDim / numBins; // 0.5 / 24 default
-
-    printf("binLength is %f \n",binLength); // 0.020833
+    double binLength = spaceDim / numBins; // 0.5/24 = 0.020833 by default
 
     double bin_area = (spaceDim*spaceDim) / numBins; // Find max no. of particles per bin
     int nlocalMax = (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per processor
@@ -443,7 +441,10 @@ int main( int argc, char **argv )
 	nPrevBin = jdx; // No. of elems to shift from prevBin to localBin
 	nNextBin = kdx; // No. of elems to shift from nextBin to localBin
 
+	MPI_Reduce(nlocal, totalN, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );        
+	if (rank == 0) printf("Total N is %d \n", totalN);
 
+/*	
 	// Get particles from adjacent bins
 	int rebinCount;
 	int tag4 = 400;
@@ -470,7 +471,7 @@ int main( int argc, char **argv )
 	   idx = idx + rebinCount;
 	   (*nlocal) += rebinCount;
 	}
-
+*/
 	
 
 	//
@@ -483,9 +484,7 @@ int main( int argc, char **argv )
         //  gathers data from all tasks & deliver combined data to all tasks
 	//
 	MPI_Allgatherv( localBin, *nlocal, PARTICLE, particles, partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
-	MPI_Reduce(nlocal, totalN, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );
-        
-	if (rank == 0) printf("Total N is %d \n", totalN);
+
 
 	//
         //  save current step if necessary
