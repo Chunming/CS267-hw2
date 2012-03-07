@@ -413,7 +413,7 @@ int main( int argc, char **argv )
 	   loc_i++;
 	}
 	//printf("MOVED particles in rank %d \n", rank);
-/*
+
 
 	//
 	// 4. Re-bin Particles
@@ -443,7 +443,7 @@ int main( int argc, char **argv )
 	   idx++;
 	}
 
-
+/*
 	// Get particles from adjacent bins
 	int rebinCount;
 	int tag4 = 400;
@@ -464,8 +464,8 @@ int main( int argc, char **argv )
 	   idx = idx + rebinCount;
 	   (*nlocal) += rebinCount;
 	}
-
-	*/
+*/
+	
 
 	//
 	// 5. Compact Particles
