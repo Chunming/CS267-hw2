@@ -414,6 +414,13 @@ int main( int argc, char **argv )
 	//printf("MOVED particles in rank %d \n", rank);
 
 
+
+        MPI_Reduce(nlocal, totalN, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );        
+        if (rank == 0) printf("Total N is %d \n", *totalN);
+
+/*	
+
+
 	//
 	// 4. Re-bin Particles
 	//
@@ -444,10 +451,6 @@ int main( int argc, char **argv )
 
 
 
-        MPI_Reduce(nlocal, totalN, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );        
-        if (rank == 0) printf("Total N is %d \n", *totalN);
-
-/*	
 	// Get particles from adjacent bins
 	int rebinCount;
 	int tag4 = 400;
