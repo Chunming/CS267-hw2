@@ -18,6 +18,8 @@
 %\subsection{}
 
 
+Lower Bounds:
+When the number of particles, n = 500, the box size is sqrt(n*density) = sqrt(n*0.0005). There is an upper bound on the number of threads we can run for a given number of particles. Since the cutoff is defined to be 0.01, the width of each subBlock can be no lesser than 0.01.
 
 The box is segmented into subBlockNum number of subBlocks. Each subBlock is represented as a bin in the binArray.
 
@@ -55,15 +57,25 @@ for each time step {
    
 }
 
-\section{Serial Code performance}
+\section{Serial Code Performance}
 
 The time needed to run the O(Nsquare) serial code takes on average 0.0214294sec for n = 500.
 The time required for our O(n) code takes on average 0.01874sec for n = 500.
-The apply_force function is called about 107,212 times when n = 500. 
-We obtained this number by declaring a static int variable in the apply_force function. This variable is incremented whenever apply_force is called.
+The apply force function is called about 107,212 times when n = 500. 
+We obtained this number by declaring a static int variable in the apply_force function. This variable is incremented whenever apply force is called.
 
 
 This is about half as many times as 500*500 = 250,000 times when apply_force is called in the original serial.cpp implementation.
  
+\section{MPI Implementation}
+
+Each processor will process the particles in a specific bin.
+MPI_SEND and MPI_RECV will be used to communicate between bins in the following 2 cases:
+1. When we have to apply forces between particles from adjacent bins.
+2. When we have to re-bin particles after they are moved from one position to another.
+
+
+
+
 
 \end{document}  
