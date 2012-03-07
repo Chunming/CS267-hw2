@@ -440,8 +440,8 @@ int main( int argc, char **argv )
 	   }
 	   idx++;
 	}
-	nPrevBin = jdx - 1; // No. of elems to shift from prevBin to localBin
-	nNextBin = kdx - 1; // No. of elems to shift from nextBin to localBin
+	nPrevBin = jdx; // No. of elems to shift from prevBin to localBin
+	nNextBin = kdx; // No. of elems to shift from nextBin to localBin
 
 
 	// Get particles from adjacent bins
