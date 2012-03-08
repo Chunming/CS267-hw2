@@ -29,18 +29,6 @@ int isCloseToEdge(particle_t &particle, double binEdge) {
 }
 
 
-void compactBin(particle_t* localBin, unsigned char* localFlags, int* nlocal) {
-
-   for (int loc=0; loc<(*nlocal); ++loc) {
-      if (0 == localFlags[loc]) {
-         int nextLoc = loc + 1;
-	 while (0 == localFlags[nextLoc]) nextLoc++;
-	 localBin[loc] = localBin[nextLoc];
-	 localFlags[loc] = 1;
-	 localFlags[nextLoc] = 0;
-      }
-   }
-}
 
 
 void copyParticleToBin(particle_t *src, particle_t *dst, unsigned char *localFlags, int bdx, int *nlocal, int &nlocalMax, int &freeIdx) {
@@ -457,8 +445,24 @@ int main( int argc, char **argv )
 	//
 	// 5. Compact Particles
 	//
-        compactBin(localBin, localFlags, nlocal);
-	 
+         for (int loc=0; loc<(*nlocal); ++loc) {
+            if (0 == localFlags[loc]) {
+               int nextLoc = loc + 1;
+	       while (0 == localFlags[nextLoc]) nextLoc++;
+	       localBin[loc] = localBin[nextLoc];
+	       localFlags[loc] = 1;
+	       localFlags[nextLoc] = 0;
+            }
+         }
+
+
+
+
+
+
+
+
+
 	// 
         //  Collect all global data locally (not good idea to do)
         //  gathers data from all tasks & deliver combined data to all tasks
