@@ -445,9 +445,10 @@ int main( int argc, char **argv )
 	//
 	// 5. Compact Particles
 	//
+	int nextLoc;
          for (int loc=0; loc<(*nlocal); ++loc) {
             if (0 == localFlags[loc]) {
-               int nextLoc = loc + 1;
+               nextLoc = loc + 1;
 	       while (0 == localFlags[nextLoc]) nextLoc++;
 	       localBin[loc] = localBin[nextLoc];
 	       localFlags[loc] = 1;
