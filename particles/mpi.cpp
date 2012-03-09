@@ -468,14 +468,14 @@ int main( int argc, char **argv )
         //  Collect all global data locally (not good idea to do)
         //  gathers data from all tasks & deliver combined data to all tasks
 	//
-	MPI_Allgatherv( localBin, *nlocal, PARTICLE, particles, partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
+	//MPI_Allgatherv( localBin, *nlocal, PARTICLE, particles, partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
 
 
 	//
         //  save current step if necessary
         //
-        if( fsave && (step%SAVEFREQ) == 0 )
-            save( fsave, n, particles );
+        //if( fsave && (step%SAVEFREQ) == 0 )
+            //save( fsave, n, particles );
     }
     simulation_time = read_timer( ) - simulation_time;
     
