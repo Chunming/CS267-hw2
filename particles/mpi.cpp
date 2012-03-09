@@ -280,8 +280,14 @@ int main( int argc, char **argv )
 	         idx++;
 	      }
 
-	      if (1==fPrevCheck) MPI_Send(localBin, nlocal, PARTICLE, rank-1, tag1, MPI_COMM_WORLD);
-	      else MPI_Send(localBin, 0, PARTICLE, rank-1, tag1, MPI_COMM_WORLD); 
+	      if (1==fPrevCheck) {
+	         MPI_Send(localBin, nlocal, PARTICLE, rank-1, tag1, MPI_COMM_WORLD);
+	         printf(" %d particles from rank %d is sent to rank %d " nlocal, rank, rank-1);
+	      }
+	      else { 
+		 MPI_Send(localBin, 0, PARTICLE, rank-1, tag1, MPI_COMM_WORLD); 
+		 printf(" %d particles from rank %d is sent to rank %d " nlocal, rank, rank-1);
+	      } 
 	   }
 	}
 
