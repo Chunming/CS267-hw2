@@ -218,6 +218,8 @@ int main( int argc, char **argv )
 //    }
     memset(localFlags, 0, nlocalMax*sizeof(unsigned char));
 
+    MPI_Barrier(MPI_COMM_WORLD);
+    printf("Start from MPI_Barrier \n");
 
    // Start binning 
    int localFreeLoc = 0; // Same as freeLocationPerBin
@@ -235,8 +237,6 @@ int main( int argc, char **argv )
 
 
 	
-    MPI_Barrier(MPI_COMM_WORLD);
-    printf("Start from MPI_Barrier \n");
 
     //
     //  simulate a number of time steps
@@ -385,13 +385,8 @@ int main( int argc, char **argv )
 
 
 
-
-
-
-
-
-
-
+    MPI_Barrier(MPI_COMM_WORLD);
+    printf("MPI_Barrier Binning is DONE \n");
 
 
 	//
