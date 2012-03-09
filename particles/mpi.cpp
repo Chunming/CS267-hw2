@@ -126,7 +126,6 @@ int main( int argc, char **argv )
     //  allocate storage for local partition
     //
     int nlocal = partition_sizes[rank];
-    printf("nlocal is %d \n", nlocal);
 
     particle_t *localBin = (particle_t*) malloc( nlocal * sizeof(particle_t) ); // Replace nlocal with nlocalMax
     if (NULL == localBin) {
@@ -167,6 +166,8 @@ int main( int argc, char **argv )
     // int* recvCount : No. of elems in receive buffer
     MPI_Allgatherv( localBin, nlocal, PARTICLE, particles, partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
 
+
+    printf("nlocal at rank %d is %d \n", rank, nlocal);
 
     // totalN is only used by rank = 1
     int* totalN = (int*) malloc(sizeof(int));
