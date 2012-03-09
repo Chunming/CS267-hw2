@@ -164,6 +164,14 @@ int main( int argc, char **argv )
 
 
 
+
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    printf("Start from MPI_Barrier \n");
+
+
+
+
    //
    // Do initial binning onto localBin array
    //
@@ -172,6 +180,8 @@ int main( int argc, char **argv )
     double binLength = spaceDim / numBins; // 0.5/24 = 0.020833 by default
     double bin_area = (spaceDim*spaceDim) / numBins; // Find max no. of particles per bin
     int nlocalMax = (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per proc
+
+
 
     // Free localBin ptr of size nlocal, and allocate for new size nlocalMax 
 
@@ -218,8 +228,6 @@ int main( int argc, char **argv )
 //    }
     memset(localFlags, 0, nlocalMax*sizeof(unsigned char));
 
-    MPI_Barrier(MPI_COMM_WORLD);
-    printf("Start from MPI_Barrier \n");
 
    // Start binning 
    int localFreeLoc = 0; // Same as freeLocationPerBin
