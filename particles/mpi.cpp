@@ -138,6 +138,13 @@ int main( int argc, char **argv )
 
 
 
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    printf("Start from MPI_Barrier \n");
+
+
+
+
     // Scatters a buffer in parts to all processes in a communicator
 
     // MPI_Scatterv(void* sendBuf, int* sendCount, int* Displs, void* recvBuf, int recvCount, data_type, int rank, handle)
@@ -166,8 +173,6 @@ int main( int argc, char **argv )
 
 
 
-    MPI_Barrier(MPI_COMM_WORLD);
-    printf("Start from MPI_Barrier \n");
 
 
 
