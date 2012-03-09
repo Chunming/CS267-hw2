@@ -45,6 +45,8 @@ int main( int argc, char **argv )
 { 
 
 
+   printf ("Where is the FREE error? \n");
+
  
     //
     //  process command line parameters
