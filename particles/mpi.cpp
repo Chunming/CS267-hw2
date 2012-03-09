@@ -90,7 +90,11 @@ int main( int argc, char **argv )
     //
     // Allocate storage for local partition/ Set up bins
     //
-    
+
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    printf("Start from MPI_Barrier \n");
+
 
     // 
     //  Set up data partitioning across processors
@@ -135,8 +139,6 @@ int main( int argc, char **argv )
 
 
 
-    MPI_Barrier(MPI_COMM_WORLD);
-    printf("Start from MPI_Barrier \n");
 
     set_size( n );
     if( rank == 0 )
