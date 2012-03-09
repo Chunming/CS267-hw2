@@ -172,6 +172,9 @@ int main( int argc, char **argv )
     int nlocalMax = (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per proc
 
     // Free localBin ptr of size nlocal, and allocate for new size nlocalMax 
+
+    printf("Check free pointer \n");
+
     free (localBin);
     localBin = (particle_t*) malloc( nlocalMax * sizeof(particle_t) ); // Replace nlocal with nlocalMax
     if (NULL == localBin) {
@@ -535,7 +538,6 @@ int main( int argc, char **argv )
     //
     //  release resources
     //
-    //free( nlocal );
     free( totalN );
     free( partition_offsets );
     free( partition_sizes );
