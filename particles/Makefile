@@ -5,7 +5,7 @@ CC = CC
 MPCC = CC
 OPENMP = -mp
 CFLAGS = -O3 -g
-LIBS =
+LIBS = $(IPM_GNU)
 
 
 TARGETS = serial pthreads openmp mpi
