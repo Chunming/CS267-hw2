@@ -173,7 +173,7 @@ int main( int argc, char **argv )
 
     // Free localBin ptr of size nlocal, and allocate for new size nlocalMax 
     free (localBin);
-    particle_t *localBin = (particle_t*) malloc( nlocalMax * sizeof(particle_t) ); // Replace nlocal with nlocalMax
+    localBin = (particle_t*) malloc( nlocalMax * sizeof(particle_t) ); // Replace nlocal with nlocalMax
     if (NULL == localBin) {
        printf("ERR allocating *localBin \n");
        return -1;
