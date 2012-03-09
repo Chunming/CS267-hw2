@@ -293,7 +293,7 @@ int main( int argc, char **argv )
 
 	if (1 == rank%2) { // ODD
 	   if (rank+1 <= 23) { // If bottom bin exists, then can receive
-	      MPI_Recv(nextBin, nlocalMax, PARTICLE, rank+1, tag1, MPI_COMM_WORLD, &status); // Recv from bot bin
+	      MPI_Recv(nextBin, 100, PARTICLE, rank+1, tag1, MPI_COMM_WORLD, &status); // Recv from bot bin
 	      MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
 	      nNextBin = adjCount; 
 	   }
