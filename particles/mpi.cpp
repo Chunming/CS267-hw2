@@ -68,8 +68,6 @@ int main( int argc, char **argv )
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 
 
-    MPI_Barrier(MPI_COMM_WORLD);
-    printf("Start from MPI_Barrier \n");
 
 
     //
@@ -174,6 +172,8 @@ int main( int argc, char **argv )
 
 
 
+    MPI_Barrier(MPI_COMM_WORLD);
+    printf("Start from MPI_Barrier \n");
 
 
 
