@@ -88,39 +88,6 @@ int main( int argc, char **argv )
     MPI_Type_commit( &PARTICLE );
 
   
-/*    
-   // Test Code
-   int sendSig[4];
-   sendSig[0] = 0;
-   sendSig[1] = 1;
-   sendSig[2] = 2;
-   sendSig[3] = 3;
-
-   int recSig[2];
-   int testCount;
-   MPI_Status tStatus;
-
-   if (rank == 0) {
-      MPI_Send(sendSig, 3, MPI_INT, 1, 5, MPI_COMM_WORLD);
-      //MPI_Send(sendSig+1, 1, MPI_INT, 1, 5, MPI_COMM_WORLD);
-      //MPI_Send(sendSig+2, 1, MPI_INT, 1, 5, MPI_COMM_WORLD);
-      //MPI_Send(sendSig+3, 1, MPI_INT, 1, 5, MPI_COMM_WORLD);
-
-   }
-
-   if (rank == 1) {
-      MPI_Recv(recSig, 10, MPI_INT, 0, 5, MPI_COMM_WORLD, &tStatus); //Recv from top bin
-      MPI_Get_count(&tStatus, MPI_INT, &testCount); // Get received count
-      printf("Received %d elements in %d from %d \n", testCount, rank, rank-1);
-   }
-
-*/
-
-
-
-
-
-
     //
     //  Set up the data partitioning across processors
     //
@@ -138,17 +105,26 @@ int main( int argc, char **argv )
     double bin_area = (spaceDim*spaceDim) / numBins; // Find max no. of particles per bin
     int nlocalMax = (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per processor
 
-    int particle_per_proc = 3* (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per processor
-    // int particle_per_proc = (n + n_proc - 1) / n_proc;
+    int localFreeLoc = 0; // Same as freeLocationPerBin
+    //int particle_per_proc = 3* (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per processor
+
+
+
+
     
+    //  set up the data partitioning across processors
+    //
+    int particle_per_proc = (n + n_proc - 1) / n_proc;
+  
     int *partition_offsets = (int*) malloc( (n_proc+1) * sizeof(int) );
     if (NULL == partition_offsets) {
        printf("ERR allocating *partition_offsets \n");
        return -1;
     }
+
     for( int i = 0; i < n_proc+1; i++ )
-        partition_offsets[i] = min( i * particle_per_proc, n );
-    
+       partition_offsets[i] = min( i * particle_per_proc, n );
+ 
     int *partition_sizes = (int*) malloc( n_proc * sizeof(int) );
     if (NULL == partition_sizes) {
        printf("ERR allocating *partition_sizes \n");
@@ -156,11 +132,57 @@ int main( int argc, char **argv )
     }
 
     for( int i = 0; i < n_proc; i++ )
-        partition_sizes[i] = partition_offsets[i+1] - partition_offsets[i];
+       partition_sizes[i] = partition_offsets[i+1] - partition_offsets[i];
+    	 
+    //
+    //  allocate storage for local partition
+    //
+    int nlocal = partition_sizes[rank];
+    particle_t *localBin = (particle_t*) malloc( nlocal * sizeof(particle_t) ); // Replace nlocal with nlocalMax
+    if (NULL == localBin) {
+       printf("ERR allocating *localBin \n");
+       return -1;
+    }
+    //memset(localBin, 0, nlocalMax*sizeof(particle_t));
 
-    //int nlocalMax= partition_sizes[rank]; // Same as maxParticlesPerBin
+    //
+    //  initialize and distribute the particles (that's fine to leave it unoptimized)
+    //
+    set_size( n );
+    if( rank == 0 )
+       init_particles( n, particles );
 
-    int localFreeLoc = 0; // Same as freeLocationPerBin
+
+
+    // Scatters a buffer in parts to all processes in a communicator
+
+    // MPI_Scatterv(void* sendBuf, int* sendCount, int* Displs, void* recvBuf, int recvCount, data_type, int rank, handle)
+    // void* sSendBuf = particles;// address of the send buffer
+    // int* sSendCount = partition_sizes;// int array specifies no. of elems to send to each processor
+    // int* sDispls = partition_offsets; // int array specifies the disp. relative to the send buffer
+    // void* sRecvBuf = local; // Receiving buffer
+    // int sRecvCount = nlocal; // No. of elems in receive buffer
+    MPI_Scatterv( particles, partition_sizes, partition_offsets, PARTICLE, local, nlocal, PARTICLE, 0, MPI_COMM_WORLD );
+
+
+    // Gathers data from all tasks and deliver combined data to all tasks
+    // Blk of data sent frm jth process is received by every process
+    // and placed in the jth block of the buffer gRecvBuf
+
+    // MPI_Allgatherv(void* sendBuf, int* sendCount, data_type, void* recvBuf, int* recvCount, int* Displs, data_type, handle);
+    // void* sendBuf  : address of the send buffer
+    // int sendCount  : int array specifies no. of elems to send to each processor
+    // int* Displs    : int array specifies the disp. relative to the send buffer
+    // void* recvBuf  : Receiving buffer
+    // int* recvCount : No. of elems in receive buffer
+    MPI_Allgatherv( local, nlocal, PARTICLE, particles, partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
+
+
+
+
+
+
+
 
     int* nlocal = (int*) malloc (sizeof(int)) ; // Same as particlesPerBin
     if (NULL == nlocal) {
@@ -177,13 +199,7 @@ int main( int argc, char **argv )
     }
     (*totalN) = 0;
 
-    particle_t *localBin = (particle_t*) malloc( nlocalMax * sizeof(particle_t) ); // Same as binParticles
-    if (NULL == localBin) {
-       printf("ERR allocating *localBin \n");
-       return -1;
-    }
-    memset(localBin, 0, nlocalMax*sizeof(particle_t));
-
+    // Tmp placeholder for particles from previous bin
     particle_t *prevBin = (particle_t*) malloc( nlocalMax * sizeof(particle_t) );
     if (NULL == prevBin) {
        printf("ERR allocating *prevBin \n");
@@ -191,6 +207,7 @@ int main( int argc, char **argv )
     }
     memset(prevBin, 0, nlocalMax*sizeof(particle_t));
 
+    // Tmp placeholder for particles from next bin
     particle_t *nextBin = (particle_t*) malloc( nlocalMax * sizeof(particle_t) );
     if (NULL == nextBin) {
        printf("ERR allocating *nextBin \n");
@@ -198,6 +215,7 @@ int main( int argc, char **argv )
     }
     memset(nextBin, 0, nlocalMax*sizeof(particle_t));
 
+    // Use array of flags to refer to particles in localBin
     unsigned char *localFlags = (unsigned char *) malloc( nlocalMax * sizeof(unsigned char)  ); // Same as binPariclesFlag
     if (NULL == localFlags) {
        printf("ERR allocating *localFlags \n");
@@ -205,33 +223,6 @@ int main( int argc, char **argv )
     }
     memset(localFlags, 0, nlocalMax*sizeof(unsigned char));
 
-    //
-    //  Initialize and distribute the particles (that's fine to leave it unoptimized)
-    //
-    set_size( n );
-//    if( rank == 0 )
-    init_particles( n, particles );
-
-
-/*
-    // Scatters a buffer in parts to all processes in a communicator
-    void* sSendBuf = particles;// address of the send buffer
-    int* sSendCount = partition_sizes;// int array specifies no. of elems to send to each processor
-    int* sDispls = partition_offsets; // int array specifies the disp. relative to the send buffer
-    void* sRecvBuf = local; // Receiving buffer
-    int sRecvCount = nlocal; // No. of elems in receive buffer
-    MPI_Scatterv( sSendBuf, sSendCount, sDispls, PARTICLE, sRecvBuf, sRecvCount, PARTICLE, 0, MPI_COMM_WORLD );
-
-    // Gathers data from all tasks and deliver combined data to all tasks
-    // Blk of data sent frm jth process is received by every process
-    // and placed in the jth block of the buffer gRecvBuf
-    void* gSendBuf = local;// address of the send buffer
-    int gSendCount = nlocal;// int array specifies no. of elems to send to each processor
-    int* gDispls = partition_offsets; // int array specifies the disp. relative to the send buffer
-    void* gRecvBuf = particles; // Receiving buffer
-    int* gRecvCount = partition_sizes; // No. of elems in receive buffer
-    MPI_Allgatherv( gSendBuf, gSendCount, PARTICLE, gRecvBuf, gRecCount, gRecBuf, PARTICLE, MPI_COMM_WORLD );
-*/
 
 
    //
