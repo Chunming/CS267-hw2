@@ -266,55 +266,124 @@ int main( int argc, char **argv )
 	bool fNextCheck = 0;	
 	MPI_Status status; 
 
-        // If top bin exists, then can send
-	if (rank-1 >= 0) {            
-	   idx = 0;
-	   fPrevCheck = 0; // Check if comms with prev bin is req
-    	   for (int i=0; i< (nlocal); ++i) { // Only send particles that are close to edge
-	      while (localFlags[idx]==0) idx++; 
-  	      if (isCloseToEdge(localBin[idx], binEdge)) { // Comms with prev bin is req
-		    fPrevCheck = 1;
+	// First, EVEN will send, ODD will receive
+	if (0 == rank%2) { // EVEN
+	   if (rank-1 >= 0) { // If top bin exists, then can send
+	      idx = 0;
+	      fPrevCheck = 0; // Check if comms with prev bin is req
+    	      for (int i=0; i< (nlocal); ++i) { // Only send particles that are close to edge
+	         while (localFlags[idx]==0) idx++; 
+  	         if (isCloseToEdge(localBin[idx], binEdge)) { // Comms with prev bin is req
+		       fPrevCheck = 1;
+		       break;
+	         }
+	         idx++;
+	      }
+
+	      if (1==fPrevCheck) MPI_Send(localBin, nlocal, PARTICLE, rank-1, tag1, MPI_COMM_WORLD);
+	      else MPI_Send(localBin, 0, PARTICLE, rank-1, tag1, MPI_COMM_WORLD); 
+	   }
+	}
+
+	if (1 == rank%2) { // ODD
+	   if (rank+1 <= 23) { // If bottom bin exists, then can receive
+	      MPI_Recv(nextBin, nlocalMax, PARTICLE, rank+1, tag1, MPI_COMM_WORLD, &status); // Recv from bot bin
+	      MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
+	      nNextBin = adjCount; 
+	   }
+	}
+
+	if (0 == rank%2) { // EVEN 
+	   if (rank+1 <= 23) { // If bottom bin exists, then can send
+     	      idx = 0;
+	      fNextCheck = 0;
+	      for (int i=0; i< (nlocal); ++i) { // Only send particles that are close to edge
+     	         while (localFlags[idx]==0) idx++;
+	         if (isCloseToEdge(localBin[idx], binEdge)) {
+	            fNextCheck = 1;
 		    break;
+	         }
+	         idx++;
 	      }
-	      idx++;
+
+	      if (1==fNextCheck) MPI_Send(localBin, nlocal, PARTICLE, rank+1, tag1, MPI_COMM_WORLD); // Send to bot bin
+	      else MPI_Send(localBin, 0, PARTICLE, rank+1, tag1, MPI_COMM_WORLD); // Send to bot bin
 	   }
-
-	   if (1==fPrevCheck) MPI_Send(localBin, nlocal, PARTICLE, rank-1, tag1, MPI_COMM_WORLD);
-	   else MPI_Send(localBin, 0, PARTICLE, rank-1, tag1, MPI_COMM_WORLD); 
-	  
+	}
+	
+	if (1 == rank%2) { // ODD
+	   if (rank-1 >= 0) { // If top bin exists, then can receive
+	      // Check receive signal from prevBin
+	      MPI_Recv(prevBin, nlocalMax, PARTICLE, rank-1, tag1, MPI_COMM_WORLD, &status); //Recv from top bin
+	      MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
+	      nPrevBin = adjCount; 
+  	   }
 	}
 
-        // If bottom bin exists, then can receive
-	if (rank+1 <= 23) {
-	   MPI_Recv(nextBin, nlocalMax, PARTICLE, rank+1, tag1, MPI_COMM_WORLD, &status); // Recv from bot bin
-	   MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
-	   nNextBin = adjCount; 
-	}
-
-        // If bottom bin exists, then can send
-	if (rank+1 <= 23) { 
-     	   idx = 0;
-	   fNextCheck = 0;
-	   for (int i=0; i< (nlocal); ++i) { // Only send particles that are close to edge
-     	      while (localFlags[idx]==0) idx++;
-	      if (isCloseToEdge(localBin[idx], binEdge)) {
-	         fNextCheck = 1;
-		 break;
+	// Now ODD will send, EVEN will receive
+	if (1 == rank%2) { // ODD
+	   if (rank-1 >= 0) { // If top bin exists, then can send
+	      idx = 0;
+	      fPrevCheck = 0; // Check if comms with prev bin is req
+    	      for (int i=0; i< (nlocal); ++i) { // Only send particles that are close to edge
+	         while (localFlags[idx]==0) idx++; 
+  	         if (isCloseToEdge(localBin[idx], binEdge)) { // Comms with prev bin is req
+		       fPrevCheck = 1;
+		       break;
+	         }
+	         idx++;
 	      }
-	      idx++;
+
+	      if (1==fPrevCheck) MPI_Send(localBin, nlocal, PARTICLE, rank-1, tag1, MPI_COMM_WORLD);
+	      else MPI_Send(localBin, 0, PARTICLE, rank-1, tag1, MPI_COMM_WORLD); 
 	   }
-
-	   if (1==fNextCheck) MPI_Send(localBin, nlocal, PARTICLE, rank+1, tag1, MPI_COMM_WORLD); // Send to bot bin
-	   else MPI_Send(localBin, 0, PARTICLE, rank+1, tag1, MPI_COMM_WORLD); // Send to bot bin
 	}
 
-        // If top bin exists, then can receive
-	if (rank-1 >= 0) { 
-	   // Check receive signal from prevBin
-	   MPI_Recv(prevBin, nlocalMax, PARTICLE, rank-1, tag1, MPI_COMM_WORLD, &status); //Recv from top bin
-	   MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
-	   nPrevBin = adjCount; 
+	if (0 == rank%2) { // EVEN
+	   if (rank+1 <= 23) { // If bottom bin exists, then can receive
+	      MPI_Recv(nextBin, nlocalMax, PARTICLE, rank+1, tag1, MPI_COMM_WORLD, &status); // Recv from bot bin
+	      MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
+	      nNextBin = adjCount; 
+	   }
 	}
+
+	if (1 == rank%2) { // ODD 
+	   if (rank+1 <= 23) { // If bottom bin exists, then can send
+     	      idx = 0;
+	      fNextCheck = 0;
+	      for (int i=0; i< (nlocal); ++i) { // Only send particles that are close to edge
+     	         while (localFlags[idx]==0) idx++;
+	         if (isCloseToEdge(localBin[idx], binEdge)) {
+	            fNextCheck = 1;
+		    break;
+	         }
+	         idx++;
+	      }
+
+	      if (1==fNextCheck) MPI_Send(localBin, nlocal, PARTICLE, rank+1, tag1, MPI_COMM_WORLD); // Send to bot bin
+	      else MPI_Send(localBin, 0, PARTICLE, rank+1, tag1, MPI_COMM_WORLD); // Send to bot bin
+	   }
+	}
+	
+	if (0 == rank%2) { // EVEN
+	   if (rank-1 >= 0) { // If top bin exists, then can receive
+	      // Check receive signal from prevBin
+	      MPI_Recv(prevBin, nlocalMax, PARTICLE, rank-1, tag1, MPI_COMM_WORLD, &status); //Recv from top bin
+	      MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
+	      nPrevBin = adjCount; 
+  	   }
+	}
+
+
+
+
+
+
+
+
+
+
+
 
 
 	//
