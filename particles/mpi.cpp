@@ -44,9 +44,7 @@ void copyParticleToBin(particle_t *src, particle_t *dst, unsigned char *localFla
 int main( int argc, char **argv )
 { 
 
-
    printf ("Where is the FREE error? \n");
-
  
     //
     //  process command line parameters
@@ -62,10 +60,7 @@ int main( int argc, char **argv )
     
     int n = read_int( argc, argv, "-n", 1000 );
     char *savename = read_string( argc, argv, "-o", NULL );
-    
 
-    MPI_Barrier(MPI_COMM_WORLD);
-    printf("Start from MPI_Barrier \n");
     //
     //  Set up MPI
     //
@@ -73,6 +68,11 @@ int main( int argc, char **argv )
     MPI_Init( &argc, &argv );
     MPI_Comm_size( MPI_COMM_WORLD, &n_proc ); // n_proc = 24
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
+
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    printf("Start from MPI_Barrier \n");
+
 
     //
     //  allocate generic resources
