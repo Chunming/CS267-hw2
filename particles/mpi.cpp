@@ -97,8 +97,8 @@ int main( int argc, char **argv )
     // 
     //  Set up data partitioning across processors
     //
-    //int particle_per_proc = (n + n_proc - 1) / n_proc;
-    int particle_per_proc = (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per proc
+    int particle_per_proc = (n + n_proc - 1) / n_proc;
+    //int particle_per_proc = (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per proc
 
     printf("particle_per_proc is %d \n", particle_per_proc);
 
@@ -127,6 +127,8 @@ int main( int argc, char **argv )
     //
     int nlocal = partition_sizes[rank];
 
+    printf("nlocal at rank %d is %d \n", rank, nlocal);
+ 
     particle_t *localBin = (particle_t*) malloc( nlocal * sizeof(particle_t) ); // Replace nlocal with nlocalMax
     if (NULL == localBin) {
        printf("ERR allocating *localBin \n");
@@ -167,7 +169,6 @@ int main( int argc, char **argv )
     MPI_Allgatherv( localBin, nlocal, PARTICLE, particles, partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
 
 
-    printf("nlocal at rank %d is %d \n", rank, nlocal);
 
     // totalN is only used by rank = 1
     int* totalN = (int*) malloc(sizeof(int));
