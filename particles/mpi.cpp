@@ -132,6 +132,12 @@ int main( int argc, char **argv )
     //
     //  initialize and distribute the particles (that's fine to leave it unoptimized)
     //
+
+
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    printf("Start from MPI_Barrier \n");
+
     set_size( n );
     if( rank == 0 )
        init_particles( n, particles );
@@ -139,8 +145,6 @@ int main( int argc, char **argv )
 
 
 
-    MPI_Barrier(MPI_COMM_WORLD);
-    printf("Start from MPI_Barrier \n");
 
 
 
