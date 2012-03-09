@@ -286,7 +286,7 @@ int main( int argc, char **argv )
 	      }
 	      else { 
 		 MPI_Send(localBin, 0, PARTICLE, rank-1, tag1, MPI_COMM_WORLD); 
-		 printf(" %d particles from rank %d is sent to rank %d \n", nlocal, rank, rank-1);
+		 printf(" 0 particles from rank %d is sent to rank %d \n", rank, rank-1);
 	      } 
 	   }
 	}
