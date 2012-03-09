@@ -6,12 +6,6 @@
 #include <math.h>
 #include <string.h>
 
-// Global variables
-
-//
-//  benchmarking program
-//
-
 // Initialize each local bin/processor
 // nlocal       : No. of particles in specific bin/processor
 // nlocalMax    : Max no. of particles allowed in bin/processor 
@@ -89,9 +83,6 @@ int main( int argc, char **argv )
     // Allocate storage for local partition/ Set up bins
     //
 
-
-
-
     // 
     //  Set up data partitioning across processors
     //
@@ -141,10 +132,8 @@ int main( int argc, char **argv )
        init_particles( n, particles );
 
 
-
-
-
-
+    MPI_Barrier(MPI_COMM_WORLD);
+    printf("Start from MPI_Barrier \n");
 
 
     // Scatters a buffer in parts to all processes in a communicator
@@ -172,8 +161,6 @@ int main( int argc, char **argv )
 
 
 
-    MPI_Barrier(MPI_COMM_WORLD);
-    printf("Start from MPI_Barrier \n");
 
 
 
