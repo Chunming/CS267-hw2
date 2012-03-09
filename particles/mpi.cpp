@@ -28,9 +28,6 @@ int isCloseToEdge(particle_t &particle, double binEdge) {
       return 1;
 }
 
-
-
-
 void copyParticleToBin(particle_t *src, particle_t *dst, unsigned char *localFlags, int bdx, int *nlocal, int &nlocalMax, int &freeIdx) {
    dst[freeIdx] = *src;
    localFlags[freeIdx] = 1;
@@ -89,12 +86,6 @@ int main( int argc, char **argv )
 
   
     //
-    //  Set up the data partitioning across processors
-    //
-
-
-
-    //
     // Allocate storage for local partition/ Set up bins
     //
     
@@ -102,7 +93,6 @@ int main( int argc, char **argv )
     int numBins = n_proc; // No. of bins 
     double binLength = spaceDim / numBins; // 0.5/24 = 0.020833 by default
     double bin_area = (spaceDim*spaceDim) / numBins; // Find max no. of particles per bin
-    int localFreeLoc = 0; // Same as freeLocationPerBin
 
     // 
     //  Set up data partitioning across processors
@@ -208,9 +198,12 @@ int main( int argc, char **argv )
 
 
    //
-   // Do Binning onto local array
+   // Do initial binning onto localBin array
    //
 
+   memset(localBin, 0, nlocal*sizeof(particle_t));
+   nlocal = 0;
+   int localFreeLoc = 0; // Same as freeLocationPerBin
    for (int ndx=0; ndx<n; ++ndx) {
       int bdx = (particles[ndx].y / binLength);
       if (bdx == rank) {
