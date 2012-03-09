@@ -99,6 +99,9 @@ int main( int argc, char **argv )
     //
     //int particle_per_proc = (n + n_proc - 1) / n_proc;
     int particle_per_proc = (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per proc
+
+    printf("particle_per_proc is %d \n", particle_per_proc);
+
     int nlocalMax = particle_per_proc;
 
     int *partition_offsets = (int*) malloc( (n_proc+1) * sizeof(int) );
@@ -123,6 +126,8 @@ int main( int argc, char **argv )
     //  allocate storage for local partition
     //
     int nlocal = partition_sizes[rank];
+    printf("nlocal is %d \n", nlocal);
+
     particle_t *localBin = (particle_t*) malloc( nlocal * sizeof(particle_t) ); // Replace nlocal with nlocalMax
     if (NULL == localBin) {
        printf("ERR allocating *localBin \n");
