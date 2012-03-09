@@ -175,7 +175,7 @@ int main( int argc, char **argv )
 
     // Free localBin ptr of size nlocal, and allocate for new size nlocalMax 
 
-//    printf("Check free pointer \n");
+    printf("nLocalMax is %d \n", nlocalMax);
 
     free (localBin);
     localBin = (particle_t*) malloc( nlocalMax * sizeof(particle_t) ); // Replace nlocal with nlocalMax
