@@ -89,20 +89,12 @@ int main( int argc, char **argv )
     // Allocate storage for local partition/ Set up bins
     //
     
-    double spaceDim = sqrt(density * n); // 0.5 default
-    int numBins = n_proc; // No. of bins 
-    double binLength = spaceDim / numBins; // 0.5/24 = 0.020833 by default
-    double bin_area = (spaceDim*spaceDim) / numBins; // Find max no. of particles per bin
 
     // 
     //  Set up data partitioning across processors
     //
     int particle_per_proc = (n + n_proc - 1) / n_proc;
-    //int particle_per_proc = (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per proc
-
     printf("particle_per_proc is %d \n", particle_per_proc);
-
-    int nlocalMax = particle_per_proc;
 
     int *partition_offsets = (int*) malloc( (n_proc+1) * sizeof(int) );
     if (NULL == partition_offsets) {
@@ -126,7 +118,6 @@ int main( int argc, char **argv )
     //  allocate storage for local partition
     //
     int nlocal = partition_sizes[rank];
-
     printf("nlocal at rank %d is %d \n", rank, nlocal);
  
     particle_t *localBin = (particle_t*) malloc( nlocal * sizeof(particle_t) ); // Replace nlocal with nlocalMax
@@ -170,6 +161,26 @@ int main( int argc, char **argv )
 
 
 
+
+   //
+   // Do initial binning onto localBin array
+   //
+    double spaceDim = sqrt(density * n); // 0.5 default
+    int numBins = n_proc; // No. of bins 
+    double binLength = spaceDim / numBins; // 0.5/24 = 0.020833 by default
+    double bin_area = (spaceDim*spaceDim) / numBins; // Find max no. of particles per bin
+    int nlocalMax = (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per proc
+
+    // Free localBin ptr of size nlocal, and allocate for new size nlocalMax 
+    free (localBin);
+    particle_t *localBin = (particle_t*) malloc( nlocalMax * sizeof(particle_t) ); // Replace nlocal with nlocalMax
+    if (NULL == localBin) {
+       printf("ERR allocating *localBin \n");
+       return -1;
+    }
+    memset(localBin, 0, nlocalMax*sizeof(particle_t));
+    nlocal = 0;
+
     // totalN is only used by rank = 1
     int* totalN = (int*) malloc(sizeof(int));
     if (NULL == totalN) {
@@ -203,13 +214,7 @@ int main( int argc, char **argv )
     memset(localFlags, 0, nlocalMax*sizeof(unsigned char));
 
 
-
-   //
-   // Do initial binning onto localBin array
-   //
-
-   memset(localBin, 0, nlocal*sizeof(particle_t));
-   nlocal = 0;
+   // Start binning 
    int localFreeLoc = 0; // Same as freeLocationPerBin
    for (int ndx=0; ndx<n; ++ndx) {
       int bdx = (particles[ndx].y / binLength);
@@ -217,6 +222,13 @@ int main( int argc, char **argv )
          copyParticleToBin(&particles[ndx], localBin, localFlags, bdx, &nlocal, nlocalMax, localFreeLoc);
       }
    }
+
+
+   // Check total num of particles
+        MPI_Reduce(&nlocal, totalN, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );        
+        if (rank == 0) printf("Total N is %d \n", *totalN);
+
+
 
 
     //
@@ -479,8 +491,6 @@ int main( int argc, char **argv )
 	nPrevBin = 0; // No. of elems to shift from prevBin to localBin
 	nNextBin = 0; // No. of elems to shift from nextBin to localBin
 	
-        MPI_Reduce(&nlocal, totalN, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );        
-        if (rank == 0) printf("Total N is %d \n", *totalN);
 
 	//
 	// 5. Compact Particles
