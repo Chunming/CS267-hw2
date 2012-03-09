@@ -406,33 +406,100 @@ int main( int argc, char **argv )
 
 
 	// Get particles from adjacent bins
+	// Using synchronous blocking send/receive
 	int rebinCount;
 	int tag4 = 400;
-	if (rank-1 >= 0) { // If top bin exists, send
-     	   MPI_Send(prevBin, nPrevBin, PARTICLE, rank-1, tag4, MPI_COMM_WORLD); //Send to bot bin
+
+
+        // Have EVEN processors send particles first
+	// and ODD processors receive
+	if (0 == rank%2) { // Even Processors  
+	   if (rank-1 >= 0) { // If top bin exists, send
+     	      MPI_Send(prevBin, nPrevBin, PARTICLE, rank-1, tag4, MPI_COMM_WORLD); //Send to bot bin
+	   }
+
 	}
 
-	if (rank+1 <= 23) { // If bottom bin exists, receive
-	   MPI_Recv(&localBin[idx], nlocalMax, PARTICLE, rank+1, tag4, MPI_COMM_WORLD, &status); //Recv from top bin
-	   MPI_Get_count(&status, PARTICLE, &rebinCount); // Get received count
-	   printf("Rebin count1 is %d \n", rebinCount);
-	   for (int j=idx; j<rebinCount; ++j) localFlags[j]=1;
-	   idx = idx + rebinCount;
-	   (*nlocal) += rebinCount;
+	if (1 == rank%2) { // Odd Processors
+	   if (rank+1 <= 23) { // If bottom bin exists, receive
+	      MPI_Recv(&localBin[idx], nlocalMax, PARTICLE, rank+1, tag4, MPI_COMM_WORLD, &status); //Recv from top bin
+	      MPI_Get_count(&status, PARTICLE, &rebinCount); // Get received count
+	      for (int j=idx; j<rebinCount; ++j) localFlags[j]=1;
+	      idx = idx + rebinCount;
+	      (*nlocal) += rebinCount;
+	   }
 	}
 
-	if (rank+1 <= 23) { // If bottom bin exists, send 
-     	   MPI_Send(nextBin, nNextBin, PARTICLE, rank+1, tag4, MPI_COMM_WORLD); //Send to bot bin
+	if (0 == rank%2) { // Even Processors  
+	   if (rank+1 <= 23) { // If bottom bin exists, send 
+     	      MPI_Send(nextBin, nNextBin, PARTICLE, rank+1, tag4, MPI_COMM_WORLD); //Send to bot bin
+   	   }
 	}
 
-	if (rank-1 >=0) { // If top bin exists, receive
-	   MPI_Recv(&localBin[idx], nlocalMax, PARTICLE, rank-1, tag4, MPI_COMM_WORLD, &status); //Recv from bot bin
-	   MPI_Get_count(&status, PARTICLE, &rebinCount);
-	   printf("Rebin count2 is %d \n", rebinCount);
-	   for (int j=idx; j<rebinCount; ++j) localFlags[j]=1;
-	   idx = idx + rebinCount;
-	   (*nlocal) += rebinCount;
+	if (1 == rank%2) { // Odd Processors
+	   if (rank-1 >=0) { // If top bin exists, receive
+	      MPI_Recv(&localBin[idx], nlocalMax, PARTICLE, rank-1, tag4, MPI_COMM_WORLD, &status); //Recv from bot bin
+	      MPI_Get_count(&status, PARTICLE, &rebinCount);
+	      for (int j=idx; j<rebinCount; ++j) localFlags[j]=1;
+	      idx = idx + rebinCount;
+	      (*nlocal) += rebinCount;
+	   }
 	}
+
+	// Have ODD processors send next
+	// and EVEN processors receive
+	if (1 == rank%2) { // Odd Processors  
+	   if (rank-1 >= 0) { // If top bin exists, send
+     	      MPI_Send(prevBin, nPrevBin, PARTICLE, rank-1, tag4, MPI_COMM_WORLD); //Send to bot bin
+	   }
+
+	}
+
+	if (0 == rank%2) { // Even Processors
+	   if (rank+1 <= 23) { // If bottom bin exists, receive
+	      MPI_Recv(&localBin[idx], nlocalMax, PARTICLE, rank+1, tag4, MPI_COMM_WORLD, &status); //Recv from top bin
+	      MPI_Get_count(&status, PARTICLE, &rebinCount); // Get received count
+	      for (int j=idx; j<rebinCount; ++j) localFlags[j]=1;
+	      idx = idx + rebinCount;
+	      (*nlocal) += rebinCount;
+	   }
+	}
+
+	if (1 == rank%2) { // Odd Processors  
+	   if (rank+1 <= 23) { // If bottom bin exists, send 
+     	      MPI_Send(nextBin, nNextBin, PARTICLE, rank+1, tag4, MPI_COMM_WORLD); //Send to bot bin
+   	   }
+	}
+
+	if (0 == rank%2) { // Even Processors
+	   if (rank-1 >=0) { // If top bin exists, receive
+	      MPI_Recv(&localBin[idx], nlocalMax, PARTICLE, rank-1, tag4, MPI_COMM_WORLD, &status); //Recv from bot bin
+	      MPI_Get_count(&status, PARTICLE, &rebinCount);
+	      for (int j=idx; j<rebinCount; ++j) localFlags[j]=1;
+	      idx = idx + rebinCount;
+	      (*nlocal) += rebinCount;
+	   }
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	memset(prevBin, 0, nPrevBin*sizeof(particle_t)); // Reset prevBin ptr for next itereation
 	memset(nextBin, 0, nNextBin*sizeof(particle_t)); // Reset nextBin ptr for next itereation
