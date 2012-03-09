@@ -234,7 +234,9 @@ int main( int argc, char **argv )
         if (rank == 0) printf("Total N is %d \n", *totalN);
 
 
-
+	
+    MPI_Barrier(MPI_COMM_WORLD);
+    printf("Start from MPI_Barrier \n");
 
     //
     //  simulate a number of time steps
