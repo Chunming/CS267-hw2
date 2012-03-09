@@ -17,7 +17,7 @@
 // nlocalMax    : Max no. of particles allowed in bin/processor 
 // freeIdx : Local free location
 
-int isCloseToEdge(particle_t &particle, double binEdge) {
+int isCloseToEdge(particle_t &particle, double binEdge, double cutoff) {
    double dy = binEdge - particle.y;
    double r2 = dy * dy;
    if (r2 > cutoff * cutoff) 
@@ -296,7 +296,7 @@ int main( int argc, char **argv )
 	      fPrevCheck = 0; // Check if comms with prev bin is req
     	      for (int i=0; i< (nlocal); ++i) { // Only send particles that are close to edge
 	         while (localFlags[idx]==0) idx++; 
-  	         if (isCloseToEdge(localBin[idx], binEdge)) { // Comms with prev bin is req
+  	         if (isCloseToEdge(localBin[idx], binEdge, cutoff)) { // Comms with prev bin is req
 		       fPrevCheck = 1;
 		       break;
 	         }
@@ -328,7 +328,7 @@ int main( int argc, char **argv )
 	      fNextCheck = 0;
 	      for (int i=0; i< (nlocal); ++i) { // Only send particles that are close to edge
      	         while (localFlags[idx]==0) idx++;
-	         if (isCloseToEdge(localBin[idx], binEdge)) {
+	         if (isCloseToEdge(localBin[idx], binEdge, cutoff)) {
 	            fNextCheck = 1;
 		    break;
 	         }
@@ -356,7 +356,7 @@ int main( int argc, char **argv )
 	      fPrevCheck = 0; // Check if comms with prev bin is req
     	      for (int i=0; i< (nlocal); ++i) { // Only send particles that are close to edge
 	         while (localFlags[idx]==0) idx++; 
-  	         if (isCloseToEdge(localBin[idx], binEdge)) { // Comms with prev bin is req
+  	         if (isCloseToEdge(localBin[idx], binEdge, cutoff)) { // Comms with prev bin is req
 		       fPrevCheck = 1;
 		       break;
 	         }
@@ -382,7 +382,7 @@ int main( int argc, char **argv )
 	      fNextCheck = 0;
 	      for (int i=0; i< (nlocal); ++i) { // Only send particles that are close to edge
      	         while (localFlags[idx]==0) idx++;
-	         if (isCloseToEdge(localBin[idx], binEdge)) {
+	         if (isCloseToEdge(localBin[idx], binEdge, cutoff)) {
 	            fNextCheck = 1;
 		    break;
 	         }
