@@ -64,6 +64,8 @@ int main( int argc, char **argv )
     char *savename = read_string( argc, argv, "-o", NULL );
     
 
+    MPI_Barrier(MPI_COMM_WORLD);
+    printf("Start from MPI_Barrier \n");
     //
     //  Set up MPI
     //
@@ -92,8 +94,6 @@ int main( int argc, char **argv )
     //
 
 
-    MPI_Barrier(MPI_COMM_WORLD);
-    printf("Start from MPI_Barrier \n");
 
 
     // 
