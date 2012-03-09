@@ -7,8 +7,6 @@
 #include <string.h>
 
 // Global variables
-#define cutoff 0.01
-#define density 0.0005
 
 //
 //  benchmarking program
@@ -186,6 +184,10 @@ int main( int argc, char **argv )
    //
    // Do initial binning onto localBin array
    //
+   
+   
+    double cutoff = 0.01;
+    double density = 0.0005;
     double spaceDim = sqrt(density * n); // 0.5 default
     int numBins = n_proc; // No. of bins 
     double binLength = spaceDim / numBins; // 0.5/24 = 0.020833 by default
