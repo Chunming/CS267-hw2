@@ -573,10 +573,10 @@ int main( int argc, char **argv )
    }
 */
 
-   printf("Timestep %d nlocal at rank %d is %d \n", step, rank, nlocal);
+   //printf("Timestep %d nlocal at rank %d is %d \n", step, rank, nlocal);
    // Check total num of particles
    MPI_Reduce(&nlocal, totalN, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );        
-   if (rank == 0) printf("Total N is %d \n", *totalN);
+   if (rank == 0) //printf("Total N is %d \n", *totalN);
 
 
 	// 
