@@ -1,0 +1,70 @@
+Warning: no access to tty (Bad file descriptor).
+Thus no job control in this shell.
+Outside the MPI loop 
+Outside the MPI loop 
+Outside the MPI loop 
+Outside the MPI loop 
+Outside the MPI loop 
+Outside the MPI loop 
+Outside the MPI loop 
+Outside the MPI loop 
+Outside the MPI loop 
+Outside the MPI loop 
+Outside the MPI loop 
+Outside the MPI loop 
+Outside the MPI loop 
+Outside the MPI loop 
+Outside the MPI loop 
+Outside the MPI loop 
+Outside the MPI loop 
+Outside the MPI loop 
+Outside the MPI loop 
+Outside the MPI loop 
+Outside the MPI loop 
+Outside the MPI loop 
+Outside the MPI loop 
+Outside the MPI loop 
+Rank is 4 
+Rank is 5 
+Rank is 1 
+Rank is 3 
+Rank is 0 
+Rank is 23 
+Rank is 7 
+Rank is 18 
+Rank is 14 
+Rank is 15 
+Rank is 22 
+Rank is 2 
+Rank is 13 
+Rank is 20 
+Rank is 6 
+Rank is 19 
+Rank is 11 
+Rank is 8 
+Rank is 10 
+Rank is 9 
+Rank is 16 
+Rank is 12 
+Rank is 21 
+Rank is 17 
+n = 500, n_procs = 24, simulation time = 0.019752 s
+Application 6195854 resources: utime ~1s, stime ~1s
+
+ + --------------------------------------------------------------------------
+ +        Job name: job-hopper-mpi24
+ +          Job Id: 1357437.sdb
+ +          System: hopper
+ +     Queued Time: Sun Mar  4 13:54:09 2012
+ +      Start Time: Sun Mar  4 13:54:31 2012
+ + Completion Time: Sun Mar  4 13:54:34 2012
+ +            User: cmchin
+ +        MOM Host: nid05417
+ +           Queue: debug
+ +  Req. Resources: other=QSUBPID:29067:hopper07,walltime=00:10:00
+ +  Used Resources: cput=00:00:00,mem=0kb,vmem=0kb,walltime=00:00:03
+ +     Acct String: mp309
+ +   PBS_O_WORKDIR: /global/homes/c/cmchin/franklin/CS267-hw2/particles
+ +     Submit Args: job-hopper-mpi24
+ + --------------------------------------------------------------------------
+

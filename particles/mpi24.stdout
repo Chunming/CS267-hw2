@@ -1,0 +1,53 @@
+Warning: no access to tty (Bad file descriptor).
+Thus no job control in this shell.
+Timestep 0 nlocal at rank 23 is 0 
+Timestep 0 nlocal at rank 21 is 23 
+Timestep 0 nlocal at rank 19 is 23 
+Timestep 0 nlocal at rank 22 is 17 
+Timestep 0 nlocal at rank 20 is 23 
+Timestep 0 nlocal at rank 13 is 23 
+Timestep 0 nlocal at rank 9 is 23 
+Timestep 0 nlocal at rank 4 is 23 
+Timestep 0 nlocal at rank 0 is 0 
+Timestep 0 nlocal at rank 3 is 23 
+Timestep 0 nlocal at rank 1 is 23 
+Timestep 0 nlocal at rank 5 is 23 
+Timestep 0 nlocal at rank 7 is 23 
+Timestep 0 nlocal at rank 18 is 23 
+Timestep 0 nlocal at rank 17 is 23 
+Timestep 0 nlocal at rank 16 is 23 
+Timestep 0 nlocal at rank 10 is 23 
+Timestep 0 nlocal at rank 2 is 23 
+Timestep 0 nlocal at rank 6 is 23 
+Timestep 0 nlocal at rank 15 is 23 
+Timestep 0 nlocal at rank 8 is 23 
+Timestep 0 nlocal at rank 11 is 23 
+Timestep 0 nlocal at rank 12 is 23 
+Timestep 0 nlocal at rank 14 is 23 
+Total N is 500 
+=>> PBS: job killed: walltime 620 exceeded limit 600
+aprun: Apid 6292581: Caught signal Terminated, sending to application
+Terminated
+_pmiu_daemon(SIGCHLD): [NID 04010] [c13-2c1s5n2] [Sat Mar 10 11:08:38 2012] PE RANK 18 exit signal Terminated
+Application 6292581 exit codes: 143
+Application 6292581 resources: utime ~607s, stime ~11s
+getopt: invalid option -- '1'
+getopt: invalid option -- '0'
+
+ + --------------------------------------------------------------------------
+ +        Job name: job-hopper-mpi24
+ +          Job Id: 1384405.sdb
+ +          System: hopper
+ +     Queued Time: Sat Mar 10 02:57:40 2012
+ +      Start Time: Sat Mar 10 02:58:18 2012
+ + Completion Time: Sat Mar 10 03:08:39 2012
+ +            User: cmchin
+ +        MOM Host: nid04749
+ +           Queue: debug
+ +  Req. Resources: other=QSUBPID:7668:hopper08,walltime=00:10:00
+ +  Used Resources: cput=00:00:00,mem=5396kb,vmem=39976kb,walltime=00:10:21
+ +     Acct String: mp309
+ +   PBS_O_WORKDIR: /global/homes/c/cmchin/franklin/CS267-hw2/particles
+ +     Submit Args: job-hopper-mpi24
+ + --------------------------------------------------------------------------
+

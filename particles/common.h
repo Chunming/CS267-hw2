@@ -8,7 +8,7 @@ inline int max( int a, int b ) { return a > b ? a : b; }
 //  saving parameters
 //
 const int NSTEPS = 100;
-const int SAVEFREQ = 10;
+const int SAVEFREQ = 50;
 
 //
 // particle data structure

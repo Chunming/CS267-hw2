@@ -24,7 +24,6 @@ int main( int argc, char **argv )
     int n = read_int( argc, argv, "-n", 1000 );
     char *savename = read_string( argc, argv, "-o", NULL );
     
-    printf("Outside the MPI loop \n");
 
     //
     //  set up MPI
@@ -34,7 +33,6 @@ int main( int argc, char **argv )
     MPI_Comm_size( MPI_COMM_WORLD, &n_proc ); // n_proc = 24
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 
-    printf("Rank is %d \n", rank);    
     //
     //  allocate generic resources
     //

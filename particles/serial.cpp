@@ -4,6 +4,7 @@
 #include <math.h>
 #include "common.h"
 #include <string.h>
+#include <vector>
 
 #define cutoff 0.01 // Was defined in common.cpp
 #define density 0.0005
@@ -13,7 +14,11 @@
 //  benchmarking program
 //
 int main( int argc, char **argv )
-{    
+{   
+   // Test vectors
+   vector<int> vectArr(100);
+
+ 
     if( find_option( argc, argv, "-h" ) >= 0 )
     {
         printf( "Options:\n" );

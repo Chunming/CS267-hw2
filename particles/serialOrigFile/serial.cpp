@@ -34,7 +34,6 @@ int main( int argc, char **argv )
     for( int step = 0; step < NSTEPS; step++ )
     {
 	    
-	printf("The time step is %d \n", step);
         //
         //  compute forces
         //
