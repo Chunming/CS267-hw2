@@ -87,14 +87,18 @@ int main( int argc, char **argv )
 
     // Do initial binning onto localBin array
 
-       double cutoff = 0.01;
-       double density = 0.0005;
-       double spaceDim = sqrt(density * n); // 0.5 default
-       int numBins = n_proc; // No. of bins 
-       double binLength = spaceDim / numBins; // 0.5/24 = 0.020833 by default
-       double bin_area = (spaceDim*spaceDim) / numBins; // Find max no. of particles per bin
-       int nlocalMax = 3 * (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per proc
+    double cutoff = 0.01;
+    double density = 0.0005;
+    double spaceDim = sqrt(density * n); // 0.5 default
+    int numBins = n_proc; // No. of bins 
+    double binLength = spaceDim / numBins; // 0.5/24 = 0.020833 by default
+    double bin_area = (spaceDim*spaceDim) / numBins; // Find max no. of particles per bin
+    int nlocalMax = 3 * (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per proc
 
+    if (binLength<cutoff) {
+       printf("ERROR, subBlock width cannot be smaller than cutoff value \n")
+       return -1
+    }
 
     free (localBin);
     localBin = (particle_t*) malloc( nlocalMax * sizeof(particle_t) ); // Replace nlocal with nlocalMax
