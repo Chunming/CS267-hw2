@@ -96,8 +96,8 @@ int main( int argc, char **argv )
     int nlocalMax = 3 * (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per proc
 
     if (binLength<cutoff) {
-       printf("ERROR, subBlock width cannot be smaller than cutoff value \n")
-       return -1
+       printf("ERROR, subBlock width cannot be smaller than cutoff value \n");
+       return -1;
     }
 
     free (localBin);
