@@ -1,20 +1,30 @@
 Warning: no access to tty (Bad file descriptor).
 Thus no job control in this shell.
-n = 100000, n_procs = 19, simulation time = 30.9962 s
-Application 6372050 resources: utime ~590s, stime ~3s
+binLength is 0.050000 
+binLength is 0.050000 
+binLength is 0.050000 
+binLength is 0.050000 
+binLength is 0.050000 
+binLength is 0.050000 
+binLength is 0.050000 
+binLength is 0.050000 
+binLength is 0.050000 
+binLength is 0.050000 
+n = 500, n_procs = 10, simulation time = 0.134653 s
+Application 6428850 resources: utime ~2s, stime ~0s
 
  + --------------------------------------------------------------------------
  +        Job name: job-hopper-mpi24
- +          Job Id: 1398760.sdb
+ +          Job Id: 1414177.sdb
  +          System: hopper
- +     Queued Time: Wed Mar 14 10:33:46 2012
- +      Start Time: Wed Mar 14 10:34:29 2012
- + Completion Time: Wed Mar 14 10:35:19 2012
+ +     Queued Time: Sun Mar 18 12:06:47 2012
+ +      Start Time: Sun Mar 18 12:07:33 2012
+ + Completion Time: Sun Mar 18 12:07:37 2012
  +            User: cmchin
- +        MOM Host: nid04944
+ +        MOM Host: nid05417
  +           Queue: debug
- +  Req. Resources: other=QSUBPID:22918:hopper08,walltime=00:10:00
- +  Used Resources: cput=00:00:00,mem=5388kb,vmem=40032kb,walltime=00:00:48
+ +  Req. Resources: other=QSUBPID:2789:hopper08,walltime=00:10:00
+ +  Used Resources: cput=00:00:00,mem=0kb,vmem=0kb,walltime=00:00:03
  +     Acct String: mp309
  +   PBS_O_WORKDIR: /global/homes/c/cmchin/franklin/CS267-hw2/particles
  +     Submit Args: job-hopper-mpi24

@@ -87,16 +87,18 @@ void init_particles( int n, particle_t *p )
 //
 //  interact two particles
 //
-void apply_force( particle_t &particle, particle_t &neighbor )
+int  apply_force( particle_t &particle, particle_t &neighbor ) // Orig return val is void
 {
+    static int count = 0;
 
     double dx = neighbor.x - particle.x;
     double dy = neighbor.y - particle.y;
     double r2 = dx * dx + dy * dy;
     if( r2 > cutoff*cutoff )
-        return;
+        return count; //return;
     r2 = fmax( r2, min_r*min_r );
     double r = sqrt( r2 );
+
 
     //
     //  very simple short-range repulsive force
@@ -104,6 +106,9 @@ void apply_force( particle_t &particle, particle_t &neighbor )
     double coef = ( 1 - cutoff / r ) / r2 / mass;
     particle.ax += coef * dx;
     particle.ay += coef * dy;
+
+    count++;
+    return count;
 }
 
 //
@@ -143,11 +148,11 @@ void save( FILE *f, int n, particle_t *p )
     static bool first = true;
     if( first )
     {
-        fprintf( f, "%d %g\n", n, size );
+        fprintf( f, "%d %g \n", n, size);
         first = false;
     }
     for( int i = 0; i < n; i++ )
-        fprintf( f, "%10.8f %10.8f\n", p[i].x, p[i].y );
+        fprintf( f, "%10.8f %10.8f \n", p[i].x, p[i].y );
 }
 
 //

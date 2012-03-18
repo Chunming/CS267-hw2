@@ -7,4 +7,4 @@
 #PBS -j oe
 
 cd $PBS_O_WORKDIR
-aprun -d 1 -n 19 -N 19 ./mpi -n 100000 -o mpi.txt
+aprun -d 1 -n 10 -N 10 ./mpi -n 500 -o mpi.txt

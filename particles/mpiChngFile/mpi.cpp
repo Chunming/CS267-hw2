@@ -5,50 +5,32 @@
 #include "common.h"
 #include <math.h>
 #include <string.h>
+#include <vector>
 
-// Global variables
-#define cutoff 0.01
-#define density 0.0005
+int isCloseToEdge(particle_t &particle, double binEdge, double cutoff) {
+    double dy = binEdge - particle.y;
+    double r2 = dy * dy;
+    if (r2 > cutoff * cutoff) 
+       return 0;
+    else 
+       return 1;
+}
+
+int compare(const void *a, const void* b) {
+   particle_t *a0 = *(particle_t**) a;
+   particle_t *b0 = *(particle_t**) b;
+
+   if (a0->globalID > b0->globalID) return 1;
+   else return -1;
+}
 
 //
 //  benchmarking program
 //
-
-// Initialize each local bin/processor
-// nlocal       : No. of particles in specific bin/processor
-// nlocalMax    : Max no. of particles allowed in bin/processor 
-// freeIdx : Local free location
-
-int isCloseToEdge(particle_t &particle, double binEdge) {
-   double dy = binEdge - particle.y;
-   double r2 = dy * dy;
-   if (r2 > cutoff * cutoff) 
-      return 0;
-   else 
-      return 1;
-}
-
-
-
-
-void copyParticleToBin(particle_t *src, particle_t *dst, unsigned char *localFlags, int bdx, int *nlocal, int &nlocalMax, int &freeIdx) {
-   dst[freeIdx] = *src;
-   localFlags[freeIdx] = 1;
-   (*nlocal)++; // Increment no. of elems in localBin
-
-   int i = freeIdx;
-   while (0 != localFlags[i]) {
-      i++; // search for next free location
-      if (i == nlocalMax) {i = 0;}
-   }
-   freeIdx = i;
-}
-
 int main( int argc, char **argv )
 { 
 
-
- 
+   
     //
     //  process command line parameters
     //
@@ -66,7 +48,7 @@ int main( int argc, char **argv )
     
 
     //
-    //  Set up MPI
+    //  set up MPI
     //
     int n_proc, rank;
     MPI_Init( &argc, &argv );
@@ -78,471 +60,628 @@ int main( int argc, char **argv )
     //
     FILE *fsave = savename && rank == 0 ? fopen( savename, "w" ) : NULL;
     particle_t *particles = (particle_t*) malloc( n * sizeof(particle_t) );
-    if (NULL == particles) {
-       printf("ERR allocating *particles \n");
-       return -1;
-    }
-    
+ 
     MPI_Datatype PARTICLE;
     MPI_Type_contiguous( 7, MPI_DOUBLE, &PARTICLE );
     MPI_Type_commit( &PARTICLE );
 
-  
-/*    
-   // Test Code
-   int sendSig[4];
-   sendSig[0] = 0;
-   sendSig[1] = 1;
-   sendSig[2] = 2;
-   sendSig[3] = 3;
-
-   int recSig[2];
-   int testCount;
-   MPI_Status tStatus;
-
-   if (rank == 0) {
-      MPI_Send(sendSig, 3, MPI_INT, 1, 5, MPI_COMM_WORLD);
-      //MPI_Send(sendSig+1, 1, MPI_INT, 1, 5, MPI_COMM_WORLD);
-      //MPI_Send(sendSig+2, 1, MPI_INT, 1, 5, MPI_COMM_WORLD);
-      //MPI_Send(sendSig+3, 1, MPI_INT, 1, 5, MPI_COMM_WORLD);
-
-   }
-
-   if (rank == 1) {
-      MPI_Recv(recSig, 10, MPI_INT, 0, 5, MPI_COMM_WORLD, &tStatus); //Recv from top bin
-      MPI_Get_count(&tStatus, MPI_INT, &testCount); // Get received count
-      printf("Received %d elements in %d from %d \n", testCount, rank, rank-1);
-   }
-
-*/
-
-
-
-
-
-
-    //
-    //  Set up the data partitioning across processors
-    //
-
-
-
-    //
-    // Allocate storage for local partition/ Set up bins
-    //
-    
+    double cutoff = 0.01;
+    double density = 0.0005;
     double spaceDim = sqrt(density * n); // 0.5 default
     int numBins = n_proc; // No. of bins 
     double binLength = spaceDim / numBins; // 0.5/24 = 0.020833 by default
-
     double bin_area = (spaceDim*spaceDim) / numBins; // Find max no. of particles per bin
-    int nlocalMax = (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per processor
+    int nlocalMax = 3 * (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per proc
+    vector<double> xVect;
+    vector<double> yVect;
+    vector<int> globalIDVect;
 
-    int particle_per_proc = 3* (int)( bin_area / (3.14*(cutoff/2)*(cutoff/2)) ); // Max particle num per processor
-    // int particle_per_proc = (n + n_proc - 1) / n_proc;
-    
-    int *partition_offsets = (int*) malloc( (n_proc+1) * sizeof(int) );
-    if (NULL == partition_offsets) {
-       printf("ERR allocating *partition_offsets \n");
-       return -1;
+    //MPI_Info info;
+    //MPI_Info_create(&info) ;
+
+    //MPI_File fh;
+    //MPI_File_open(MPI_COMM_WORLD, "mpi.txt", MPI_MODE_RDWR, info, &fh );
+    //MPI_File_set_view (fh, rank*nlocalMax, MPI_DOUBLE, MPI_DOUBLE, "internal", info);
+
+   particle_t** compactVect;
+   compactVect = (particle_t**)malloc( n * sizeof(particle_t*));
+
+   particle_t* particleVect;
+   particleVect = (particle_t*)malloc( n_proc*nlocalMax*sizeof(particle_t));
+   if (NULL == particleVect) {
+      printf("ERR allocating *particleVect \n");
+      return -1;
+   }
+
+   int* flagVect;
+   flagVect = (int*)malloc( n_proc*nlocalMax*sizeof(int));
+   if (NULL == flagVect) {
+      printf("ERR allocating *flagVect \n");
+      return -1;
+   }
+
+   // No. of local particles from each proc
+   int* nlocalVect;
+   nlocalVect = (int*)malloc( n_proc*sizeof(int));
+   if (NULL == nlocalVect) {
+      printf("ERR allocating *nlocalVect \n");
+      return -1;
+   }
+   memset(flagVect, 0, n_proc*nlocalMax*sizeof(int));
+   memset(particleVect, 0, n_proc*nlocalMax*sizeof(particle_t));
+   memset(nlocalVect, 0, n_proc*sizeof(int));
+
+
+
+    int *displs = (int*) malloc( (n_proc) * sizeof(int) );
+    int *rcounts = (int*) malloc( n_proc * sizeof(int) );
+    for( int i = 0; i < n_proc; i++ ) {
+        displs[i] = i * nlocalMax;
+        rcounts[i] = 100; 
     }
+
+    int *displsC = (int*) malloc( (n_proc) * sizeof(int) );
+    int *rcountsC = (int*) malloc( n_proc * sizeof(int) );
+    for( int i = 0; i < n_proc; i++ ) {
+        displsC[i] = i;
+        rcountsC[i] = 1; 
+    }
+ 
+    //
+    //  set up the data partitioning across processors
+    //
+    int particle_per_proc = (n + n_proc - 1) / n_proc;
+    int *partition_offsets = (int*) malloc( (n_proc+1) * sizeof(int) );
     for( int i = 0; i < n_proc+1; i++ )
         partition_offsets[i] = min( i * particle_per_proc, n );
     
     int *partition_sizes = (int*) malloc( n_proc * sizeof(int) );
-    if (NULL == partition_sizes) {
-       printf("ERR allocating *partition_sizes \n");
-       return -1;
-    }
-
     for( int i = 0; i < n_proc; i++ )
         partition_sizes[i] = partition_offsets[i+1] - partition_offsets[i];
+    
+    //
+    //  allocate storage for local partition
+    //
+    int nlocal = partition_sizes[rank];
+    particle_t *localBin = (particle_t*) malloc( nlocal * sizeof(particle_t) );
+    
+    //
+    //  initialize and distribute the particles (that's fine to leave it unoptimized)
+    //
+    set_size( n );
+    if( rank == 0 )
+        init_particles( n, particles );
+    MPI_Scatterv( particles, partition_sizes, partition_offsets, PARTICLE, localBin, nlocal, PARTICLE, 0, MPI_COMM_WORLD );
+    MPI_Allgatherv( localBin, nlocal, PARTICLE, particles, partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
+  
 
-    //int nlocalMax= partition_sizes[rank]; // Same as maxParticlesPerBin
+    // Do initial binning onto localBin array
 
-    int localFreeLoc = 0; // Same as freeLocationPerBin
 
-    int* nlocal = (int*) malloc (sizeof(int)) ; // Same as particlesPerBin
-    if (NULL == nlocal) {
-       printf("ERR allocating *nlocal \n");
+    if (binLength<cutoff) {
+       printf("ERROR, subBlock width cannot be smaller than cutoff value \n");
        return -1;
     }
-    (*nlocal) = 0;
 
-    // totalN is only used by rank = 1
-    int* totalN = (int*) malloc(sizeof(int));
-    if (NULL == totalN) {
-       printf("ERR allocating *totalN \n");
-       return -1;
-    }
-    (*totalN) = 0;
-
-    particle_t *localBin = (particle_t*) malloc( nlocalMax * sizeof(particle_t) ); // Same as binParticles
+    free (localBin);
+    localBin = (particle_t*) malloc( nlocalMax * sizeof(particle_t) ); // Replace nlocal with nlocalMax
     if (NULL == localBin) {
        printf("ERR allocating *localBin \n");
        return -1;
     }
     memset(localBin, 0, nlocalMax*sizeof(particle_t));
+    nlocal = 0;
 
-    particle_t *prevBin = (particle_t*) malloc( nlocalMax * sizeof(particle_t) );
-    if (NULL == prevBin) {
-       printf("ERR allocating *prevBin \n");
-       return -1;
-    }
-    memset(prevBin, 0, nlocalMax*sizeof(particle_t));
+    int* totalN = (int*) malloc(sizeof(int));
+     (*totalN) = 0;
+ 
+     // Tmp placeholder to receive particles from previous bin
+     particle_t *prevBin = (particle_t*) malloc( nlocalMax * sizeof(particle_t) );
+     if (NULL == prevBin) {
+        printf("ERR allocating *prevBin \n");
+        return -1;
+     }
+     memset(prevBin, 0, nlocalMax*sizeof(particle_t));
+ 
+     // Tmp placeholder to receive particles from next bin
+     particle_t *nextBin = (particle_t*) malloc( nlocalMax * sizeof(particle_t) );
+     if (NULL == nextBin) {
+        printf("ERR allocating *nextBin \n");
+        return -1;
+     }
+     memset(nextBin, 0, nlocalMax*sizeof(particle_t));
 
-    particle_t *nextBin = (particle_t*) malloc( nlocalMax * sizeof(particle_t) );
-    if (NULL == nextBin) {
-       printf("ERR allocating *nextBin \n");
-       return -1;
-    }
-    memset(nextBin, 0, nlocalMax*sizeof(particle_t));
+     // Tmp placeholder to send particles to previous bin 
+     particle_t *prevBinSend = (particle_t*) malloc( nlocalMax * sizeof(particle_t) );
+     if (NULL == prevBinSend) {
+        printf("ERR allocating *prevBinSend \n");
+        return -1;
+     }
+     memset(prevBinSend, 0, nlocalMax*sizeof(particle_t));
 
-    unsigned char *localFlags = (unsigned char *) malloc( nlocalMax * sizeof(unsigned char)  ); // Same as binPariclesFlag
+     // Tmp placeholder to send particles to next bin 
+     particle_t *nextBinSend = (particle_t*) malloc( nlocalMax * sizeof(particle_t) );
+     if (NULL == nextBinSend) {
+        printf("ERR allocating *nextBinSend \n");
+        return -1;
+     }
+     memset(nextBinSend, 0, nlocalMax*sizeof(particle_t));
+
+
+    int *localFlags = (int *) malloc( nlocalMax * sizeof(int)  ); // Same as binPariclesFlag
     if (NULL == localFlags) {
        printf("ERR allocating *localFlags \n");
        return -1;
     }
-    memset(localFlags, 0, nlocalMax*sizeof(unsigned char));
-
-    //
-    //  Initialize and distribute the particles (that's fine to leave it unoptimized)
-    //
-    set_size( n );
-//    if( rank == 0 )
-    init_particles( n, particles );
+    memset(localFlags, 0, nlocalMax*sizeof(int));
 
 
-/*
-    // Scatters a buffer in parts to all processes in a communicator
-    void* sSendBuf = particles;// address of the send buffer
-    int* sSendCount = partition_sizes;// int array specifies no. of elems to send to each processor
-    int* sDispls = partition_offsets; // int array specifies the disp. relative to the send buffer
-    void* sRecvBuf = local; // Receiving buffer
-    int sRecvCount = nlocal; // No. of elems in receive buffer
-    MPI_Scatterv( sSendBuf, sSendCount, sDispls, PARTICLE, sRecvBuf, sRecvCount, PARTICLE, 0, MPI_COMM_WORLD );
-
-    // Gathers data from all tasks and deliver combined data to all tasks
-    // Blk of data sent frm jth process is received by every process
-    // and placed in the jth block of the buffer gRecvBuf
-    void* gSendBuf = local;// address of the send buffer
-    int gSendCount = nlocal;// int array specifies no. of elems to send to each processor
-    int* gDispls = partition_offsets; // int array specifies the disp. relative to the send buffer
-    void* gRecvBuf = particles; // Receiving buffer
-    int* gRecvCount = partition_sizes; // No. of elems in receive buffer
-    MPI_Allgatherv( gSendBuf, gSendCount, PARTICLE, gRecvBuf, gRecCount, gRecBuf, PARTICLE, MPI_COMM_WORLD );
-*/
 
 
-   //
-   // Do Binning onto local array
-   //
-
-   for (int ndx=0; ndx<n; ++ndx) {
-      int bdx = (particles[ndx].y / binLength);
-      if (bdx == rank) {
-         copyParticleToBin(&particles[ndx], localBin, localFlags, bdx, nlocal, nlocalMax, localFreeLoc);
-      }
-   }
 
 
-    //
+
+
+ 
+    // Start binning
+    int freeIdx = 0; // Same as freeLocationPerBin
+    for (int ndx=0; ndx<n; ++ndx) {
+       int bdx = (particles[ndx].y / binLength);
+       if (bdx == rank) {
+          localBin[freeIdx] = particles[ndx];
+          localFlags[freeIdx] = 1;
+          nlocal++; // Increment no. of elems in localBin
+ 
+          int i = freeIdx + 1;
+          while (0 != localFlags[i]) {
+             i++; // search for next free location
+             if (i == nlocalMax) {i = 0;}
+          }
+          freeIdx = i;
+       }
+    }
+   //free( particles ); // Particle array is not used after binning
+
+
+
+
+
+
+
+
+  //
     //  simulate a number of time steps
     //
     double simulation_time = read_timer( );
-    //int recvSig = 0;
-    //int prevSig = 0;
-    //int nextSig = 0;
     for( int step = 0; step < NSTEPS; step++ )
-    {  
-	//printf("Time step is %d from rank %d \n", step, rank);
-	//printf("AFT nlocal from rank %d is %d \n", rank, *nlocal);	    
+    {
 
-
-	// 
-	// 1. MPI send/receive particles to/from adjacent bins
-	// MPI_Send(void* start, int numElem, DATA_TYPE, int source, int tag, COMM)
-	// MPI_Recv(void* start, int numElem, DATA_TYPE, int source, int tag, COMM, status)
-        // Each MPI_Send must be paired with a MPI_Recv
-        // Cannot call successive MPI_Sends and call just one MPI_Recv
-
-	int tag1 = 100; // Message ID
-	int adjCount; // Received count from adjacent bins
+        int tag1 = 100; // Message ID
+        int adjCount; // Received count from adjacent bins
         int nPrevBin=0; // No. of elems from prevBin
-	int nNextBin=0;
+        int nNextBin=0;
         double binEdge = rank*binLength;
-	int idx = 0;
-	bool fPrevCheck = 0;	
-	bool fNextCheck = 0;	
-	MPI_Status status; 
+        int idx = 0;
+	int sIdx = 0; // Send index
+        bool fPrevCheck = 0;
+        bool fNextCheck = 0;
+        MPI_Status status;
 
-        // If top bin exists, then can send
-	if (rank-1 >= 0) {            
-	   idx = 0;
-	   fPrevCheck = 0; // Check if comms with prev bin is req
-    	   for (int i=0; i< (*nlocal); ++i) { // Only send particles that are close to edge
-	      while (localFlags[idx]==0) idx++; 
-  	      if (isCloseToEdge(localBin[idx], binEdge)) { // Comms with prev bin is req
-		    fPrevCheck = 1;
-		    break;
+        // First, EVEN will send, ODD will receive
+        if (0 == rank%2) { // EVEN
+           if (rank-1 >= 0) { // If top bin exists, then can send
+              idx = 0;
+	      sIdx = 0;
+              fPrevCheck = 0; // Check if comms with prev bin is req
+              for (int i=0; i< (nlocal); ++i) { // Only send particles that are close to edge
+                 while (0==localFlags[idx]) idx++;
+                 if (isCloseToEdge(localBin[idx], binEdge, cutoff)) { // Comms with prev bin is req
+		       prevBinSend[sIdx] = localBin[idx]; // Set send index
+		       sIdx++;
+                       fPrevCheck = 1;
+                       break;
+                 }
+                 idx++;
+              }
+
+              if (1==fPrevCheck) {
+                 MPI_Send(localBin, nlocal, PARTICLE, rank-1, tag1, MPI_COMM_WORLD);
+                 //MPI_Send(prevBinSend, sIdx, PARTICLE, rank-1, tag1, MPI_COMM_WORLD);
+                 //printf(" %d particles from rank %d is sent to rank %d \n", nlocal, rank, rank-1);
+              }
+              else {
+                 MPI_Send(localBin, 0, PARTICLE, rank-1, tag1, MPI_COMM_WORLD);
+                 //printf(" 0 particles from rank %d is sent to rank %d \n", rank, rank-1);
+              }
+           }
+        }
+
+        if (1 == rank%2) { // ODD
+           if (rank+1 <= n_proc-1) { // If bottom bin exists, then can receive
+              MPI_Recv(&nextBin[nNextBin], nlocalMax, PARTICLE, rank+1, tag1, MPI_COMM_WORLD, &status); // Recv from bot bin
+              MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
+              nNextBin += adjCount;
+           }
+        }
+
+        if (0 == rank%2) { // EVEN 
+           if (rank+1 <= n_proc-1) { // If bottom bin exists, then can send
+              idx = 0;
+	      sIdx = 0;
+              fNextCheck = 0;
+              for (int i=0; i< (nlocal); ++i) { // Only send particles that are close to edge
+                 while (0==localFlags[idx]) idx++;
+                 if (isCloseToEdge(localBin[idx], binEdge+binLength, cutoff)) {
+		    nextBinSend[sIdx] = localBin[idx];
+		    sIdx++;
+                    fNextCheck = 1;
+                    break;
+                 }
+                 idx++;
+              }
+
+              if (1==fNextCheck) {
+                 MPI_Send(localBin, nlocal, PARTICLE, rank+1, tag1+1, MPI_COMM_WORLD); // Send to bot bin
+		//MPI_Send(nextBinSend, sIdx, PARTICLE, rank+1, tag1+1, MPI_COMM_WORLD); // Send to bot bin
 	      }
-	      idx++;
-	   }
+              else MPI_Send(localBin, 0, PARTICLE, rank+1, tag1+1, MPI_COMM_WORLD); // Send to bot bin
+           }
+        }
 
-	   if (1==fPrevCheck) MPI_Send(localBin, *nlocal, PARTICLE, rank-1, tag1, MPI_COMM_WORLD);
-	   else MPI_Send(localBin, 0, PARTICLE, rank-1, tag1, MPI_COMM_WORLD); 
-	  
-	}
+        if (1 == rank%2) { // ODD
+           if (rank-1 >= 0) { // If top bin exists, then can receive
+              // Check receive signal from prevBin
+              MPI_Recv(&prevBin[nPrevBin], nlocalMax, PARTICLE, rank-1, tag1+1, MPI_COMM_WORLD, &status); //Recv from top bin
+              MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
+           }
+        }
 
-        // If bottom bin exists, then can receive
-	if (rank+1 <= 23) {
-	   MPI_Recv(nextBin, nlocalMax, PARTICLE, rank+1, tag1, MPI_COMM_WORLD, &status); // Recv from bot bin
-	   MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
-	   nNextBin = adjCount; 
-	}
 
-        // If bottom bin exists, then can send
-	if (rank+1 <= 23) { 
-     	   idx = 0;
-	   fNextCheck = 0;
-	   for (int i=0; i< (*nlocal); ++i) { // Only send particles that are close to edge
-     	      while (localFlags[idx]==0) idx++;
-	      if (isCloseToEdge(localBin[idx], binEdge)) {
-	         fNextCheck = 1;
-		 break;
+
+        // Now ODD will send, EVEN will receive
+        if (1 == rank%2) { // ODD
+           if (rank-1 >= 0) { // If top bin exists, then can send
+              idx = 0;
+	      sIdx = 0;
+              fPrevCheck = 0; // Check if comms with prev bin is req
+              for (int i=0; i< (nlocal); ++i) { // Only send particles that are close to edge
+                 while (0==localFlags[idx]) idx++;
+                 if (isCloseToEdge(localBin[idx], binEdge, cutoff)) { // Comms with prev bin is req
+		       prevBinSend[sIdx] = localBin[idx];
+		       sIdx++;
+                       fPrevCheck = 1;
+                       break;
+                 }
+                 idx++;
+              }
+
+              if (1==fPrevCheck) {
+	         //MPI_Send(prevBinSend, sIdx, PARTICLE, rank-1, tag1+2, MPI_COMM_WORLD);
+	         MPI_Send(localBin, nlocal, PARTICLE, rank-1, tag1+2, MPI_COMM_WORLD);
 	      }
-	      idx++;
-	   }
+              else MPI_Send(localBin, 0, PARTICLE, rank-1, tag1+2, MPI_COMM_WORLD);
+           }
+        }
 
-	   if (1==fNextCheck) MPI_Send(localBin, *nlocal, PARTICLE, rank+1, tag1, MPI_COMM_WORLD); // Send to bot bin
-	   else MPI_Send(localBin, 0, PARTICLE, rank+1, tag1, MPI_COMM_WORLD); // Send to bot bin
-	}
+        if (0 == rank%2) { // EVEN
+           if (rank+1 <= n_proc-1) { // If bottom bin exists, then can receive
+              MPI_Recv(&nextBin[nNextBin], nlocalMax, PARTICLE, rank+1, tag1+2, MPI_COMM_WORLD, &status); // Recv from bot bin
+              MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
+              nNextBin += adjCount;
+           }
+        }
 
-        // If top bin exists, then can receive
-	if (rank-1 >= 0) { 
-	   // Check receive signal from prevBin
-	   MPI_Recv(prevBin, nlocalMax, PARTICLE, rank-1, tag1, MPI_COMM_WORLD, &status); //Recv from top bin
-	   MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
-	   nPrevBin = adjCount; 
-	}
+        if (1 == rank%2) { // ODD 
+           if (rank+1 <= n_proc-1) { // If bottom bin exists, then can send
+              idx = 0;
+	      sIdx = 0;
+              fNextCheck = 0;
+              for (int i=0; i< (nlocal); ++i) { // Only send particles that are close to edge
+                 while (0==localFlags[idx]) idx++;
+                 if (isCloseToEdge(localBin[idx], binEdge+binLength, cutoff)) {
+		    nextBinSend[sIdx] = localBin[idx];
+		    sIdx++;
+                    fNextCheck = 1;
+                    break;
+                 }
+                 idx++;
+              }
 
+              if (1==fNextCheck) {
+	         //MPI_Send(nextBinSend, sIdx, PARTICLE, rank+1, tag1+3, MPI_COMM_WORLD); // Send to bot bin 
+	         MPI_Send(localBin, nlocal, PARTICLE, rank+1, tag1+3, MPI_COMM_WORLD); // Send to bot bin 
+	      }
+              else MPI_Send(localBin, 0, PARTICLE, rank+1, tag1+3, MPI_COMM_WORLD); // Send to bot bin
+           }
+        }
 
-	//
-	// 2. Apply Force
-	//
-	int loc_i = 0;
-	int loc_j = 0;
-	for (int i=0; i<(*nlocal); ++i) { // For each particle in local bin
+        if (0 == rank%2) { // EVEN
+           if (rank-1 >= 0) { // If top bin exists, then can receive
+              // Check receive signal from prevBin
+              MPI_Recv(&prevBin[nPrevBin], nlocalMax, PARTICLE, rank-1, tag1+3, MPI_COMM_WORLD, &status); //Recv from top bin
+              MPI_Get_count(&status, PARTICLE, &adjCount); // Get received count
+              nPrevBin += adjCount;
+           }
+        }
+        memset(prevBinSend, 0, nPrevBin*sizeof(particle_t)); // Reset prevBin ptr for next itereation
+        memset(nextBinSend, 0, nNextBin*sizeof(particle_t)); // Reset nextBin ptr for next itereation
 
-           while(localFlags[loc_i]==0) loc_i++;
-	   localBin[i].ax = localBin[i].ay = 0;
-
-	   
-	   // SELF LOOP - Compute interactions with particles within the bin
-	   loc_j = 0;
-	   for (int j=0; j<(*nlocal); ++j) {
-	      while(localFlags[loc_j]==0) loc_j++;
-	      apply_force (localBin[loc_i], localBin[loc_j]);
-	      loc_j++;
-	   }
-
-	   // PREV LOOP Compute interactions with particles from top bin
-	   for (int j=0; j<nPrevBin; ++j) {
-	      apply_force (localBin[loc_i], prevBin[j]);
-	   }
-
-	   // NEXT LOOP Compute interactions with particles from bot bin
-	   for (int j=0; j<nNextBin; ++j) {
-	      apply_force (localBin[loc_i], nextBin[j]);
-	   }
-
-	   loc_i++;
-	}
-	
-	memset(prevBin, 0, nPrevBin*sizeof(particle_t)); // Reset prevBin ptr for next itereation
-	memset(nextBin, 0, nNextBin*sizeof(particle_t)); // Reset nextBin ptr for next itereation
-	nPrevBin = 0;
-	nNextBin = 0;
-
-	//printf("COMPLETED Apply Force in rank %d \n", rank);
 
 	// 
-	// 3. Move Particles
-	//
-	loc_i = 0;
-	for (int i=0; i<(*nlocal); ++i) {
-	   while(localFlags[loc_i]==0) loc_i++; // Make sure particle_t has valid data 
-	   move( localBin[loc_i] );
-	   loc_i++;
-	}
+        // 2. Apply Force
+        //
+        int loc_i = 0;
+        int loc_j = 0;
+        int forceCount;
+        for (int i=0; i<(nlocal); ++i) { // For each particle in local bin
+           while(0==localFlags[loc_i]) {
+              loc_i++;
+              if (loc_i == nlocalMax) {loc_i = 0;}
+	   }	
+           localBin[loc_i].ax = localBin[loc_i].ay = 0;
 
-	//
-	// 4. Re-bin Particles
-	//
-	int bdx;
-	int jdx = 0; int kdx = 0;
-	idx = 0; 
-	for (int i=0; i<(*nlocal); ++i) { // Analyze each particle in localBin
-	   while(localFlags[idx]==0) idx++;
+           // SELF LOOP - Compute interactions with particles within the bin
+           loc_j = 0;
+           for (int j=0; j<(nlocal); ++j) {
+              while(0==localFlags[loc_j]) { 
+	         loc_j++;
+		 if (loc_j == nlocalMax) {loc_j = 0;}
+	      }
+              forceCount = apply_force (localBin[loc_i], localBin[loc_j]);
+	      //printf("Force Count at rank %d is %d \n", rank, forceCount);
+              loc_j++;
+           }
+
+           // PREV LOOP Compute interactions with particles from top bin
+           for (int j=0; j<nPrevBin; ++j) {
+              forceCount = apply_force (localBin[loc_i], prevBin[j]);
+	      //printf("Force Count at rank %d is %d \n", rank, forceCount);
+           }
+
+           // NEXT LOOP Compute interactions with particles from bot bin
+           for (int j=0; j<nNextBin; ++j) {
+              forceCount = apply_force (localBin[loc_i], nextBin[j]);
+	      //printf("Force Count at rank %d is %d \n", rank, forceCount);
+	   }
+
+           loc_i++;
+        }
+
+        memset(prevBin, 0, nPrevBin*sizeof(particle_t)); // Reset prevBin ptr for next itereation
+        memset(nextBin, 0, nNextBin*sizeof(particle_t)); // Reset nextBin ptr for next itereation
+        nPrevBin = 0;
+        nNextBin = 0;
+
+
+	MPI_Barrier(MPI_COMM_WORLD);
+
+   	MPI_Reduce(&forceCount, totalN, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );        
+   	//if (rank == 0) printf("Total N FORCE COUNT is %d \n", *totalN);
+
+	MPI_Barrier(MPI_COMM_WORLD);
+
+        // 
+        // 3. Move Particles
+        //
+        loc_i = 0;
+        for (int i=0; i<(nlocal); ++i) {
+           while(0==localFlags[loc_i]) {
+
+		printf("MOVE HOLE CALLED \n");
+
+	      loc_i++;
+	      if (loc_i == nlocalMax) {loc_i=0;}
+	   }
+           move( localBin[loc_i] );
+           loc_i++;
+        }
+
+        
+
+        //
+        // 4. Re-bin Particles
+        //
+        int bdx;
+        int jdx = 0; int kdx = 0;
+        idx = 0;
+        for (int i=0; i<(nlocal); ++i) { // Analyze each particle in localBin
+           while(0==localFlags[idx]) { 
+	      idx++; 
+	      if (idx == nlocalMax) {idx = 0;}
+	   }
            bdx = (localBin[idx].y / binLength);
 
-	   if (bdx == rank-1) { // Particle moved to top bin
-	      localFlags[idx] = 0; // Remove from localBin
-	      prevBin[jdx] = localBin[idx];
-	      jdx++;
-	      (*nlocal)--;
-	   }
+           if (bdx == rank-1) { // Particle moved to top bin
+              localFlags[idx] = 0; // Remove from localBin
+              prevBin[jdx] = localBin[idx];
+              jdx++;
+           }
 
-	   if (bdx == rank+1) { // Particle moved to top bin
-	      localFlags[idx] = 0; // Remove from localBin
-	      nextBin[kdx] = localBin[idx];
-	      kdx++;
-	      (*nlocal)--;
-	   }
-	   idx++;
-	}
-	nPrevBin = jdx; // No. of elems to shift from prevBin to localBin
-	nNextBin = kdx; // No. of elems to shift from nextBin to localBin
+           if (bdx == rank+1) { // Particle moved to top bin
+              localFlags[idx] = 0; // Remove from localBin
+              nextBin[kdx] = localBin[idx];
+              kdx++;
+           }
+           idx++;
+        }
+        nPrevBin = jdx; // No. of elems to shift from prevBin to localBin
+        nNextBin = kdx; // No. of elems to shift from nextBin to localBin
+	nlocal = nlocal - nPrevBin - nNextBin;
 
+        //
+        // 5. Compact Particles
+        //
+        int nextLoc;
+         for (int loc=0; loc<nlocal; ++loc) {
+            if (0 == localFlags[loc]) {
+               nextLoc = loc + 1;
+               while (0 == localFlags[nextLoc]) { 
+	          nextLoc++;
+		  if (nextLoc == nlocalMax) {nextLoc = 0;}
+	       }
+               localBin[loc] = localBin[nextLoc];
+               localFlags[loc] = 1;
+               localFlags[nextLoc] = 0;
+            }  
+         }  
 
-	// Get particles from adjacent bins
-	// Using synchronous blocking send/receive
-	int rebinCount;
-	int tag4 = 400;
+        // Get particles from adjacent bins
+        // Using synchronous blocking send/receive
+        int rebinCount;
+        int tag4 = 400;
+
+/*
+   if (rank == 1) {
+      int tdx = 0;
+      int udx = 0;
+      printf("BEF nlocal is %d \n", nlocal);
+      while (tdx < nlocal) {
+         if (0!=localFlags[udx]) {
+            printf("BEF udx is %d \n", udx);
+            tdx++;
+         }
+	 printf("BEF udx is incremented \n ");
+	 udx++;
+      }
+   }
+*/
+
 
 
         // Have EVEN processors send particles first
-	// and ODD processors receive
-	if (0 == rank%2) { // Even Processors  
-	   if (rank-1 >= 0) { // If top bin exists, send
-     	      MPI_Send(prevBin, nPrevBin, PARTICLE, rank-1, tag4, MPI_COMM_WORLD); //Send to bot bin
-	   }
-
-	}
-
-	if (1 == rank%2) { // Odd Processors
-	   if (rank+1 <= 23) { // If bottom bin exists, receive
-	      MPI_Recv(&localBin[idx], nlocalMax, PARTICLE, rank+1, tag4, MPI_COMM_WORLD, &status); //Recv from top bin
-	      MPI_Get_count(&status, PARTICLE, &rebinCount); // Get received count
-	      for (int j=idx; j<rebinCount; ++j) localFlags[j]=1;
-	      idx = idx + rebinCount;
-	      (*nlocal) += rebinCount;
-	   }
-	}
-
-	if (0 == rank%2) { // Even Processors  
-	   if (rank+1 <= 23) { // If bottom bin exists, send 
-     	      MPI_Send(nextBin, nNextBin, PARTICLE, rank+1, tag4, MPI_COMM_WORLD); //Send to bot bin
-   	   }
-	}
-
-	if (1 == rank%2) { // Odd Processors
-	   if (rank-1 >=0) { // If top bin exists, receive
-	      MPI_Recv(&localBin[idx], nlocalMax, PARTICLE, rank-1, tag4, MPI_COMM_WORLD, &status); //Recv from bot bin
-	      MPI_Get_count(&status, PARTICLE, &rebinCount);
-	      for (int j=idx; j<rebinCount; ++j) localFlags[j]=1;
-	      idx = idx + rebinCount;
-	      (*nlocal) += rebinCount;
-	   }
-	}
-
-	// Have ODD processors send next
-	// and EVEN processors receive
-	if (1 == rank%2) { // Odd Processors  
-	   if (rank-1 >= 0) { // If top bin exists, send
-     	      MPI_Send(prevBin, nPrevBin, PARTICLE, rank-1, tag4, MPI_COMM_WORLD); //Send to bot bin
-	   }
-
-	}
-
-	if (0 == rank%2) { // Even Processors
-	   if (rank+1 <= 23) { // If bottom bin exists, receive
-	      MPI_Recv(&localBin[idx], nlocalMax, PARTICLE, rank+1, tag4, MPI_COMM_WORLD, &status); //Recv from top bin
-	      MPI_Get_count(&status, PARTICLE, &rebinCount); // Get received count
-	      for (int j=idx; j<rebinCount; ++j) localFlags[j]=1;
-	      idx = idx + rebinCount;
-	      (*nlocal) += rebinCount;
-	   }
-	}
-
-	if (1 == rank%2) { // Odd Processors  
-	   if (rank+1 <= 23) { // If bottom bin exists, send 
-     	      MPI_Send(nextBin, nNextBin, PARTICLE, rank+1, tag4, MPI_COMM_WORLD); //Send to bot bin
-   	   }
-	}
-
-	if (0 == rank%2) { // Even Processors
-	   if (rank-1 >=0) { // If top bin exists, receive
-	      MPI_Recv(&localBin[idx], nlocalMax, PARTICLE, rank-1, tag4, MPI_COMM_WORLD, &status); //Recv from bot bin
-	      MPI_Get_count(&status, PARTICLE, &rebinCount);
-	      for (int j=idx; j<rebinCount; ++j) localFlags[j]=1;
-	      idx = idx + rebinCount;
-	      (*nlocal) += rebinCount;
-	   }
-	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	memset(prevBin, 0, nPrevBin*sizeof(particle_t)); // Reset prevBin ptr for next itereation
-	memset(nextBin, 0, nNextBin*sizeof(particle_t)); // Reset nextBin ptr for next itereation
-	nPrevBin = 0; // No. of elems to shift from prevBin to localBin
-	nNextBin = 0; // No. of elems to shift from nextBin to localBin
-	
-        MPI_Reduce(nlocal, totalN, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );        
-        if (rank == 0) printf("Total N is %d \n", *totalN);
-
-	//
-	// 5. Compact Particles
-	//
-	int nextLoc;
-         for (int loc=0; loc<(*nlocal); ++loc) {
-            if (0 == localFlags[loc]) {
-               nextLoc = loc + 1;
-	       while (0 == localFlags[nextLoc]) nextLoc++;
-	       localBin[loc] = localBin[nextLoc];
-	       localFlags[loc] = 1;
-	       localFlags[nextLoc] = 0;
-            }
+        // and ODD processors receive
+        if (0 == rank%2) { // Even Processors  
+           if (rank-1 >= 0) { // If top bin exists, send
+              MPI_Send(prevBin, nPrevBin, PARTICLE, rank-1, tag4, MPI_COMM_WORLD); //Send to top bin
+           }
          }
 
+        if (1 == rank%2) { // Odd Processors
+           if (rank+1 <= n_proc-1) { // If bottom bin exists, receive
+              MPI_Recv(&localBin[nlocal], nlocalMax, PARTICLE, rank+1, tag4, MPI_COMM_WORLD, &status); //Recv from bot bin
+              MPI_Get_count(&status, PARTICLE, &rebinCount); // Get received count
+              for (int j=nlocal; j<(nlocal+rebinCount); ++j) {localFlags[j]=1;}
+              nlocal += rebinCount;
+           }
+        }
+
+        if (0 == rank%2) { // Even Processors  
+           if (rank+1 <= n_proc-1) { // If bottom bin exists, send 
+              MPI_Send(nextBin, nNextBin, PARTICLE, rank+1, tag4+1, MPI_COMM_WORLD); //Send to bot bin
+           }
+        }
+
+        if (1 == rank%2) { // Odd Processors
+           if (rank-1 >=0) { // If top bin exists, receive
+              MPI_Recv(&localBin[nlocal], nlocalMax, PARTICLE, rank-1, tag4+1, MPI_COMM_WORLD, &status); //Recv from bot bin
+              MPI_Get_count(&status, PARTICLE, &rebinCount);
+              for (int j=nlocal; j<(nlocal+rebinCount); ++j) {localFlags[j]=1;}
+              nlocal += rebinCount;
+           }
+        }
+
+         // Have ODD processors send next
+        // and EVEN processors receive
+        if (1 == rank%2) { // Odd Processors  
+           if (rank-1 >= 0) { // If top bin exists, send
+              MPI_Send(prevBin, nPrevBin, PARTICLE, rank-1, tag4+2, MPI_COMM_WORLD); //Send to bot bin
+           }
+        }
+
+        if (0 == rank%2) { // Even Processors
+           if (rank+1 <= n_proc-1) { // If bottom bin exists, receive
+              MPI_Recv(&localBin[nlocal], nlocalMax, PARTICLE, rank+1, tag4+2, MPI_COMM_WORLD, &status); //Recv from top bin
+              MPI_Get_count(&status, PARTICLE, &rebinCount); // Get received count
+              for (int j=nlocal; j<(nlocal+rebinCount); ++j) {localFlags[j]=1;}
+              nlocal += rebinCount;
+           }
+        }
+
+        if (1 == rank%2) { // Odd Processors  
+           if (rank+1 <= n_proc-1) { // If bottom bin exists, send 
+              MPI_Send(nextBin, nNextBin, PARTICLE, rank+1, tag4+3, MPI_COMM_WORLD); //Send to bot bin
+           }
+        }
+
+        if (0 == rank%2) { // Even Processors
+           if (rank-1 >=0) { // If top bin exists, receive
+              MPI_Recv(&localBin[nlocal], nlocalMax, PARTICLE, rank-1, tag4+3, MPI_COMM_WORLD, &status); //Recv from bot bin
+              MPI_Get_count(&status, PARTICLE, &rebinCount);
+              for (int j=nlocal; j<(nlocal+rebinCount); ++j) {localFlags[j]=1;}
+	      nlocal += rebinCount;
+	   }
+	}	
+
+        memset(prevBin, 0, nPrevBin*sizeof(particle_t)); // Reset prevBin ptr for next itereation
+        memset(nextBin, 0, nNextBin*sizeof(particle_t)); // Reset nextBin ptr for next itereation
+        nPrevBin = 0; // No. of elems to shift from prevBin to localBin
+        nNextBin = 0; // No. of elems to shift from nextBin to localBin
 
 
+	MPI_Barrier(MPI_COMM_WORLD);
 
+   	// Check total num of particles
+   	//MPI_Reduce(&nlocal, totalN, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );        
+   	//if (rank == 0) printf("Total N is %d \n", *totalN);
 
-
-
-
-
-	// 
-        //  Collect all global data locally (not good idea to do)
-        //  gathers data from all tasks & deliver combined data to all tasks
-	//
-	//MPI_Allgatherv( localBin, *nlocal, PARTICLE, particles, partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
-
+	//MPI_Barrier(MPI_COMM_WORLD);
 
 	//
         //  save current step if necessary
         //
-        //if( fsave && (step%SAVEFREQ) == 0 )
-            //save( fsave, n, particles );
+	//  if( fsave && (step%SAVEFREQ) == 0 ) {
+
+	// Assume you don't have to compact anymore
+	//printf("Check 1 from rank %d has %d particles at timestep %d \n", rank, nlocal, step);
+	MPI_Gatherv( localBin, 100, PARTICLE, particleVect, rcounts, displs, PARTICLE, 0, MPI_COMM_WORLD );
+        //MPI_Gatherv(localFlags, 100, MPI_INT, flagVect, rcounts, displs, MPI_INT, 0, MPI_COMM_WORLD);
+        MPI_Gatherv(&nlocal, 1, MPI_INT, nlocalVect, rcountsC, displsC, MPI_INT, 0, MPI_COMM_WORLD);
+/*
+        if (rank == 0) {
+	   for (int rdx=0; rdx<n_proc; rdx++) { printf("rank %d has %d particles \n", rdx, nlocalVect[rdx]);}
+	}
+*/
+
+
+	MPI_Barrier(MPI_COMM_WORLD);
+
+	//
+	// At Master Processor, gather all particles, reorder based on globalID, and save.
+	//
+        if (rank == 0) {
+	   int cdx=0;
+           for (int rdx=0; rdx<n_proc; rdx++) {
+	      for (int sdx=0; sdx<nlocalVect[rdx]; sdx++) {
+	         compactVect[cdx] = &particleVect[displs[rdx] + sdx]; // displs[rdx] is displac of one proc
+		 //printf("PRE GlobalID is %d \n", compactVect[cdx]->globalID);
+	         cdx++;
+	      }
+           }
+	   //printf("CDX is %d \n", cdx);
+
+	   for (int rdx=0; rdx<cdx; rdx++){
+              for (int sdx=0; sdx<cdx; sdx++) {
+	         if (compactVect[rdx]->globalID == compactVect[sdx]->globalID && rdx!=sdx) {
+	            printf("ERROR GLOBAL ID CONFLICT \n");
+	         }
+	      }
+	   }
+
+	   qsort(compactVect, n, sizeof(particle_t*), compare);
+
+	   for (int rdx=0; rdx<cdx; rdx++){
+	      particles[rdx] = *compactVect[rdx];
+	      //printf("POST GlobalID is %d \n", particles[rdx].globalID);
+	   }
+
+           save( fsave, n, particles );
+
+	}
+
+	//}
+
+	MPI_Barrier(MPI_COMM_WORLD);
+
     }
     simulation_time = read_timer( ) - simulation_time;
     
@@ -552,14 +691,30 @@ int main( int argc, char **argv )
     //
     //  release resources
     //
-    free( nlocal );
-    free( totalN );
+
+    free ( displs );
+    free ( rcounts );
+    free ( displsC );
+    free ( rcountsC );
+    free ( particleVect );
+    free ( flagVect );
+    free ( nlocalVect );
     free( partition_offsets );
     free( partition_sizes );
     free( localBin );
+     free( particles );
     free( prevBin );
     free( nextBin );
-    free( particles );
+
+    free( compactVect );
+
+    free( prevBinSend );
+    free( nextBinSend );
+
+
+    free( localFlags );
+    free( totalN );
+
     if( fsave )
         fclose( fsave );
     

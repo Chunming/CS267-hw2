@@ -1,0 +1,122 @@
+Warning: no access to tty (Bad file descriptor).
+Thus no job control in this shell.
+Total N FORCE COUNT is 500 
+Total N FORCE COUNT is 1000 
+Total N FORCE COUNT is 1500 
+Total N FORCE COUNT is 2000 
+Total N FORCE COUNT is 2500 
+Total N FORCE COUNT is 3000 
+Total N FORCE COUNT is 3500 
+Total N FORCE COUNT is 4000 
+Total N FORCE COUNT is 4500 
+Total N FORCE COUNT is 5000 
+Total N FORCE COUNT is 5500 
+Total N FORCE COUNT is 6000 
+Total N FORCE COUNT is 6500 
+Total N FORCE COUNT is 7004 
+Total N FORCE COUNT is 7514 
+Total N FORCE COUNT is 8028 
+Total N FORCE COUNT is 8560 
+Total N FORCE COUNT is 9110 
+Total N FORCE COUNT is 9680 
+Total N FORCE COUNT is 10261 
+Total N FORCE COUNT is 10836 
+Total N FORCE COUNT is 11414 
+Total N FORCE COUNT is 11973 
+Total N FORCE COUNT is 12524 
+Total N FORCE COUNT is 13085 
+Total N FORCE COUNT is 13632 
+Total N FORCE COUNT is 14180 
+Total N FORCE COUNT is 14732 
+Total N FORCE COUNT is 15269 
+Total N FORCE COUNT is 15793 
+Total N FORCE COUNT is 16320 
+Total N FORCE COUNT is 16851 
+Total N FORCE COUNT is 17391 
+Total N FORCE COUNT is 17929 
+Total N FORCE COUNT is 18465 
+Total N FORCE COUNT is 19008 
+Total N FORCE COUNT is 19545 
+Total N FORCE COUNT is 20083 
+Total N FORCE COUNT is 20624 
+Total N FORCE COUNT is 21168 
+Total N FORCE COUNT is 21716 
+Total N FORCE COUNT is 22278 
+Total N FORCE COUNT is 22845 
+Total N FORCE COUNT is 23408 
+Total N FORCE COUNT is 23960 
+Total N FORCE COUNT is 24508 
+Total N FORCE COUNT is 25055 
+Total N FORCE COUNT is 25603 
+Total N FORCE COUNT is 26161 
+Total N FORCE COUNT is 26720 
+Total N FORCE COUNT is 27277 
+Total N FORCE COUNT is 27835 
+Total N FORCE COUNT is 28383 
+Total N FORCE COUNT is 28920 
+Total N FORCE COUNT is 29455 
+Total N FORCE COUNT is 29993 
+Total N FORCE COUNT is 30532 
+Total N FORCE COUNT is 31082 
+Total N FORCE COUNT is 31630 
+Total N FORCE COUNT is 32174 
+Total N FORCE COUNT is 32714 
+Total N FORCE COUNT is 33252 
+Total N FORCE COUNT is 33793 
+Total N FORCE COUNT is 34348 
+Total N FORCE COUNT is 34904 
+Total N FORCE COUNT is 35454 
+Total N FORCE COUNT is 36002 
+Total N FORCE COUNT is 36550 
+Total N FORCE COUNT is 37096 
+Total N FORCE COUNT is 37646 
+Total N FORCE COUNT is 38205 
+Total N FORCE COUNT is 38759 
+Total N FORCE COUNT is 39320 
+Total N FORCE COUNT is 39876 
+Total N FORCE COUNT is 40426 
+Total N FORCE COUNT is 40979 
+Total N FORCE COUNT is 41532 
+Total N FORCE COUNT is 42086 
+Total N FORCE COUNT is 42647 
+Total N FORCE COUNT is 43209 
+Total N FORCE COUNT is 43766 
+Total N FORCE COUNT is 44322 
+Total N FORCE COUNT is 44883 
+Total N FORCE COUNT is 45445 
+Total N FORCE COUNT is 46006 
+Total N FORCE COUNT is 46565 
+Total N FORCE COUNT is 47123 
+Total N FORCE COUNT is 47692 
+Total N FORCE COUNT is 48273 
+Total N FORCE COUNT is 48855 
+Total N FORCE COUNT is 49430 
+Total N FORCE COUNT is 50004 
+Total N FORCE COUNT is 50560 
+Total N FORCE COUNT is 51115 
+Total N FORCE COUNT is 51670 
+Total N FORCE COUNT is 52224 
+Total N FORCE COUNT is 52781 
+Total N FORCE COUNT is 53321 
+Total N FORCE COUNT is 53863 
+Total N FORCE COUNT is 54406 
+n = 500, n_procs = 24, simulation time = 0.135284 s
+Application 6421893 resources: utime ~4s, stime ~2s
+
+ + --------------------------------------------------------------------------
+ +        Job name: job-hopper-mpi24
+ +          Job Id: 1412957.sdb
+ +          System: hopper
+ +     Queued Time: Sat Mar 17 20:43:55 2012
+ +      Start Time: Sat Mar 17 20:44:49 2012
+ + Completion Time: Sat Mar 17 20:44:56 2012
+ +            User: cmchin
+ +        MOM Host: nid03840
+ +           Queue: debug
+ +  Req. Resources: other=QSUBPID:29494:hopper03,walltime=00:10:00
+ +  Used Resources: cput=00:00:00,mem=1788kb,vmem=13060kb,walltime=00:00:05
+ +     Acct String: mp309
+ +   PBS_O_WORKDIR: /global/homes/c/cmchin/franklin/CS267-hw2/particles
+ +     Submit Args: job-hopper-mpi24
+ + --------------------------------------------------------------------------
+
