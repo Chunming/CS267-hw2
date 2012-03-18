@@ -1,0 +1,10 @@
+#PBS -q dirac_reg
+#PBS -l nodes=1:ppn=1:fermi
+#PBS -l walltime=00:10:00
+#PBS -N gpu
+#PBS -e gpu.$PBS_JOBID.err
+#PBS -o gpu.$PBS_JOBID.out
+#PBS -V
+
+cd $PBS_O_WORKDIR
+mpirun -np 1 ./gpu
