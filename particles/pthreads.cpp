@@ -4,6 +4,7 @@
 #include <math.h>
 #include <pthread.h>
 #include "common.h"
+#include <string.h>
 
 #define __VIRAJ_DEBUG
 					

@@ -103,11 +103,13 @@ int  apply_force( particle_t &particle, particle_t &neighbor ) // Orig return va
     //
     //  very simple short-range repulsive force
     //
+    
+    if (particle.globalID==152) count++;
+
     double coef = ( 1 - cutoff / r ) / r2 / mass;
     particle.ax += coef * dx;
     particle.ay += coef * dy;
 
-    count++;
     return count;
 }
 
@@ -146,13 +148,14 @@ void move( particle_t &p )
 void save( FILE *f, int n, particle_t *p )
 {
     static bool first = true;
+
     if( first )
     {
         fprintf( f, "%d %g \n", n, size);
         first = false;
     }
     for( int i = 0; i < n; i++ )
-        fprintf( f, "%10.8f %10.8f \n", p[i].x, p[i].y );
+        fprintf( f, "%10.8f %10.8f \n", p[i].x, p[i].y);
 }
 
 //

@@ -78,12 +78,14 @@ int main( int argc, char **argv )
         //
         //  compute all forces
         //
+	int forceCount;
         for( int i = 0; i < nlocal; i++ )
         {
             local[i].ax = local[i].ay = 0;
             for (int j = 0; j < n; j++ )
-                apply_force( local[i], particles[j] );
+                forceCount = apply_force( local[i], particles[j] );
         }
+	printf("forceCount is %d \n", forceCount);
         
         //
         //  move particles
