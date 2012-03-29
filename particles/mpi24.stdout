@@ -1,154 +1,20 @@
 Warning: no access to tty (Bad file descriptor).
 Thus no job control in this shell.
-binLength is 0.020833 
-binLength is 0.020833 
-binLength is 0.020833 
-binLength is 0.020833 
-binLength is 0.020833 
-binLength is 0.020833 
-binLength is 0.020833 
-binLength is 0.020833 
-binLength is 0.020833 
-binLength is 0.020833 
-binLength is 0.020833 
-binLength is 0.020833 
-binLength is 0.020833 
-binLength is 0.020833 
-binLength is 0.020833 
-binLength is 0.020833 
-binLength is 0.020833 
-binLength is 0.020833 
-binLength is 0.020833 
-binLength is 0.020833 
-binLength is 0.020833 
-binLength is 0.020833 
-binLength is 0.020833 
-binLength is 0.020833 
-Total N is 500 
-CDX is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-CDX is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-CDX is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-CDX is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-CDX is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-CDX is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-CDX is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-CDX is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-CDX is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-CDX is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-Total N is 500 
-n = 500, n_procs = 24, simulation time = 0.037339 s
-Application 6626546 resources: utime ~1s, stime ~3s
+n = 10000, n_procs = 24, simulation time = 2.10265 s
+Application 6628155 resources: utime ~51s, stime ~4s
 
  + --------------------------------------------------------------------------
  +        Job name: job-hopper-mpi24
- +          Job Id: 1456718.sdb
+ +          Job Id: 1456995.sdb
  +          System: hopper
- +     Queued Time: Wed Mar 28 21:57:38 2012
- +      Start Time: Wed Mar 28 21:59:07 2012
- + Completion Time: Wed Mar 28 21:59:10 2012
+ +     Queued Time: Thu Mar 29 00:22:11 2012
+ +      Start Time: Thu Mar 29 00:23:24 2012
+ + Completion Time: Thu Mar 29 00:23:29 2012
  +            User: cmchin
- +        MOM Host: nid04219
+ +        MOM Host: nid03934
  +           Queue: debug
- +  Req. Resources: other=QSUBPID:65035:hopper10,walltime=00:10:00
- +  Used Resources: cput=00:00:00,mem=0kb,vmem=0kb,walltime=00:00:03
+ +  Req. Resources: other=QSUBPID:14160:hopper06,walltime=00:10:00
+ +  Used Resources: cput=00:00:00,mem=0kb,vmem=0kb,walltime=00:00:05
  +     Acct String: mp309
  +   PBS_O_WORKDIR: /global/homes/c/cmchin/franklin/CS267-hw2/particles
  +     Submit Args: job-hopper-mpi24

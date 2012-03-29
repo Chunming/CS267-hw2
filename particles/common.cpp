@@ -104,7 +104,7 @@ int  apply_force( particle_t &particle, particle_t &neighbor ) // Orig return va
     //  very simple short-range repulsive force
     //
     
-    if (particle.globalID==152) count++;
+    count++;
 
     double coef = ( 1 - cutoff / r ) / r2 / mass;
     particle.ax += coef * dx;
