@@ -151,11 +151,11 @@ void save( FILE *f, int n, particle_t *p )
 
     if( first )
     {
-        fprintf( f, "%d %g \n", n, size);
+        fprintf( f, "%d %g\n", n, size);
         first = false;
     }
     for( int i = 0; i < n; i++ )
-        fprintf( f, "%10.8f %10.8f \n", p[i].x, p[i].y);
+        fprintf( f, "%10.8f %10.8f\n", p[i].x, p[i].y);
 }
 
 //
