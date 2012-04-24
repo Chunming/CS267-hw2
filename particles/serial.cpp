@@ -10,6 +10,15 @@
 #define density 0.0005
 #define subBlockLen 0.025
 
+
+int compare(const void *a, const void* b) {
+   particle_t *a0 = *(particle_t**) a;
+   particle_t *b0 = *(particle_t**) b;
+
+   if (a0->globalID > b0->globalID) return 1;
+   else return -1;
+}
+
 //
 //  benchmarking program
 //
@@ -37,6 +46,9 @@ int main( int argc, char **argv )
     int subBlockNum = ceil(boxSize/subBlockLen); // No. of sub blocks along a row/column (Default: 5)
     int binNum = subBlockNum*subBlockNum; // No. of bins
 
+
+   int max_per_bin = floor( 2 * ((2*subBlockLen)/(sqrt(3)*cutoff)+1) * (subBlockLen/(2*cutoff) + 1) ) + 2;
+
     // Determine number of sublocks, represent as a vector;
     // Set no. of blocks as 5 x 5
     int* binParticleNum = new int [binNum]; // No. of particles in each bin
@@ -45,34 +57,27 @@ int main( int argc, char **argv )
        return -1;
     }
 
-    particle_t*** binArray = new particle_t** [binNum]; // Array of ptrs to particle*
+    // binNum * max_per_bin
+    particle_t* binArray = new particle_t [binNum*max_per_bin]; // Array of ptrs to particle*
     if (NULL == binArray) {
        printf("ERROR binArray mem alloc failed \n");
        return -1;
     }
 
 
-   for (int i = 0; i<binNum; ++i) {
-      binParticleNum[i] = 0; // sizeof(binParticleNum[b] is 4 bytes
-   }	   
+    int* binFlags = new int [binNum*max_per_bin]; // Array of ptrs to particle*
+    if (NULL == binFlags) {
+       printf("ERROR binFlags mem alloc failed \n");
+       return -1;
+    }
+
+   particle_t** compactVect = (particle_t**)malloc( n * sizeof(particle_t*));
+   particle_t *particles_mpi = (particle_t*) malloc( n * sizeof(particle_t) );
+
 
    memset(binParticleNum, 0, sizeof(int)*binNum); // sizeof(binParticleNum[b] is 4 bytes
-
-   int max_per_bin = floor( 2 * ((2*subBlockLen)/(sqrt(3)*cutoff)+1) * (subBlockLen/(2*cutoff) + 1) ) + 2;
-
-
-   for (int b=0; b<binNum; ++b) { 
-	    binArray[b] = new particle_t* [max_per_bin]; // Set it to max 100 particles first
-            if (NULL == binArray[b]) {
-               printf("ERROR binArray index  mem alloc failed \n");
-               return -1;
-            }
-          
-            //for (int i=0; i<100; i++) {
-	    //   binArray[b][i] = NULL;
-	    //}
-	    memset(binArray[b], NULL, max_per_bin*sizeof(particle_t*));
-    }
+   memset(binArray, 0, binNum*max_per_bin*sizeof(particle_t));
+   memset(binFlags, 0, binNum*max_per_bin*sizeof(int));
 
     // Initialize particles 
     init_particles( n, particles );
@@ -80,7 +85,7 @@ int main( int argc, char **argv )
     // Initialize particle binning
     int xIdx, yIdx; // x/y index in 1D array
     int bdx; 
-
+    int offsetIdx;
     for (int ndx=0; ndx<n; ++ndx) { // For each particle
        xIdx = (particles[ndx].x)/subBlockLen; // Takes values 0-4
        yIdx = (particles[ndx].y)/subBlockLen; // Takes values 0-4
@@ -90,8 +95,10 @@ int main( int argc, char **argv )
 //       }
 //       printf("Bin index is %d \n", yIdx+xIdx*subBlockNum);
        bdx = binParticleNum[yIdx+(xIdx*subBlockNum)];
-       binArray[yIdx+(xIdx*subBlockNum)][bdx] = &particles[ndx];
-       binParticleNum[yIdx+(xIdx*subBlockNum)]++; // Increment bin count
+       offsetIdx =  yIdx+(xIdx*subBlockNum);
+       binArray[(offsetIdx*max_per_bin)+bdx] = particles[ndx]; // Offset from binArray
+       binFlags[(offsetIdx*max_per_bin)+bdx] = 1; // Offset from binArray
+       binParticleNum[offsetIdx]++; // Increment bin count
     }
 
     //
@@ -105,24 +112,6 @@ int main( int argc, char **argv )
     for( int step = 0; step < NSTEPS; step++ )
     {
 	    
-
-	//
-        //  Compute forces
-        //
-	/*
-	// Orginal apply_force function
-        for( int i = 0; i < n; i++ )
-        {
-            particles[i].ax = particles[i].ay = 0;
-            for (int j = 0; j < n; j++ )
-                apply_force( particles[i], particles[j] );
-        }
-	*/
-
-        // Set particle accelerations to 0 before using apply_force
-//        for( int i = 0; i < 500; i++ ) 
-//		particles[i].ax = particles[i].ay = 0;
-
 	// Compute Forces
 	double leftBnd, rightBnd, topBnd, botBnd;
 	double leftDist, rightDist, topDist, botDist;
@@ -134,21 +123,21 @@ int main( int argc, char **argv )
 	   for (int i=0; i<binParticleNum[b]; ++i) { // The ith particle in bth bin
 	     
 
-	       while ((NULL == binArray[b][idx])) { idx++; } // Index skips NULL values
-      	       (*binArray[b][idx]).ax = (*binArray[b][idx]).ay = 0;
+	       while ((0 == binFlags[(b*max_per_bin)+idx])) { idx++; } // Index skips NULL values
+      	       (binArray[(b*max_per_bin)+idx]).ax = (binArray[(b*max_per_bin)+idx]).ay = 0;
 
 	      // Check all particles in bth subBlock
 	      jdx=0;
      	      for (int j=0; j<binParticleNum[b]; ++j) { // The jth particle in bth bin
-     	         while (NULL == (binArray[b][jdx])) { jdx++; }
-		 apply_force(*binArray[b][idx],*binArray[b][jdx]);
+     	         while (0 == (binFlags[(b*max_per_bin)+jdx])) { jdx++; }
+		 apply_force(binArray[(b*max_per_bin)+idx],binArray[(b*max_per_bin)+jdx]);
 		 jdx++;
 	      }
 
 	      // Check particles to the left/right/top/bottom subBlocks of bth subBlock	 
 	      //printf("xIdx is %d \n", xIdx);
-	      xIdx = (*binArray[b][idx]).x/subBlockLen;
-	      yIdx = (*binArray[b][idx]).y/subBlockLen;
+	      xIdx = (binArray[(b*max_per_bin)+idx]).x/subBlockLen;
+	      yIdx = (binArray[(b*max_per_bin)+idx]).y/subBlockLen;
 
 	      //printf("botBnd is %f \n", botBnd);
 	      leftBnd = xIdx*subBlockLen;
@@ -158,10 +147,10 @@ int main( int argc, char **argv )
 
 
 	      //printf("botDist is %f \n", botDist);
-	      leftDist = fabs((*binArray[b][idx]).x - leftBnd);
-	      rightDist = fabs((*binArray[b][idx]).x - rightBnd);
-	      topDist = fabs((*binArray[b][idx]).y - topBnd);
-	      botDist = fabs((*binArray[b][idx]).y - botBnd);
+	      leftDist = fabs((binArray[(b*max_per_bin)+idx]).x - leftBnd);
+	      rightDist = fabs((binArray[(b*max_per_bin)+idx]).x - rightBnd);
+	      topDist = fabs((binArray[(b*max_per_bin)+idx]).y - topBnd);
+	      botDist = fabs((binArray[(b*max_per_bin)+idx]).y - botBnd);
 
 	      // Consider 8 different adjacent subBlocks
 	      if (leftDist<=cutoff) {
@@ -169,8 +158,8 @@ int main( int argc, char **argv )
 		    bLeft = b - subBlockNum;
 		    kdx=0;
 		    for (int k=0; k<binParticleNum[bLeft]; ++k) { 
-		       while (NULL == (binArray[bLeft][kdx])) { kdx++; }
-		       apply_force(*binArray[b][idx],*binArray[bLeft][kdx]);
+		       while (0 == (binFlags[(bLeft*max_per_bin)+kdx])) { kdx++; }
+		       apply_force(binArray[(b*max_per_bin)+idx],binArray[(bLeft*max_per_bin)+kdx]);
 		       kdx++;
 		    }
 		 }
@@ -182,8 +171,8 @@ int main( int argc, char **argv )
   		    bRight = b + subBlockNum; 
 		    kdx=0;
 		    for (int k=0; k<binParticleNum[bRight]; ++k) { 
-		       while (NULL == (binArray[bRight][kdx])) { kdx++; }
-		       apply_force(*binArray[b][idx],*binArray[bRight][kdx]);
+		       while (0 == (binFlags[(bRight*max_per_bin)+kdx])) { kdx++; }
+		       apply_force(binArray[(b*max_per_bin)+idx],binArray[(bRight*max_per_bin)+kdx]);
 		       kdx++;
 		    }
 		 }
@@ -196,8 +185,8 @@ int main( int argc, char **argv )
 		  bTop = b - 1; 
 		  kdx=0;
 		  for (int k=0; k<binParticleNum[bTop]; ++k) { 
-		    while (NULL == (binArray[bTop][kdx])) { kdx++; }
-		    apply_force(*binArray[b][idx],*binArray[bTop][kdx]);
+		    while (0 == (binFlags[(bTop*max_per_bin)+kdx])) { kdx++; }
+		    apply_force(binArray[(b*max_per_bin)+idx],binArray[(bTop*max_per_bin)+kdx]);
 		    kdx++;
 		  }
 		}
@@ -209,8 +198,8 @@ int main( int argc, char **argv )
 		  bBottom = b + 1;
 		  kdx=0;
 		  for (int k=0; k<binParticleNum[bBottom]; ++k) { 
-		    while (NULL == (binArray[bBottom][kdx])) { kdx++; }
-		    apply_force(*binArray[b][idx],*binArray[bBottom][kdx]);
+		    while (0 == (binFlags[(bBottom*max_per_bin)+kdx])) { kdx++; }
+		    apply_force(binArray[(b*max_per_bin)+idx],binArray[(bBottom*max_per_bin)+kdx]);
 		    kdx++;
 		  }
 		}
@@ -224,8 +213,8 @@ int main( int argc, char **argv )
 		  bTopLeft = b-subBlockNum-1;     
 		  kdx=0;
 		  for (int k=0; k<binParticleNum[bTopLeft]; ++k) { 
-		    while (NULL == (binArray[bTopLeft][kdx])) { kdx++; }
-		    apply_force(*binArray[b][idx],*binArray[bTopLeft][kdx]);
+		    while (0 == (binFlags[(bTopLeft*max_per_bin)+kdx])) { kdx++; }
+		    apply_force(binArray[(b*max_per_bin)+idx],binArray[(bTopLeft*max_per_bin)+kdx]);
 		    kdx++;
 		  }
 		}
@@ -238,8 +227,8 @@ int main( int argc, char **argv )
 		  bBotLeft = b-subBlockNum+1;     
 		  kdx=0;
 		  for (int k=0; k<binParticleNum[bBotLeft]; ++k) { 
-		    while (NULL == (binArray[bBotLeft][kdx])) { kdx++; }
-		    apply_force(*binArray[b][idx],*binArray[bBotLeft][kdx]);
+		    while (0 == (binFlags[(bBotLeft*max_per_bin)+kdx])) { kdx++; }
+		    apply_force(binArray[(b*max_per_bin)+idx],binArray[(bBotLeft*max_per_bin)+kdx]);
 		    kdx++;
 		  }
 		}
@@ -252,8 +241,8 @@ int main( int argc, char **argv )
 		  bTopRight = b+subBlockNum-1;     
 		  kdx=0;
 		  for (int k=0; k<binParticleNum[bTopRight]; ++k) { 
-		    while (NULL == (binArray[bTopRight][kdx])) { kdx++; }
-		    apply_force(*binArray[b][idx],*binArray[bTopRight][kdx]);
+		    while (0 == (binFlags[(bTopRight*max_per_bin)+kdx])) { kdx++; }
+		    apply_force(binArray[(b*max_per_bin)+idx],binArray[(bTopRight*max_per_bin)+kdx]);
 		    kdx++;
 		  }
 		}
@@ -265,8 +254,8 @@ int main( int argc, char **argv )
 		  kdx=0;
 
 		  for (int k=0; k<binParticleNum[bBotRight]; ++k) { 
-		    while (NULL == (binArray[bBotRight][kdx])) { kdx++; }
-		    apply_force(*binArray[b][idx],*binArray[bBotRight][kdx]);
+		    while (0 == (binFlags[(bBotRight*max_per_bin)+kdx])) { kdx++; }
+		    apply_force(binArray[(b*max_per_bin)+idx],binArray[(bBotRight*max_per_bin)+kdx]);
 		    kdx++;
 		  }
 		}
@@ -278,15 +267,17 @@ int main( int argc, char **argv )
 	   idxCount += binParticleNum[b];
 	}
 
-        //printf("The idxCount is %d \n", idxCount);
-        
 	
 	//
         //  Move particles
         //
-        for( int i = 0; i < n; i++ ) 
-            move( particles[i] );
-        
+       for (int b=0; b<binNum; b++) { // The bth bin
+           for (int i=0; i<binParticleNum[b]; i++) { // The ith particle in bth bin
+              move( binArray[(b*max_per_bin)+i] );
+           }
+        }
+
+ 
 	//
 	// Re-bin particles
 	//
@@ -297,23 +288,25 @@ int main( int argc, char **argv )
 	      
 	      // Check if particle shld be moved to another bin	  
 	     
-     	      while (NULL == (binArray[b][idx])) { idx++; }
-	      xIdx = (*binArray[b][idx]).x/subBlockLen;
-              yIdx = (*binArray[b][idx]).y/subBlockLen;
+     	      while (0 == (binFlags[(b*max_per_bin)+idx])) { idx++; }
+	      xIdx = (binArray[(b*max_per_bin)+idx]).x/subBlockLen;
+              yIdx = (binArray[(b*max_per_bin)+idx]).y/subBlockLen;
 	      index = yIdx+(xIdx*subBlockNum); // Map 2D to 1D index
 	      if (index != b) { // Particle has moved out of of the bin
 
                  // Store into first non-NULL index in array
 		 bdx = 0;
-                 while (NULL != binArray[index][bdx]) {
+                 while (0 != binFlags[(index*max_per_bin)+bdx]) {
 	            bdx++;
                     if (bdx > n) {
                        printf("ERROR: Overflow \n");
                        return -1;
 		    }	 
 		 }
-                 binArray[index][bdx] = binArray[b][idx]; // Add element into first non-NULL index   	
-		 binArray[b][idx] = NULL;
+                 binArray[(index*max_per_bin)+bdx] = binArray[(b*max_per_bin)+idx]; // Add element into first non-NULL index   	
+                 binFlags[(index*max_per_bin)+bdx] = 1;
+		 binFlags[(b*max_per_bin)+idx] = 0; // Add element into first non-NULL index   	
+
 		 binParticleNum[b]--;
 		 i--;
 		 binParticleNum[index]++;
@@ -323,33 +316,86 @@ int main( int argc, char **argv )
 	   }
 	}
 
+
+        //
+        // 5. Compact Particles
+        //
+        int nextLoc;
+        for (int b=0; b<binNum; b++) { // The bth bin
+           for (int i=0; i<binParticleNum[b]; ++i) {
+              if (0 == binFlags[(b*max_per_bin)+i]) {
+                 nextLoc = i + 1;
+                 while (0 == binFlags[(b*max_per_bin)+nextLoc]) {
+                    nextLoc++;
+                    if (nextLoc == max_per_bin) {nextLoc = 0;}
+                 }
+                 binArray[(b*max_per_bin)+i] = binArray[(b*max_per_bin)+nextLoc];
+                 binFlags[(b*max_per_bin)+i] = 1;
+                 binFlags[(b*max_per_bin)+nextLoc] = 0;
+
+              }
+
+           }
+        }
+
+
+
 	// Check count
 	count = 0;
 	for (int b=0; b<binNum; ++b) {
 	   count += binParticleNum[b];
 	}
 
-        //
-        //  save if necessary
-        //
-        if( fsave && (step%SAVEFREQ) == 0 ) {
+//        if( fsave && (step%SAVEFREQ) == 0 ) {save( fsave, n, particles );}
 
-            save( fsave, n, particles );
+           if( fsave && (step%SAVEFREQ) == 0 ) {
 
-         }
+           int cdx=0;
+           for (int rdx=0; rdx<binNum; rdx++) {
+              for (int sdx=0; sdx<binParticleNum[rdx]; sdx++) {
+                 compactVect[cdx] = &binArray[(rdx*max_per_bin)+sdx]; // displs[rdx] is displac of one proc
+                 //printf("PRE GlobalID is %d \n", compactVect[cdx]->globalID);
+                 cdx++;
+              }
+           }
+           //printf("CDX is %d \n", cdx);
+
+           for (int rdx=0; rdx<cdx; rdx++){
+              for (int sdx=0; sdx<cdx; sdx++) {
+                 if (compactVect[rdx]->globalID == compactVect[sdx]->globalID && rdx!=sdx) {
+                    printf("ERROR GLOBAL ID CONFLICT, %d \n", compactVect[rdx]->globalID);
+                 }
+              }
+           }
+
+           qsort(compactVect, n, sizeof(particle_t*), compare);
+
+           int currID = 0;
+           for (int rdx=0; rdx<cdx; rdx++){
+              particles_mpi[rdx] = *compactVect[rdx];
+              //if (particles_mpi[rdx].globalID != currID  ) { 
+                 //printf("POST GlobalID is %d \n", particles_mpi[rdx].globalID);
+              //}
+              currID++; 
+           }
+
+           save( fsave, n, particles_mpi );
+
+           }
+
+
     }
     simulation_time = read_timer( ) - simulation_time;
     
     printf( "n = %d, simulation time = %g seconds\n", n, simulation_time );
    
     delete [] binParticleNum;
-    for (int b=0; b<binNum; ++b) {
-       delete [] binArray[b];
-    }
-    delete binArray;
+    delete [] binArray;
+    delete [] binFlags;
 
-
+    free( compactVect );
     free( particles );
+    free ( particles_mpi );
     if( fsave )
         fclose( fsave );
     

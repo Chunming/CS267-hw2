@@ -263,10 +263,7 @@ int main( int argc, char **argv )
         double binEdge = rank*binLength;
         int idx = 0;
         int sIdx = 0; // Send index
-        bool fPrevCheck = 0;
-        bool fNextCheck = 0;
         MPI_Status status;
-
 	int leftmostBins = rank;
 	int rightmostBins = rank;
 	double leftBnd, rightBnd, topBnd, botBnd;
@@ -277,7 +274,6 @@ int main( int argc, char **argv )
      // First, EVEN will send, ODD will receive
      if (0 == rank%2 && rank<actual_n_proc) { // EVEN
            if (rank-1 >= 0) { // If left bin exists, then can send
-
 
            sIdx = 0; // Send index
 	   // Only traverse bins that are local to the bin
