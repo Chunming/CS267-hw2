@@ -6,7 +6,7 @@
 #include <errno.h>
 #include "common.h"
 
-extern double cutoff; //make sure this shit works.
+double cutoff = 0.01; //make sure this shit works.
 extern double size;
 
 //
