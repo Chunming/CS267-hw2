@@ -522,7 +522,7 @@ int main( int argc, char **argv )
    	//MPI_Reduce(&nlocal, totalN, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );        
    	//if (rank == 0) printf("Total N is %d \n", *totalN);
 
-/*
+
 	//
         //  Save current step if necessary
         //
@@ -562,7 +562,7 @@ int main( int argc, char **argv )
 	}
 
 	//}
-*/
+
 
 	MPI_Barrier(MPI_COMM_WORLD);
 

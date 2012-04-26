@@ -7,4 +7,4 @@
 #PBS -j oe
 
 cd $PBS_O_WORKDIR
-aprun -d 1 -n 1 -N 1 ./serial -n 10000 -o serial.txt
+aprun -d 1 -n 1 -N 1 ./serial -n 500 -o serial.txt
