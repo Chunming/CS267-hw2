@@ -1,20 +1,25 @@
 Warning: no access to tty (Bad file descriptor).
 Thus no job control in this shell.
-n = 500, n_threads = 24, simulation time = 0.045803 seconds
-Application 6077384 resources: utime ~1s, stime ~0s
+blks_num 11, blks_size 0.642824, subblks_num 32, subblks_size 0.020088, totblks_num 352 
+size 7.071068, totblks_num * subblks_size 7.071068 
+shit allocated 
+pthreads created 
+first thread runs 
+n = 100000, n_threads = 121, simulation time = 3.85727 seconds
+Application 7062947 resources: utime ~57s, stime ~1s
 
  + --------------------------------------------------------------------------
  +        Job name: job-hopper-pthreads24
- +          Job Id: 1332405.sdb
+ +          Job Id: 1553421.sdb
  +          System: hopper
- +     Queued Time: Mon Feb 27 21:49:13 2012
- +      Start Time: Mon Feb 27 21:49:41 2012
- + Completion Time: Mon Feb 27 21:49:43 2012
+ +     Queued Time: Mon Apr 23 20:53:43 2012
+ +      Start Time: Mon Apr 23 20:59:09 2012
+ + Completion Time: Mon Apr 23 20:59:18 2012
  +            User: cmchin
- +        MOM Host: nid04754
+ +        MOM Host: nid03841
  +           Queue: debug
- +  Req. Resources: other=QSUBPID:21712:hopper07,walltime=00:10:00
- +  Used Resources: cput=00:00:00,mem=0kb,vmem=0kb,walltime=00:00:02
+ +  Req. Resources: other=QSUBPID:32378:hopper10,walltime=00:10:00
+ +  Used Resources: cput=00:00:00,mem=5360kb,vmem=40060kb,walltime=00:00:09
  +     Acct String: mp309
  +   PBS_O_WORKDIR: /global/homes/c/cmchin/franklin/CS267-hw2/particles
  +     Submit Args: job-hopper-pthreads24
